@@ -2,11 +2,7 @@ package org.k8sui.service;
 
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.models.V1DeleteOptions;
-import io.kubernetes.client.openapi.models.V1Namespace;
-import io.kubernetes.client.openapi.models.V1ObjectMeta;
-import io.kubernetes.client.openapi.models.V1Status;
-import org.k8sui.ApiUtil;
+import io.kubernetes.client.openapi.models.*;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.NameSpace;
 
@@ -18,9 +14,10 @@ public class NameSpaceService {
     private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
     public List<NameSpace> nameSpaces() throws ApiException {
-        return ApiUtil.nodeList().getItems().stream().map(item -> {
+        return coreV1Api.listNamespace().execute().getItems().stream().map(item -> {
             V1ObjectMeta data = item.getMetadata();
-            return new NameSpace(data.getUid(), data.getName(), data.getCreationTimestamp());
+            V1NamespaceStatus status = item.getStatus();
+            return new NameSpace(data.getUid(), data.getName(), data.getCreationTimestamp(), status.getPhase());
         }).collect(Collectors.toList());
     }
 

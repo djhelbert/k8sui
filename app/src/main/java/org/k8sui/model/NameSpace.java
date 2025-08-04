@@ -6,11 +6,13 @@ public class NameSpace {
     private String uid;
     private String namespace;
     private OffsetDateTime creation;
+    private String status;
 
-    public NameSpace(String uid, String namespace, OffsetDateTime creation) {
+    public NameSpace(String uid, String namespace, OffsetDateTime creation, String status) {
         this.uid = uid;
         this.namespace = namespace;
         this.creation = creation;
+        this.status = status;
     }
 
     public String getUid() {
@@ -37,8 +39,16 @@ public class NameSpace {
         this.creation = creation;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
-        return "Namespace[" + uid + ":" + namespace + ":" + creation + "]";
+        return "Namespace[" + getUid() + ":" + getNamespace() + ":" + getCreation() + ":" + getStatus() + "]";
     }
 }
