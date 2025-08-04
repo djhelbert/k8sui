@@ -16,6 +16,9 @@ public class ApiClientSupplier {
         }
     }
 
+    private ApiClientSupplier() {
+    }
+
     public static ApiClient client() {
         return client;
     }
