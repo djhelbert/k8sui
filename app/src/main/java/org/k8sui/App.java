@@ -10,8 +10,6 @@ public class App {
         nodeService.nodes().stream().forEach(System.out::println);
 
         NameSpaceService service = new NameSpaceService();
-        var test = service.createNamespace("test");
         service.nameSpaces().stream().forEach(System.out::println);
-        service.deleteNamespace("test");
     }
 }

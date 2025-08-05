@@ -4,12 +4,16 @@ public class Node {
     private String uid;
     private String name;
     private String cpu;
+    private String image;
+    private String ip;
+    private String memory;
 
     public Node(String uid, String name, String cpu) {
         this.uid = uid;
         this.name = name;
         this.cpu = cpu;
     }
+
     public String getUid() {
         return uid;
     }
@@ -34,8 +38,32 @@ public class Node {
         this.cpu = cpu;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getMemory() {
+        return memory;
+    }
+
+    public void setMemory(String memory) {
+        this.memory = memory;
+    }
+
     @Override
     public String toString() {
-        return "Node[" + getUid() + ":" + getName() + "(" + getCpu() + " cores)]";
+        return "Node[" + getUid() + ":" + getName() + "(" + getCpu() + " cores," + memory + ")]";
     }
 }
