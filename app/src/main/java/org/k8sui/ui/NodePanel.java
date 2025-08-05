@@ -5,8 +5,10 @@ import org.k8sui.service.NodeService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class NodePanel extends JPanel {
+public class NodePanel extends JPanel implements ActionListener  {
     JPanel buttonPanel = new JPanel();
     JButton refreshButton = new JButton("Refresh");
     JTable table;
@@ -21,12 +23,12 @@ public class NodePanel extends JPanel {
     private void init() {
         try {
             nodeModel = new NodeModel(service.nodes());
-        } catch (ApiException e) {
-            throw new RuntimeException(e);
+        } catch (ApiException err) {
+            throw new RuntimeException(err);
         }
 
         refreshButton.setIcon(Util.getImageIcon("undo.png"));
-
+        refreshButton.addActionListener(this);
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(refreshButton);
 
@@ -37,5 +39,17 @@ public class NodePanel extends JPanel {
         JTabbedPane tabbedPane = new JTabbedPane();
         add(buttonPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource().equals(refreshButton)) {
+            try {
+                nodeModel.setNodes(service.nodes());
+                nodeModel.fireTableDataChanged();
+            } catch (ApiException err) {
+                throw new RuntimeException(err);
+            }
+        }
     }
 }
