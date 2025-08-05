@@ -1,6 +1,8 @@
 package org.k8sui.model;
 
-public class Node {
+import org.jetbrains.annotations.NotNull;
+
+public class Node implements Comparable<Node> {
     private String uid;
     private String name;
     private String cpu;
@@ -65,5 +67,10 @@ public class Node {
     @Override
     public String toString() {
         return "Node[" + getUid() + ":" + getName() + "(" + getCpu() + " cores," + memory + ")]";
+    }
+
+    @Override
+    public int compareTo(@NotNull Node n) {
+        return n.getName().compareTo(name);
     }
 }

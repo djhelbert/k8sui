@@ -1,8 +1,10 @@
 package org.k8sui.model;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.time.OffsetDateTime;
 
-public class NameSpace {
+public class NameSpace implements Comparable<NameSpace> {
     private String uid;
     private String namespace;
     private OffsetDateTime creation;
@@ -50,5 +52,10 @@ public class NameSpace {
     @Override
     public String toString() {
         return "Namespace[" + getUid() + ":" + getNamespace() + ":" + getCreation() + ":" + getStatus() + "]";
+    }
+
+    @Override
+    public int compareTo(@NotNull NameSpace n) {
+        return n.getNamespace().compareTo(namespace);
     }
 }

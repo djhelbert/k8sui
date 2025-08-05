@@ -1,15 +1,27 @@
 package org.k8sui;
 
 import io.kubernetes.client.openapi.ApiException;
-import org.k8sui.service.NameSpaceService;
-import org.k8sui.service.NodeService;
+import org.k8sui.ui.MainFrame;
+import org.k8sui.ui.Util;
+
+import javax.swing.*;
 
 public class App {
-    public static void main(String[] args) throws ApiException {
-        NodeService nodeService = new NodeService();
-        nodeService.nodes().stream().forEach(System.out::println);
+    private static MainFrame frame;
 
-        NameSpaceService service = new NameSpaceService();
-        service.nameSpaces().stream().forEach(System.out::println);
+    public static void main(String[] args) throws ApiException {
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+        } catch (Exception err) {
+            err.printStackTrace();
+        }
+
+        frame = new MainFrame();
+        frame.setSize(1000, 800);
+        frame.setResizable(true);
+        frame.setVisible(true);
+        frame.setIconImage(Util.getImageIcon("wheel.png").getImage());
+
+        Util.centerComponent(frame);
     }
 }
