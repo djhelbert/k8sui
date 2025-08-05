@@ -5,14 +5,19 @@ import javax.swing.border.EtchedBorder;
 import java.awt.*;
 
 public class MainPanel extends JPanel {
-    JLabel label = new JLabel(" ");
+    static final JLabel label = new JLabel(" ");
 
     public MainPanel() {
         super();
         init();
     }
 
+    public static void setLabelText(String text) {
+        label.setText(text);
+    }
+
     private void init() {
+        label.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         setLayout(new BorderLayout());
 

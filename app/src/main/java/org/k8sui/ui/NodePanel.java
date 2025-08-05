@@ -25,6 +25,8 @@ public class NodePanel extends JPanel {
             throw new RuntimeException(e);
         }
 
+        refreshButton.setIcon(Util.getImageIcon("undo.png"));
+
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(refreshButton);
 
