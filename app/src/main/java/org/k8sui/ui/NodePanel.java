@@ -27,8 +27,10 @@ public class NodePanel extends JPanel implements ActionListener  {
             throw new RuntimeException(err);
         }
 
+        // Refresh button setup
         refreshButton.setIcon(Util.getImageIcon("undo.png"));
         refreshButton.addActionListener(this);
+        // Button panel setup
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(refreshButton);
 
@@ -36,7 +38,6 @@ public class NodePanel extends JPanel implements ActionListener  {
 
         setLayout(new BorderLayout());
 
-        JTabbedPane tabbedPane = new JTabbedPane();
         add(buttonPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
     }

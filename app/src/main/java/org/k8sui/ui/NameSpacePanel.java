@@ -27,17 +27,16 @@ public class NameSpacePanel extends JPanel implements ActionListener {
             throw new RuntimeException(err);
         }
 
+        // Refresh button setup
         refreshButton.addActionListener(this);
         refreshButton.setIcon(Util.getImageIcon("undo.png"));
-
+        // Button panel setup
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(refreshButton);
 
         table = new JTable(nameSpaceModel);
 
         setLayout(new BorderLayout());
-
-        JTabbedPane tabbedPane = new JTabbedPane();
         add(buttonPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
