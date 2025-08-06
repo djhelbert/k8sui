@@ -4,22 +4,46 @@ import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.*;
 import org.k8sui.CoreApiSupplier;
+import org.k8sui.model.Port;
 import org.k8sui.model.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ServiceService {
 
     private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
-    public List<Service> services() throws ApiException {
-        var serviceList = coreV1Api.listNamespacedService("default").execute();
+    public List<Service> services(String nameSpace) throws ApiException {
+        var serviceList = coreV1Api.listNamespacedService(nameSpace).execute();
 
         return serviceList.getItems().stream()
-                .map(s ->
-                        new Service(s.getMetadata().getUid(), s.getMetadata().getName(), s.getMetadata().getNamespace())
+                .map(s -> {
+                            Service svc = new Service(s.getMetadata().getUid(), s.getMetadata().getName(), s.getMetadata().getNamespace());
+
+                            Map<String, String> map = s.getSpec().getSelector();
+                            svc.setSelectors(map);
+                            svc.setType(s.getSpec().getType());
+
+                            List<V1ServicePort> ports = s.getSpec().getPorts();
+
+                            if (ports != null) {
+                                List<Port> portList = ports.stream().map(p -> {
+                                    Port port = new Port();
+                                    port.setName(p.getName());
+                                    port.setPort(p.getPort());
+                                    port.setProtocol(p.getProtocol());
+                                    port.setTargetPort(p.getTargetPort().toString());
+                                    return port;
+                                }).toList();
+
+                                svc.setPorts(portList);
+                            }
+
+                            return svc;
+                        }
                 )
                 .collect(Collectors.toList());
     }
@@ -31,6 +55,7 @@ public class ServiceService {
         service.setMetadata(metadata);
 
         var serviceSpec = new V1ServiceSpec();
+
         var servicePort = new V1ServicePort();
         servicePort.setPort(port);
         serviceSpec.setPorts(Collections.singletonList(servicePort));

@@ -1,9 +1,17 @@
 package org.k8sui.model;
 
-public class Service {
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Map;
+
+public class Service implements Comparable<Service> {
     private String uid;
     private String name;
     private String namespace;
+    private String type;
+    private Map<String, String> selectors;
+    private List<Port> ports;
 
     public Service(String uid, String name, String namespace) {
         this.uid = uid;
@@ -35,8 +43,37 @@ public class Service {
         this.namespace = namespace;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Map<String, String> getSelectors() {
+        return selectors;
+    }
+
+    public void setSelectors(Map<String, String> selectors) {
+        this.selectors = selectors;
+    }
+
+    public List<Port> getPorts() {
+        return ports;
+    }
+
+    public void setPorts(List<Port> ports) {
+        this.ports = ports;
+    }
+
     @Override
     public String toString() {
-        return "Service[" + getUid() + ":" + getNamespace() + ":" + getName() + "]";
+        return "Service[" + getUid() + ":" + getNamespace() + ":" + getType() + ":" + getName() + "]";
+    }
+
+    @Override
+    public int compareTo(@NotNull Service svc) {
+        return svc.getName().compareTo(svc.getName());
     }
 }

@@ -1,9 +1,17 @@
 package org.k8sui.model;
 
-public class Deployment {
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
+
+public class Deployment implements Comparable<Deployment> {
     private String uid;
     private String name;
     private String namespace;
+    private Integer replicas;
+    private String image;
+    private Integer port;
+    private Map<String, String> labels;
 
     public Deployment(String uid, String name, String namespace) {
         this.uid = uid;
@@ -35,8 +43,45 @@ public class Deployment {
         this.namespace = namespace;
     }
 
+    public Integer getReplicas() {
+        return replicas;
+    }
+
+    public void setReplicas(Integer replicas) {
+        this.replicas = replicas;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+    public Map<String, String> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Map<String, String> labels) {
+        this.labels = labels;
+    }
+
     @Override
     public String toString() {
         return "Deployment[" + getUid() + ":" + getNamespace() + ":" + getName() + "]";
+    }
+
+    @Override
+    public int compareTo(@NotNull Deployment d) {
+        return d.getName().compareTo(getName());
     }
 }
