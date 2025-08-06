@@ -21,38 +21,39 @@ public class DeploymentService {
                 .map(d -> {
                     Deployment dep = new Deployment(d.getMetadata().getUid(), d.getMetadata().getName(), d.getMetadata().getNamespace());
                     dep.setReplicas(d.getSpec().getReplicas());
-                    dep.setImage("");
 
                     return dep;
                 }).collect(Collectors.toList());
     }
 
-    public V1Deployment addDeployment(Deployment request) throws ApiException {
+    public V1Deployment addDeployment(Deployment dep) throws ApiException {
         // Create a basic deployment
         V1Deployment deployment = new V1Deployment();
         V1ObjectMeta metadata = new V1ObjectMeta();
-        metadata.setName(request.getName());
+        metadata.setName(dep.getName());
 
         // Set the selector to match the labels in the template
         V1LabelSelector selector = new V1LabelSelector();
-        selector.setMatchLabels(request.getLabels());
+        selector.setMatchLabels(dep.getLabels());
         V1DeploymentSpec spec = new V1DeploymentSpec();
         spec.setSelector(selector);
 
         // Set the template with metadata and containers
         V1PodTemplateSpec template = new V1PodTemplateSpec();
         V1ObjectMeta templateMetadata = new V1ObjectMeta();
-        templateMetadata.setLabels(request.getLabels());
+        templateMetadata.setLabels(dep.getLabels());
         template.setMetadata(templateMetadata);
 
-        // Add a container to the template
-        V1Container container = new V1Container();
-        container.setName(request.getName());
-        container.setImage(request.getImage());
-        container.setPorts(Collections.singletonList(new V1ContainerPort().containerPort(request.getPort())));
+        var containerList = dep.getContainers().stream().map(c -> {
+            V1Container container = new V1Container();
+            container.setName(c.getName());
+            container.setImage(c.getImage());
+            container.setPorts(Collections.singletonList(new V1ContainerPort().containerPort(c.getPorts().getFirst().getContainerPort())));
+            return container;
+        }).toList();
 
         // Set other container properties as needed
-        template.setSpec(new V1PodSpec().containers(Collections.singletonList(container)));
+        template.setSpec(new V1PodSpec().containers(containerList));
         spec.setTemplate(template);
 
         // Set the deployment's metadata and spec
@@ -60,9 +61,13 @@ public class DeploymentService {
         deployment.spec(spec);
 
         // Set the number of replicas
-        deployment.getSpec().setReplicas(request.getReplicas());
+        if (dep.getReplicas() != null) {
+            if (deployment.getSpec() != null) {
+                deployment.getSpec().setReplicas(dep.getReplicas());
+            }
+        }
 
-        return appsV1Api.createNamespacedDeployment(request.getNamespace(), deployment).execute();
+        return appsV1Api.createNamespacedDeployment(dep.getNamespace(), deployment).execute();
     }
 
     public V1Status deleteDeployment(String nameSpace, String name) throws ApiException {

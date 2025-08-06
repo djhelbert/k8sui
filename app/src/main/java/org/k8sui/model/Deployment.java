@@ -10,8 +10,6 @@ public class Deployment implements Comparable<Deployment> {
     private String name;
     private String namespace;
     private Integer replicas;
-    private String image;
-    private Integer port;
     private Map<String, String> labels;
     private List<Container> containers;
 
@@ -51,22 +49,6 @@ public class Deployment implements Comparable<Deployment> {
 
     public void setReplicas(Integer replicas) {
         this.replicas = replicas;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public Integer getPort() {
-        return port;
-    }
-
-    public void setPort(Integer port) {
-        this.port = port;
     }
 
     public Map<String, String> getLabels() {
