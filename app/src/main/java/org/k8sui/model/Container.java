@@ -1,33 +1,16 @@
 package org.k8sui.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Container {
     private String name;
     private String image;
-    List<ContainerPort> ports;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public List<ContainerPort> getPorts() {
-        return ports;
-    }
-
-    public void setPorts(List<ContainerPort> ports) {
-        this.ports = ports;
-    }
+    private List<ContainerPort> ports;
 }

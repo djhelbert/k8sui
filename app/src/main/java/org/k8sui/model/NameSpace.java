@@ -1,9 +1,11 @@
 package org.k8sui.model;
 
+import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.OffsetDateTime;
 
+@Data
 public class NameSpace implements Comparable<NameSpace> {
     private String uid;
     private String namespace;
@@ -14,38 +16,6 @@ public class NameSpace implements Comparable<NameSpace> {
         this.uid = uid;
         this.namespace = namespace;
         this.creation = creation;
-        this.status = status;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public OffsetDateTime getCreation() {
-        return creation;
-    }
-
-    public void setCreation(OffsetDateTime creation) {
-        this.creation = creation;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
         this.status = status;
     }
 

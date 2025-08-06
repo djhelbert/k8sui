@@ -35,11 +35,14 @@ public class ServiceService {
                                     servicePort.setName(p.getName());
                                     servicePort.setPort(p.getPort());
                                     servicePort.setProtocol(p.getProtocol());
-                                    servicePort.setTargetPort(p.getTargetPort().toString());
+
+                                    if(p.getTargetPort() != null) {
+                                        servicePort.setTargetPort(p.getTargetPort().toString());
+                                    }
                                     return servicePort;
                                 }).toList();
 
-                                svc.setPorts(servicePortList);
+                                svc.setServicePorts(servicePortList);
                             }
 
                             return svc;
@@ -49,17 +52,17 @@ public class ServiceService {
     }
 
     public V1Service createService(String name, String kind, Integer port) throws ApiException {
-        V1Service service = new V1Service();
+        V1Service v1Service = new V1Service();
         V1ObjectMeta metadata = new V1ObjectMeta();
         metadata.setName(name);
-        service.setMetadata(metadata);
+        v1Service.setMetadata(metadata);
 
         var serviceSpec = new V1ServiceSpec();
 
         var servicePort = new V1ServicePort();
         servicePort.setPort(port);
         serviceSpec.setPorts(Collections.singletonList(servicePort));
-        service.setSpec(serviceSpec);
+        v1Service.setSpec(serviceSpec);
 
         V1Service body = new V1Service();
         body.setKind(kind);

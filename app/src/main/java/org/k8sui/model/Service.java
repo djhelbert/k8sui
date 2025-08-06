@@ -1,10 +1,12 @@
 package org.k8sui.model;
 
+import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
 
+@Data
 public class Service implements Comparable<Service> {
     private String uid;
     private String name;
@@ -17,54 +19,6 @@ public class Service implements Comparable<Service> {
         this.uid = uid;
         this.namespace = namespace;
         this.name = name;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Map<String, String> getSelectors() {
-        return selectors;
-    }
-
-    public void setSelectors(Map<String, String> selectors) {
-        this.selectors = selectors;
-    }
-
-    public List<ServicePort> getPorts() {
-        return servicePorts;
-    }
-
-    public void setPorts(List<ServicePort> servicePorts) {
-        this.servicePorts = servicePorts;
     }
 
     @Override

@@ -1,10 +1,12 @@
 package org.k8sui.model;
 
+import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
 
+@Data
 public class Deployment implements Comparable<Deployment> {
     private String uid;
     private String name;
@@ -17,54 +19,6 @@ public class Deployment implements Comparable<Deployment> {
         this.uid = uid;
         this.namespace = namespace;
         this.name = name;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public Integer getReplicas() {
-        return replicas;
-    }
-
-    public void setReplicas(Integer replicas) {
-        this.replicas = replicas;
-    }
-
-    public Map<String, String> getLabels() {
-        return labels;
-    }
-
-    public void setLabels(Map<String, String> labels) {
-        this.labels = labels;
-    }
-
-    public List<Container> getContainers() {
-        return containers;
-    }
-
-    public void setContainers(List<Container> containers) {
-        this.containers = containers;
     }
 
     @Override
