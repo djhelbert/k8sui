@@ -24,4 +24,8 @@ public class App {
 
         Util.centerComponent(frame);
     }
+
+    public static JFrame frame() {
+        return frame;
+    }
 }
