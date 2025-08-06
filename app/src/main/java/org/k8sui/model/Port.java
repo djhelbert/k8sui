@@ -37,4 +37,9 @@ public class Port {
     public void setTargetPort(String targetPort) {
         this.targetPort = targetPort;
     }
+
+    @Override
+    public String toString() {
+        return "Port[" + getName() + " " + getPort() + "]";
+    }
 }

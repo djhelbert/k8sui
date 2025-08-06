@@ -17,7 +17,7 @@ public class App {
         }
 
         frame = new MainFrame();
-        frame.setSize(1000, 800);
+        frame.setSize(1100, 700);
         frame.setResizable(true);
         frame.setVisible(true);
         frame.setIconImage(Util.getImageIcon("wheel.png").getImage());
