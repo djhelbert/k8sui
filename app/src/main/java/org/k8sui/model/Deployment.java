@@ -2,6 +2,7 @@ package org.k8sui.model;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Map;
 
 public class Deployment implements Comparable<Deployment> {
@@ -12,6 +13,7 @@ public class Deployment implements Comparable<Deployment> {
     private String image;
     private Integer port;
     private Map<String, String> labels;
+    private List<Container> containers;
 
     public Deployment(String uid, String name, String namespace) {
         this.uid = uid;
@@ -73,6 +75,14 @@ public class Deployment implements Comparable<Deployment> {
 
     public void setLabels(Map<String, String> labels) {
         this.labels = labels;
+    }
+
+    public List<Container> getContainers() {
+        return containers;
+    }
+
+    public void setContainers(List<Container> containers) {
+        this.containers = containers;
     }
 
     @Override

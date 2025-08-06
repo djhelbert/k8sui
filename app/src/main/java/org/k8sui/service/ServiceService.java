@@ -4,7 +4,7 @@ import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.*;
 import org.k8sui.CoreApiSupplier;
-import org.k8sui.model.Port;
+import org.k8sui.model.ServicePort;
 import org.k8sui.model.Service;
 
 import java.util.Collections;
@@ -30,16 +30,16 @@ public class ServiceService {
                             List<V1ServicePort> ports = s.getSpec().getPorts();
 
                             if (ports != null) {
-                                List<Port> portList = ports.stream().map(p -> {
-                                    Port port = new Port();
-                                    port.setName(p.getName());
-                                    port.setPort(p.getPort());
-                                    port.setProtocol(p.getProtocol());
-                                    port.setTargetPort(p.getTargetPort().toString());
-                                    return port;
+                                List<ServicePort> servicePortList = ports.stream().map(p -> {
+                                    ServicePort servicePort = new ServicePort();
+                                    servicePort.setName(p.getName());
+                                    servicePort.setPort(p.getPort());
+                                    servicePort.setProtocol(p.getProtocol());
+                                    servicePort.setTargetPort(p.getTargetPort().toString());
+                                    return servicePort;
                                 }).toList();
 
-                                svc.setPorts(portList);
+                                svc.setPorts(servicePortList);
                             }
 
                             return svc;

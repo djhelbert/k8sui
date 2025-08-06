@@ -1,6 +1,6 @@
 package org.k8sui.model;
 
-public class Port {
+public class ServicePort {
     private String name;
     private String protocol;
     private Integer port;

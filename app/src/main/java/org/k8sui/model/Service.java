@@ -11,7 +11,7 @@ public class Service implements Comparable<Service> {
     private String namespace;
     private String type;
     private Map<String, String> selectors;
-    private List<Port> ports;
+    private List<ServicePort> servicePorts;
 
     public Service(String uid, String name, String namespace) {
         this.uid = uid;
@@ -59,12 +59,12 @@ public class Service implements Comparable<Service> {
         this.selectors = selectors;
     }
 
-    public List<Port> getPorts() {
-        return ports;
+    public List<ServicePort> getPorts() {
+        return servicePorts;
     }
 
-    public void setPorts(List<Port> ports) {
-        this.ports = ports;
+    public void setPorts(List<ServicePort> servicePorts) {
+        this.servicePorts = servicePorts;
     }
 
     @Override
