@@ -35,6 +35,7 @@ public class NodePanel extends JPanel implements ActionListener  {
         buttonPanel.add(refreshButton);
 
         table = new JTable(nodeModel);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         setLayout(new BorderLayout());
 

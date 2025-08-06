@@ -30,7 +30,7 @@ public class MainFrame extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         aboutItem.setIcon(Util.getImageIcon("about.png"));
-        licenseItem.setIcon(Util.getImageIcon("business.png"));
+        licenseItem.setIcon(Util.getImageIcon("note.png"));
 
         final JMenu helpMenu = new JMenu("Help");
         helpMenu.add(aboutItem);

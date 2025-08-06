@@ -41,6 +41,7 @@ public class NameSpacePanel extends JPanel implements ActionListener {
         buttonPanel.add(addButton);
         // Table setup
         table = new JTable(nameSpaceModel);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         setLayout(new BorderLayout());
         add(buttonPanel, BorderLayout.NORTH);
@@ -48,11 +49,14 @@ public class NameSpacePanel extends JPanel implements ActionListener {
     }
 
     private void update() {
+        table.clearSelection();
+
         try {
             nameSpaceModel.setNodes(service.nameSpaces());
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
+
         nameSpaceModel.fireTableDataChanged();
     }
 
