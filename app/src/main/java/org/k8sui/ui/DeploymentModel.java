@@ -47,7 +47,11 @@ public class DeploymentModel extends AbstractTableModel {
             return deployments.get(row).getReplicas();
         }
 
-        return deployments.get(row).getSelectors().toString();
+        if (deployments.get(row).getSelectors() == null) {
+            return "";
+        } else {
+            return deployments.get(row).getSelectors().toString();
+        }
     }
 
     @Override

@@ -6,7 +6,7 @@ import io.kubernetes.client.openapi.models.*;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.Deployment;
 
-import java.util.Collections;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,24 +19,34 @@ public class DeploymentService {
 
         return deploymentList.getItems().stream()
                 .map(d -> {
-                    Deployment dep = new Deployment(d.getMetadata().getUid(), d.getMetadata().getName(), d.getMetadata().getNamespace());
-                    dep.setReplicas(d.getSpec().getReplicas());
+                    Deployment deployment = new Deployment(d.getMetadata().getUid(), d.getMetadata().getName(), d.getMetadata().getNamespace());
 
-                    return dep;
+                    if (d.getSpec() != null) {
+                        deployment.setReplicas(d.getSpec().getReplicas());
+                    }
+
+                    var containers = d.getSpec().getTemplate().getSpec().getContainers();
+                    deployment.setSelectors(d.getSpec().getSelector().getMatchLabels());
+                    deployment.setLabels(d.getMetadata().getLabels());
+
+                    return deployment;
                 }).collect(Collectors.toList());
     }
 
     public V1Deployment addDeployment(Deployment dep) throws ApiException {
-        // Create a basic deployment
-        V1Deployment deployment = new V1Deployment();
+        // Create a deployment
+        V1Deployment v1Deployment = new V1Deployment();
         V1ObjectMeta metadata = new V1ObjectMeta();
         metadata.setName(dep.getName());
+        metadata.setCreationTimestamp(OffsetDateTime.now());
 
-        // Set the selector to match the labels in the template
+        // Set the selector to match the labels
         V1LabelSelector selector = new V1LabelSelector();
         selector.setMatchLabels(dep.getLabels());
-        V1DeploymentSpec spec = new V1DeploymentSpec();
-        spec.setSelector(selector);
+
+        // Set deployment spec
+        V1DeploymentSpec v1DeploymentSpec = new V1DeploymentSpec();
+        v1DeploymentSpec.setSelector(selector);
 
         // Set the template with metadata and containers
         V1PodTemplateSpec template = new V1PodTemplateSpec();
@@ -45,29 +55,28 @@ public class DeploymentService {
         template.setMetadata(templateMetadata);
 
         var containerList = dep.getContainers().stream().map(c -> {
-            V1Container container = new V1Container();
-            container.setName(c.getName());
-            container.setImage(c.getImage());
-            container.setPorts(Collections.singletonList(new V1ContainerPort().containerPort(c.getPorts().getFirst().getContainerPort())));
-            return container;
+            V1Container v1Container = new V1Container();
+            v1Container.setName(c.getName());
+            v1Container.setImage(c.getImage());
+            v1Container.setPorts(c.getPorts().stream().map(p -> new V1ContainerPort().containerPort(p.getContainerPort())).toList());
+            return v1Container;
         }).toList();
 
-        // Set other container properties as needed
         template.setSpec(new V1PodSpec().containers(containerList));
-        spec.setTemplate(template);
+        v1DeploymentSpec.setTemplate(template);
 
-        // Set the deployment's metadata and spec
-        deployment.metadata(metadata);
-        deployment.spec(spec);
+        // Set the metadata and spec
+        v1Deployment.metadata(metadata);
+        v1Deployment.spec(v1DeploymentSpec);
 
         // Set the number of replicas
         if (dep.getReplicas() != null) {
-            if (deployment.getSpec() != null) {
-                deployment.getSpec().setReplicas(dep.getReplicas());
+            if (v1Deployment.getSpec() != null) {
+                v1Deployment.getSpec().setReplicas(dep.getReplicas());
             }
         }
 
-        return appsV1Api.createNamespacedDeployment(dep.getNamespace(), deployment).execute();
+        return appsV1Api.createNamespacedDeployment(dep.getNamespace(), v1Deployment).execute();
     }
 
     public V1Status deleteDeployment(String nameSpace, String name) throws ApiException {

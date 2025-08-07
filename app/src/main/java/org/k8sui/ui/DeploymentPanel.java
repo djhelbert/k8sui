@@ -2,6 +2,8 @@ package org.k8sui.ui;
 
 import io.kubernetes.client.openapi.ApiException;
 import org.k8sui.App;
+import org.k8sui.model.Container;
+import org.k8sui.model.ContainerPort;
 import org.k8sui.model.Deployment;
 import org.k8sui.service.DeploymentService;
 
@@ -9,6 +11,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DeploymentPanel extends JPanel implements ActionListener {
     JPanel buttonPanel = new JPanel();
@@ -68,13 +74,25 @@ public class DeploymentPanel extends JPanel implements ActionListener {
         }
         if (e.getSource().equals(addButton)) {
             // Create the dialog
-            JDialog dialog = new JDialog(App.frame(), "Add Namespace", true);
+            JDialog dialog = new JDialog(App.frame(), "Add Deployment", true);
             dialog.setLayout(new FlowLayout());
 
             // Create text field
-            JTextField textField = new JTextField(20);
+            JTextField nameField = new JTextField(10);
             dialog.add(new JLabel("Name:"));
-            dialog.add(textField);
+            dialog.add(nameField);
+
+            JTextField imageField = new JTextField(20);
+            dialog.add(new JLabel("Image:"));
+            dialog.add(imageField);
+
+            JComboBox<Integer> replicas = new JComboBox<>(new Integer[] {1,2,3,4,5,6,7,8,9});
+            replicas.setSelectedIndex(2);
+            dialog.add(replicas);
+
+            JTextField portField = new JTextField("80", 4);
+            dialog.add(new JLabel("Port:"));
+            dialog.add(portField);
 
             // Create OK and Cancel buttons
             JButton okButton = new JButton("OK");
@@ -82,14 +100,28 @@ public class DeploymentPanel extends JPanel implements ActionListener {
 
             // OK button action
             okButton.addActionListener(e1 -> {
-                String input = textField.getText();
+                String input = nameField.getText();
 
                 // contain at most 63 characters
                 // contain only lowercase alphanumeric characters or '-'
                 // start with an alphanumeric character
                 // end with an alphanumeric character
                 try {
-                    service.addDeployment(new Deployment("", "", "default"));
+                    Map<String,String> map = new HashMap<>();
+                    map.put("app",nameField.getText());
+
+                    Deployment newDeployment = new Deployment(null, input, "default");
+                    newDeployment.setReplicas((Integer)replicas.getSelectedItem());
+                    newDeployment.setLabels(map);
+                    newDeployment.setSelectors(map);
+
+                    Container container = new Container();
+                    container.setName(nameField.getText());
+                    container.setImage(imageField.getText());
+                    container.setPorts(List.of(new ContainerPort(Integer.parseInt(portField.getText()))));
+                    newDeployment.setContainers(List.of(container));
+
+                    service.addDeployment(newDeployment);
                     update();
                 } catch (ApiException ex) {
                     throw new RuntimeException(ex);
