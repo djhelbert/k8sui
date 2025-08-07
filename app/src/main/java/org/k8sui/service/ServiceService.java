@@ -68,10 +68,9 @@ public class ServiceService {
         serviceSpec.setPorts(Collections.singletonList(servicePort));
         v1Service.setSpec(serviceSpec);
 
-        V1Service body = new V1Service();
-        body.setKind(kind);
+        v1Service.setKind(kind);
 
-        return coreV1Api.createNamespacedService(name, body).execute();
+        return coreV1Api.createNamespacedService(name, v1Service).execute();
     }
 
     public V1Service deleteService(String name, String namespace) throws ApiException {

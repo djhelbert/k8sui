@@ -29,6 +29,6 @@ public class Service implements Comparable<Service> {
 
     @Override
     public int compareTo(@NotNull Service svc) {
-        return svc.getName().compareTo(svc.getName());
+        return name.compareTo(svc.getName());
     }
 }
