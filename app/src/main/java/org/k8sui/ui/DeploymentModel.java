@@ -6,6 +6,9 @@ import javax.swing.table.AbstractTableModel;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Deployment Table Model
+ */
 public class DeploymentModel extends AbstractTableModel {
 
     private static final String[] headers = {"UID", "Name", "Namespace", "Replicas", "Selector"};
@@ -18,6 +21,10 @@ public class DeploymentModel extends AbstractTableModel {
     public void setDeployments(List<Deployment> deployments) {
         this.deployments = deployments;
         Collections.sort(deployments);
+    }
+
+    public Deployment getDeployment(int i) {
+        return deployments.get(i);
     }
 
     @Override
