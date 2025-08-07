@@ -4,6 +4,7 @@ import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.models.*;
 import org.k8sui.CoreApiSupplier;
+import org.k8sui.model.Container;
 import org.k8sui.model.Deployment;
 
 import java.time.OffsetDateTime;
@@ -25,7 +26,20 @@ public class DeploymentService {
                         deployment.setReplicas(d.getSpec().getReplicas());
                     }
 
-                    var containers = d.getSpec().getTemplate().getSpec().getContainers();
+                    if(d.getSpec().getTemplate() != null) {
+                        var containerList = d.getSpec().getTemplate().getSpec().getContainers();
+
+                        List<Container> containers = containerList.stream().map(c -> {
+                            Container cont = new Container();
+                            cont.setName(c.getName());
+                            cont.setImage(c.getImage());
+
+                            return cont;
+                        }).collect(Collectors.toList());
+
+                        deployment.setContainers(containers);
+                    }
+
                     deployment.setSelectors(d.getSpec().getSelector().getMatchLabels());
                     deployment.setLabels(d.getMetadata().getLabels());
 
