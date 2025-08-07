@@ -8,11 +8,11 @@ import java.util.List;
 
 public class ServiceModel extends AbstractTableModel {
 
-    private static final String[] headers = {"UID", "Name", "Namespace", "Type", "Selectors"};
+    private static final String[] headers = {"UID", "Name", "Namespace", "Type", "Cluster IP"};
     private List<Service> services;
 
-    public ServiceModel(List<Service> nodes) {
-        setServices(nodes);
+    public ServiceModel(List<Service> serviceList) {
+        setServices(serviceList);
     }
 
     public void setServices(List<Service> services) {
@@ -47,7 +47,7 @@ public class ServiceModel extends AbstractTableModel {
             return services.get(row).getType();
         }
 
-        return services.get(row).getSelectors().toString();
+        return services.get(row).getClusterIp();
     }
 
     @Override

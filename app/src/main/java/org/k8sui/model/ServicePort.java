@@ -12,6 +12,8 @@ public class ServicePort {
     private String protocol;
     private Integer port;
     private String targetPort;
+    private String appProtocol;
+    private Integer nodePort;
 
     @Override
     public String toString() {

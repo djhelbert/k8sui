@@ -21,31 +21,35 @@ public class ServiceService {
 
         return serviceList.getItems().stream()
                 .map(s -> {
-                            Service svc = new Service(s.getMetadata().getUid(), s.getMetadata().getName(), s.getMetadata().getNamespace());
+                            Service service = new Service(s.getMetadata().getUid(), s.getMetadata().getName(), s.getMetadata().getNamespace());
 
                             Map<String, String> map = s.getSpec().getSelector();
-                            svc.setSelectors(map);
-                            svc.setType(s.getSpec().getType());
+                            service.setSelectors(map);
+                            service.setType(s.getSpec().getType());
+                            service.setClusterIp(s.getSpec().getClusterIP());
 
-                            List<V1ServicePort> ports = s.getSpec().getPorts();
+                            List<V1ServicePort> v1ServicePorts = s.getSpec().getPorts();
 
-                            if (ports != null) {
-                                List<ServicePort> servicePortList = ports.stream().map(p -> {
+                            if (v1ServicePorts != null) {
+                                List<ServicePort> servicePortList = v1ServicePorts.stream().map(p -> {
                                     ServicePort servicePort = new ServicePort();
                                     servicePort.setName(p.getName());
                                     servicePort.setPort(p.getPort());
                                     servicePort.setProtocol(p.getProtocol());
+                                    servicePort.setNodePort(p.getNodePort());
+                                    servicePort.setAppProtocol(p.getAppProtocol());
 
                                     if(p.getTargetPort() != null) {
                                         servicePort.setTargetPort(p.getTargetPort().toString());
                                     }
+
                                     return servicePort;
                                 }).toList();
 
-                                svc.setServicePorts(servicePortList);
+                                service.setServicePorts(servicePortList);
                             }
 
-                            return svc;
+                            return service;
                         }
                 )
                 .collect(Collectors.toList());

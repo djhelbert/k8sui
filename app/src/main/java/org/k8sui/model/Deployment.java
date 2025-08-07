@@ -13,6 +13,7 @@ public class Deployment implements Comparable<Deployment> {
     private String namespace;
     private Integer replicas;
     private Map<String, String> labels;
+    private Map<String, String> selectors;
     private List<Container> containers;
 
     public Deployment(String uid, String name, String namespace) {

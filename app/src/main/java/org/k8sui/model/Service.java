@@ -12,6 +12,7 @@ public class Service implements Comparable<Service> {
     private String name;
     private String namespace;
     private String type;
+    private String clusterIp;
     private Map<String, String> selectors;
     private List<ServicePort> servicePorts;
 
