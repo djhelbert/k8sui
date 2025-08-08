@@ -1,11 +1,15 @@
 package org.k8sui.service;
 
+import io.kubernetes.client.custom.IntOrString;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.models.*;
+import io.kubernetes.client.openapi.models.V1ObjectMeta;
+import io.kubernetes.client.openapi.models.V1Service;
+import io.kubernetes.client.openapi.models.V1ServicePort;
+import io.kubernetes.client.openapi.models.V1ServiceSpec;
 import org.k8sui.CoreApiSupplier;
-import org.k8sui.model.ServicePort;
 import org.k8sui.model.Service;
+import org.k8sui.model.ServicePort;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,8 +43,8 @@ public class ServiceService {
                                     servicePort.setNodePort(p.getNodePort());
                                     servicePort.setAppProtocol(p.getAppProtocol());
 
-                                    if(p.getTargetPort() != null) {
-                                        servicePort.setTargetPort(p.getTargetPort().toString());
+                                    if (p.getTargetPort() != null) {
+                                        servicePort.setTargetPort(p.getTargetPort().getIntValue());
                                     }
 
                                     return servicePort;
@@ -55,22 +59,25 @@ public class ServiceService {
                 .collect(Collectors.toList());
     }
 
-    public V1Service createService(String name, String kind, Integer port) throws ApiException {
+    public V1Service addService(Service svc) throws ApiException {
         V1Service v1Service = new V1Service();
         V1ObjectMeta metadata = new V1ObjectMeta();
-        metadata.setName(name);
+        metadata.setName(svc.getName());
         v1Service.setMetadata(metadata);
 
-        var serviceSpec = new V1ServiceSpec();
+        var v1ServiceSpec = new V1ServiceSpec();
+        v1ServiceSpec.setType(svc.getType());
+        v1ServiceSpec.setSelector(svc.getSelectors());
 
-        var servicePort = new V1ServicePort();
-        servicePort.setPort(port);
-        serviceSpec.setPorts(Collections.singletonList(servicePort));
-        v1Service.setSpec(serviceSpec);
+        var v1ServicePort = new V1ServicePort();
+        v1ServicePort.setPort(svc.getServicePorts().get(0).getPort());
+        v1ServicePort.setTargetPort(new IntOrString(svc.getServicePorts().get(0).getTargetPort()));
+        v1ServicePort.setProtocol("TCP");
 
-        v1Service.setKind(kind);
+        v1ServiceSpec.setPorts(Collections.singletonList(v1ServicePort));
+        v1Service.setSpec(v1ServiceSpec);
 
-        return coreV1Api.createNamespacedService(name, v1Service).execute();
+        return coreV1Api.createNamespacedService(svc.getNamespace(), v1Service).execute();
     }
 
     public V1Service deleteService(String name, String namespace) throws ApiException {
