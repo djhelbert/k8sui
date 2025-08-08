@@ -44,9 +44,13 @@ public class ServicePanel extends JPanel implements ActionListener  {
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(refreshButton);
         buttonPanel.add(addButton);
-
+        // Table setup
         table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getColumnModel().getColumn(3).setMaxWidth(80);
+        table.getColumnModel().getColumn(3).setPreferredWidth(80);
+        table.getColumnModel().getColumn(4).setMaxWidth(100);
+        table.getColumnModel().getColumn(4).setPreferredWidth(100);
 
         setLayout(new BorderLayout());
 

@@ -36,6 +36,12 @@ public class NodePanel extends JPanel implements ActionListener  {
 
         table = new JTable(nodeModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getColumnModel().getColumn(3).setMaxWidth(50);
+        table.getColumnModel().getColumn(4).setMaxWidth(110);
+        table.getColumnModel().getColumn(5).setMaxWidth(110);
+        table.getColumnModel().getColumn(3).setPreferredWidth(50);
+        table.getColumnModel().getColumn(4).setPreferredWidth(110);
+        table.getColumnModel().getColumn(5).setPreferredWidth(110);
 
         setLayout(new BorderLayout());
 

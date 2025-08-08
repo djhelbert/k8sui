@@ -48,6 +48,8 @@ public class DeploymentPanel extends JPanel implements ActionListener {
         // Table setup
         table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getColumnModel().getColumn(3).setMaxWidth(80);
+        table.getColumnModel().getColumn(3).setPreferredWidth(80);
 
         setLayout(new BorderLayout());
         add(buttonPanel, BorderLayout.NORTH);
