@@ -38,6 +38,10 @@ public class NameSpaceModel extends AbstractTableModel {
         return headers[col];
     }
 
+    public NameSpace get(int row) {
+        return namespaces.get(row);
+    }
+
     @Override
     public Object getValueAt(int row, int col) {
         if (col == 0) {

@@ -2,6 +2,7 @@ package org.k8sui.ui;
 
 import io.kubernetes.client.openapi.ApiException;
 import org.k8sui.App;
+import org.k8sui.model.NameSpace;
 import org.k8sui.service.NameSpaceService;
 
 import javax.swing.*;
@@ -13,8 +14,9 @@ public class NameSpacePanel extends JPanel implements ActionListener {
     JPanel buttonPanel = new JPanel();
     JButton refreshButton = new JButton("Refresh");
     JButton addButton = new JButton("Add");
+    JButton deleteButton = new JButton("Delete");
     JTable table;
-    NameSpaceModel nameSpaceModel;
+    NameSpaceModel model;
     NameSpaceService service = new NameSpaceService();
 
     public NameSpacePanel() {
@@ -24,7 +26,7 @@ public class NameSpacePanel extends JPanel implements ActionListener {
 
     private void init() {
         try {
-            nameSpaceModel = new NameSpaceModel(service.nameSpaces());
+            model = new NameSpaceModel(service.nameSpaces());
         } catch (ApiException err) {
             throw new RuntimeException(err);
         }
@@ -32,6 +34,8 @@ public class NameSpacePanel extends JPanel implements ActionListener {
         // Add button setup
         addButton.setIcon(Util.getImageIcon("add.png"));
         addButton.addActionListener(this);
+        deleteButton.setIcon(Util.getImageIcon("delete.png"));
+        deleteButton.addActionListener(this);
         // Refresh button setup
         refreshButton.addActionListener(this);
         refreshButton.setIcon(Util.getImageIcon("undo.png"));
@@ -39,8 +43,9 @@ public class NameSpacePanel extends JPanel implements ActionListener {
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(refreshButton);
         buttonPanel.add(addButton);
+        buttonPanel.add(deleteButton);
         // Table setup
-        table = new JTable(nameSpaceModel);
+        table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getColumnModel().getColumn(3).setMaxWidth(80);
         table.getColumnModel().getColumn(3).setPreferredWidth(80);
@@ -54,12 +59,12 @@ public class NameSpacePanel extends JPanel implements ActionListener {
         table.clearSelection();
 
         try {
-            nameSpaceModel.setNodes(service.nameSpaces());
+            model.setNodes(service.nameSpaces());
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
 
-        nameSpaceModel.fireTableDataChanged();
+        model.fireTableDataChanged();
     }
 
     @Override
@@ -67,15 +72,27 @@ public class NameSpacePanel extends JPanel implements ActionListener {
         if (e.getSource().equals(refreshButton)) {
             update();
         }
+        if (e.getSource().equals(deleteButton)) {
+            int row = table.getSelectedRow();
+            if(row != -1) {
+                NameSpace ns = model.get(row);
+                try {
+                    service.deleteNamespace(ns.getNamespace());
+                } catch (ApiException ex) {
+                    ex.printStackTrace();
+                }
+                update();
+            }
+        }
         if (e.getSource().equals(addButton)) {
             // Create the dialog
             JDialog dialog = new JDialog(App.frame(), "Add Namespace", true);
             dialog.setLayout(new FlowLayout());
 
             // Create text field
-            JTextField textField = new JTextField(20);
+            JTextField nameField = new JTextField(20);
             dialog.add(new JLabel("Name:"));
-            dialog.add(textField);
+            dialog.add(nameField);
 
             // Create OK and Cancel buttons
             JButton okButton = new JButton("OK");
@@ -83,12 +100,13 @@ public class NameSpacePanel extends JPanel implements ActionListener {
 
             // OK button action
             okButton.addActionListener(e1 -> {
-                String input = textField.getText();
+                String input = nameField.getText();
 
-                // contain at most 63 characters
-                // contain only lowercase alphanumeric characters or '-'
-                // start with an alphanumeric character
-                // end with an alphanumeric character
+                if(!NameValidator.validName(nameField.getText())) {
+                    Util.showError(this, "Invalid Name", "Validation Error");
+                    return;
+                }
+
                 try {
                     service.createNamespace(input);
                     update();

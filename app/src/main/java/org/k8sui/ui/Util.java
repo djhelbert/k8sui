@@ -41,6 +41,18 @@ public class Util {
      * Show Error Dialog
      *
      * @param c       Component
+     * @param message Error Message String
+     * @param title   Dialog Title
+     */
+    public static void showError(Component c, String message, String title) {
+        final JLabel label = new JLabel(message);
+        JOptionPane.showMessageDialog(c, label, title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * Show Info Dialog
+     *
+     * @param c       Component
      * @param message Message String
      * @param title   Dialog Title
      */

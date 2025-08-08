@@ -2,8 +2,8 @@ package org.k8sui.ui;
 
 import io.kubernetes.client.openapi.ApiException;
 import org.k8sui.App;
-import org.k8sui.model.*;
-import org.k8sui.model.Container;
+import org.k8sui.model.Service;
+import org.k8sui.model.ServicePort;
 import org.k8sui.service.ServiceService;
 
 import javax.swing.*;

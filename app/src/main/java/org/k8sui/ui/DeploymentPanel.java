@@ -19,6 +19,7 @@ public class DeploymentPanel extends JPanel implements ActionListener {
     JPanel buttonPanel = new JPanel();
     JButton refreshButton = new JButton("Refresh");
     JButton addButton = new JButton("Add");
+    JButton deleteButton = new JButton("Delete");
     JTable table;
     DeploymentModel model;
     DeploymentService service = new DeploymentService();
@@ -38,6 +39,8 @@ public class DeploymentPanel extends JPanel implements ActionListener {
         // Add button setup
         addButton.setIcon(Util.getImageIcon("add.png"));
         addButton.addActionListener(this);
+        deleteButton.setIcon(Util.getImageIcon("delete.png"));
+        deleteButton.addActionListener(this);
         // Refresh button setup
         refreshButton.addActionListener(this);
         refreshButton.setIcon(Util.getImageIcon("undo.png"));
@@ -72,6 +75,9 @@ public class DeploymentPanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(refreshButton)) {
             update();
+        }
+        if (e.getSource().equals(deleteButton)) {
+            // Todo
         }
         if (e.getSource().equals(addButton)) {
             // Create the dialog
