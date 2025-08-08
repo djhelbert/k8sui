@@ -1,5 +1,7 @@
 package org.k8sui.ui;
 
+import org.json.JSONObject;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
@@ -115,5 +117,10 @@ public class Util {
         int x = screenSize.width - size.width;
 
         comp.setLocation(x, y);
+    }
+
+    public static String getValue(String json, String field) {
+        JSONObject jsonObject = new JSONObject(json);
+        return jsonObject.getString(field);
     }
 }
