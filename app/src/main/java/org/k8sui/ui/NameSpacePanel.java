@@ -49,6 +49,7 @@ public class NameSpacePanel extends JPanel implements ActionListener {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getColumnModel().getColumn(3).setMaxWidth(80);
         table.getColumnModel().getColumn(3).setPreferredWidth(80);
+        table.setDefaultRenderer(String.class, new StatusTableCellRenderer());
 
         setLayout(new BorderLayout());
         add(buttonPanel, BorderLayout.NORTH);
