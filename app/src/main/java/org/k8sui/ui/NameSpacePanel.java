@@ -79,7 +79,7 @@ public class NameSpacePanel extends JPanel implements ActionListener {
                 try {
                     service.deleteNamespace(ns.getNamespace());
                 } catch (ApiException ex) {
-                    ex.printStackTrace();
+                    Util.showError(this, Util.getValue(ex.getResponseBody(),"reason"), "Error");
                 }
                 update();
             }
@@ -111,7 +111,7 @@ public class NameSpacePanel extends JPanel implements ActionListener {
                     service.createNamespace(input);
                     update();
                 } catch (ApiException ex) {
-                    throw new RuntimeException(ex);
+                    Util.showError(this, Util.getValue(ex.getResponseBody(),"reason"), "Error");
                 }
 
                 dialog.dispose();
