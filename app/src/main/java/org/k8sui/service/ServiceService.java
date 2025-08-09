@@ -32,6 +32,7 @@ public class ServiceService {
                             service.setType(s.getSpec().getType());
                             service.setClusterIp(s.getSpec().getClusterIP());
 
+
                             List<V1ServicePort> v1ServicePorts = s.getSpec().getPorts();
 
                             if (v1ServicePorts != null) {

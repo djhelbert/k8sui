@@ -56,12 +56,14 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
         // Table setup
         table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getColumnModel().getColumn(1).setMaxWidth(110);
-        table.getColumnModel().getColumn(1).setPreferredWidth(110);
+        table.getColumnModel().getColumn(1).setMaxWidth(120);
+        table.getColumnModel().getColumn(1).setPreferredWidth(120);
+        table.getColumnModel().getColumn(2).setMaxWidth(110);
+        table.getColumnModel().getColumn(2).setPreferredWidth(110);
         table.getColumnModel().getColumn(3).setMaxWidth(90);
         table.getColumnModel().getColumn(3).setPreferredWidth(90);
-        table.getColumnModel().getColumn(4).setMaxWidth(100);
-        table.getColumnModel().getColumn(4).setPreferredWidth(100);
+        table.getColumnModel().getColumn(4).setMaxWidth(110);
+        table.getColumnModel().getColumn(4).setPreferredWidth(110);
         table.getSelectionModel().addListSelectionListener(this);
         servicePortTable = new JTable(servicePortModel);
         servicePortTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -95,8 +97,20 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
                 Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
             }
         }
+        else if (e.getSource().equals(deleteButton)) {
+            int row = table.getSelectedRow();
 
-        if (e.getSource().equals(addButton)) {
+            if(row != -1) {
+                try {
+                    service.deleteService(model.getService(row).getName(), "default");
+                } catch (ApiException ex) {
+                    Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
+                }
+            }
+
+            update();
+        }
+        else if (e.getSource().equals(addButton)) {
             // Create the dialog
             var dialog = new JDialog(App.frame(), "Add Service", true);
             dialog.setLayout(new FlowLayout());
@@ -130,24 +144,13 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
             var okButton = new JButton("OK");
             var cancelButton = new JButton("Cancel");
 
-            deleteButton.addActionListener(evt -> {
-                int row = table.getSelectedRow();
-
-                if(row != -1) {
-                    try {
-                        service.deleteService(model.getService(row).getName(), "default");
-                    } catch (ApiException ex) {
-                        Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
-                    }
-                }
-            });
-
             // OK button action
             okButton.addActionListener(e1 -> {
-                // contain at most 63 characters
-                // contain only lowercase alphanumeric characters or '-'
-                // start with an alphanumeric character
-                // end with an alphanumeric character
+                if(!NameValidator.validName(nameField.getText())) {
+                    Util.showError(this, "Invalid Name", "Validation Error");
+                    return;
+                }
+
                 try {
                     Map<String, String> map = new HashMap<>();
                     map.put("app", selectorField.getText());
