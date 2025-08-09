@@ -17,16 +17,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ServicePanel extends JPanel implements ActionListener, ListSelectionListener {
-    JPanel buttonPanel = new JPanel();
-    JButton refreshButton = new JButton("Refresh");
-    JButton addButton = new JButton("Add");
-    JTable table;
-    ServiceModel model;
-    ServiceService service = new ServiceService();
-    JTable servicePortTable;
-    ServicePortModel servicePortModel = new ServicePortModel(new ArrayList<>());
-    JButton deleteButton = new JButton("Delete");
+public class ServicePanel extends JPanel implements ActionListener, ListSelectionListener, Updated {
+    private final JPanel buttonPanel = new JPanel();
+    private final JButton refreshButton = new JButton("Refresh");
+    private final JButton addButton = new JButton("Add");
+    private JTable table;
+    private ServiceModel model;
+    private final ServiceService service = new ServiceService();
+    private JTable servicePortTable;
+    private final ServicePortModel servicePortModel = new ServicePortModel(new ArrayList<>());
+    private final JButton deleteButton = new JButton("Delete");
+    private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
 
     public ServicePanel() {
         super();
@@ -35,9 +36,9 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
 
     private void init() {
         try {
-            model = new ServiceModel(service.services("default"));
+            model = new ServiceModel(service.services(nameSpaceListPanel.getNamespace()));
         } catch (ApiException err) {
-            throw new RuntimeException(err);
+            err.printStackTrace();
         }
 
         // Setup add button
@@ -50,6 +51,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
         refreshButton.addActionListener(this);
         // Button panel setup
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        buttonPanel.add(nameSpaceListPanel);
         buttonPanel.add(refreshButton);
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
@@ -75,11 +77,12 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
         add(new JScrollPane(servicePortTable), BorderLayout.SOUTH);
     }
 
-    private void update() {
+    @Override
+    public void update() {
         table.clearSelection();
 
         try {
-            model.setServices(service.services("default"));
+            model.setServices(service.services(nameSpaceListPanel.getNamespace()));
         } catch (ApiException ex) {
             Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
         }
@@ -91,7 +94,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(refreshButton)) {
             try {
-                model.setServices(service.services("default"));
+                model.setServices(service.services(nameSpaceListPanel.getNamespace()));
                 model.fireTableDataChanged();
             } catch (ApiException ex) {
                 Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
@@ -102,7 +105,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
 
             if(row != -1) {
                 try {
-                    service.deleteService(model.getService(row).getName(), "default");
+                    service.deleteService(model.getService(row).getName(), nameSpaceListPanel.getNamespace());
                 } catch (ApiException ex) {
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
@@ -155,7 +158,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
                     Map<String, String> map = new HashMap<>();
                     map.put("app", selectorField.getText());
 
-                    var newService = new Service(null, nameField.getText(), "default");
+                    var newService = new Service(null, nameField.getText(), nameSpaceListPanel.getNamespace());
                     newService.setSelectors(map);
                     newService.setType(types.getSelectedItem().toString());
 

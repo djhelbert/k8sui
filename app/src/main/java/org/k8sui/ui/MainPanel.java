@@ -24,8 +24,8 @@ public class MainPanel extends JPanel {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Nodes", new NodePanel());
         tabbedPane.addTab("Namespaces", new NameSpacePanel());
-        tabbedPane.addTab("Deployments", new DeploymentPanel());
         tabbedPane.addTab("Services", new ServicePanel());
+        tabbedPane.addTab("Deployments", new DeploymentPanel());
         add(tabbedPane, BorderLayout.CENTER);
         add(label, BorderLayout.SOUTH);
     }
