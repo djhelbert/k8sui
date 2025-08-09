@@ -18,16 +18,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DeploymentPanel extends JPanel implements ActionListener, ListSelectionListener {
-    JPanel buttonPanel = new JPanel();
-    JButton refreshButton = new JButton("Refresh");
-    JButton addButton = new JButton("Add");
-    JButton deleteButton = new JButton("Delete");
-    JTable table;
-    JTable containerTable;
-    DeploymentModel model;
-    ContainerModel containerModel = new ContainerModel(new ArrayList<>());
-    DeploymentService service = new DeploymentService();
+public class DeploymentPanel extends JPanel implements ActionListener, ListSelectionListener, Updated {
+    private final JPanel buttonPanel = new JPanel();
+    private final JButton refreshButton = new JButton("Refresh");
+    private final JButton addButton = new JButton("Add");
+    private final JButton deleteButton = new JButton("Delete");
+    private JTable table;
+    private JTable containerTable;
+    private DeploymentModel model;
+    private final ContainerModel containerModel = new ContainerModel(new ArrayList<>());
+    private final DeploymentService service = new DeploymentService();
+    private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
 
     public DeploymentPanel() {
         super();
@@ -36,7 +37,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
 
     private void init() {
         try {
-            model = new DeploymentModel(service.listDeployments("default"));
+            model = new DeploymentModel(service.listDeployments(nameSpaceListPanel.getNamespace()));
         } catch (ApiException err) {
             err.printStackTrace();
         }
@@ -51,6 +52,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
         refreshButton.setIcon(Util.getImageIcon("undo.png"));
         // Button panel setup
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        buttonPanel.add(nameSpaceListPanel);
         buttonPanel.add(refreshButton);
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
@@ -69,13 +71,14 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
         add(new JScrollPane(containerTable), BorderLayout.SOUTH);
     }
 
-    private void update() {
+    @Override
+    public void update() {
         table.clearSelection();
 
         try {
-            model.setDeployments(service.listDeployments("default"));
+            model.setDeployments(service.listDeployments(nameSpaceListPanel.getNamespace()));
         } catch (ApiException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         model.fireTableDataChanged();
@@ -91,7 +94,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
             if (row != -1) {
                 Deployment dp = model.getDeployment(row);
                 try {
-                    service.deleteDeployment("default", dp.getName());
+                    service.deleteDeployment(dp.getNamespace(), dp.getName());
                 } catch (ApiException ex) {
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
@@ -133,15 +136,11 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
                     return;
                 }
 
-                // contain at most 63 characters
-                // contain only lowercase alphanumeric characters or '-'
-                // start with an alphanumeric character
-                // end with an alphanumeric character
                 try {
                     Map<String, String> map = new HashMap<>();
                     map.put("app", nameField.getText());
 
-                    Deployment newDeployment = new Deployment(null, input, "default");
+                    Deployment newDeployment = new Deployment(null, input, nameSpaceListPanel.getNamespace());
                     newDeployment.setReplicas((Integer) replicas.getSelectedItem());
                     newDeployment.setLabels(map);
                     newDeployment.setSelectors(map);
