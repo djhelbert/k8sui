@@ -56,8 +56,10 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
         // Table setup
         table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getColumnModel().getColumn(3).setMaxWidth(80);
-        table.getColumnModel().getColumn(3).setPreferredWidth(80);
+        table.getColumnModel().getColumn(1).setMaxWidth(110);
+        table.getColumnModel().getColumn(1).setPreferredWidth(110);
+        table.getColumnModel().getColumn(3).setMaxWidth(90);
+        table.getColumnModel().getColumn(3).setPreferredWidth(90);
         table.getColumnModel().getColumn(4).setMaxWidth(100);
         table.getColumnModel().getColumn(4).setPreferredWidth(100);
         table.getSelectionModel().addListSelectionListener(this);
@@ -155,10 +157,20 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
                     newService.setType(types.getSelectedItem().toString());
 
                     var servicePort = new ServicePort();
-                    servicePort.setPort(Integer.valueOf(portField.getText()));
-                    servicePort.setTargetPort(Integer.valueOf(targetPortField.getText()));
                     servicePort.setProtocol("TCP");
-                    servicePort.setNodePort(Integer.valueOf(nodePortField.getText()));
+                    servicePort.setName("port");
+
+                    if (portField.getText() != null && !portField.getText().isEmpty()) {
+                        servicePort.setPort(Integer.valueOf(portField.getText()));
+                    }
+
+                    if (targetPortField.getText() != null && !targetPortField.getText().isEmpty()) {
+                        servicePort.setTargetPort(Integer.valueOf(targetPortField.getText()));
+                    }
+
+                    if (nodePortField.getText() != null && !nodePortField.getText().isEmpty()) {
+                        servicePort.setNodePort(Integer.valueOf(nodePortField.getText()));
+                    }
 
                     newService.setServicePorts(List.of(servicePort));
 

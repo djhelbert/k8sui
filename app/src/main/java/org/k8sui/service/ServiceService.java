@@ -70,9 +70,11 @@ public class ServiceService {
         v1ServiceSpec.setSelector(svc.getSelectors());
 
         var v1ServicePort = new V1ServicePort();
+        v1ServicePort.setName(svc.getServicePorts().get(0).getName());
         v1ServicePort.setPort(svc.getServicePorts().get(0).getPort());
         v1ServicePort.setTargetPort(new IntOrString(svc.getServicePorts().get(0).getTargetPort()));
-        v1ServicePort.setProtocol("TCP");
+        v1ServicePort.setProtocol(svc.getServicePorts().get(0).getProtocol());
+        v1ServicePort.setNodePort(svc.getServicePorts().get(0).getNodePort());
 
         v1ServiceSpec.setPorts(Collections.singletonList(v1ServicePort));
         v1Service.setSpec(v1ServiceSpec);
