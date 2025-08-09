@@ -37,7 +37,7 @@ public class ServiceService {
                             if (v1ServicePorts != null) {
                                 List<ServicePort> servicePortList = v1ServicePorts.stream().map(p -> {
                                     ServicePort servicePort = new ServicePort();
-                                    servicePort.setName(p.getName());
+                                    servicePort.setName(p.getName() == null ? "" : p.getName());
                                     servicePort.setPort(p.getPort());
                                     servicePort.setProtocol(p.getProtocol());
                                     servicePort.setNodePort(p.getNodePort());

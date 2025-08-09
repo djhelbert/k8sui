@@ -29,6 +29,6 @@ public class Deployment implements Comparable<Deployment> {
 
     @Override
     public int compareTo(@NotNull Deployment d) {
-        return d.getName().compareTo(getName());
+        return name.compareTo(d.getName());
     }
 }

@@ -38,7 +38,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
         try {
             model = new DeploymentModel(service.listDeployments("default"));
         } catch (ApiException err) {
-            throw new RuntimeException(err);
+            err.printStackTrace();
         }
 
         // Add button setup
@@ -53,6 +53,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(refreshButton);
         buttonPanel.add(addButton);
+        buttonPanel.add(deleteButton);
         // Table setup
         table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

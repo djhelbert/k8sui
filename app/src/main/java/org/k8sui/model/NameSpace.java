@@ -26,6 +26,6 @@ public class NameSpace implements Comparable<NameSpace> {
 
     @Override
     public int compareTo(@NotNull NameSpace n) {
-        return n.getNamespace().compareTo(namespace);
+        return namespace.compareTo(n.getNamespace());
     }
 }

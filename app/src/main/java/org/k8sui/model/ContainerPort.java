@@ -18,6 +18,6 @@ public class ContainerPort implements Comparable<ContainerPort> {
 
     @Override
     public int compareTo(@NotNull ContainerPort cp) {
-        return cp.getContainerPort().compareTo(containerPort);
+        return containerPort.compareTo(cp.getContainerPort());
     }
 }

@@ -6,6 +6,9 @@ import javax.swing.table.AbstractTableModel;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Service Model
+ */
 public class ServiceModel extends AbstractTableModel {
 
     private static final String[] headers = {"UID", "Name", "Namespace", "Type", "Cluster IP", "Selectors"};
@@ -18,6 +21,10 @@ public class ServiceModel extends AbstractTableModel {
     public void setServices(List<Service> services) {
         this.services = services;
         Collections.sort(services);
+    }
+
+    public Service getService(int row) {
+        return services.get(row);
     }
 
     @Override

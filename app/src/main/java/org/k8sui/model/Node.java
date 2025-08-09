@@ -24,7 +24,7 @@ public class Node implements Comparable<Node> {
     }
 
     @Override
-    public int compareTo(@NotNull Node n) {
-        return n.getName().compareTo(name);
+    public int compareTo(@NotNull Node node) {
+        return name.compareTo(node.getName());
     }
 }

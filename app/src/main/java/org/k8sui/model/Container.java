@@ -31,6 +31,6 @@ public class Container implements Comparable<Container> {
 
     @Override
     public int compareTo(@NotNull Container cont) {
-        return cont.getName().compareTo(name);
+        return name.compareTo(cont.getName());
     }
 }

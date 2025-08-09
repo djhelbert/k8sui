@@ -7,20 +7,26 @@ import org.k8sui.model.ServicePort;
 import org.k8sui.service.ServiceService;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ServicePanel extends JPanel implements ActionListener  {
+public class ServicePanel extends JPanel implements ActionListener, ListSelectionListener {
     JPanel buttonPanel = new JPanel();
     JButton refreshButton = new JButton("Refresh");
     JButton addButton = new JButton("Add");
     JTable table;
     ServiceModel model;
     ServiceService service = new ServiceService();
+    JTable servicePortTable;
+    ServicePortModel servicePortModel = new ServicePortModel(new ArrayList<>());
+    JButton deleteButton = new JButton("Delete");
 
     public ServicePanel() {
         super();
@@ -37,6 +43,8 @@ public class ServicePanel extends JPanel implements ActionListener  {
         // Setup add button
         addButton.setIcon(Util.getImageIcon("add.png"));
         addButton.addActionListener(this);
+        deleteButton.setIcon(Util.getImageIcon("delete.png"));
+        deleteButton.addActionListener(this);
         // Refresh button setup
         refreshButton.setIcon(Util.getImageIcon("undo.png"));
         refreshButton.addActionListener(this);
@@ -44,6 +52,7 @@ public class ServicePanel extends JPanel implements ActionListener  {
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(refreshButton);
         buttonPanel.add(addButton);
+        buttonPanel.add(deleteButton);
         // Table setup
         table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -51,11 +60,15 @@ public class ServicePanel extends JPanel implements ActionListener  {
         table.getColumnModel().getColumn(3).setPreferredWidth(80);
         table.getColumnModel().getColumn(4).setMaxWidth(100);
         table.getColumnModel().getColumn(4).setPreferredWidth(100);
+        table.getSelectionModel().addListSelectionListener(this);
+        servicePortTable = new JTable(servicePortModel);
+        servicePortTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         setLayout(new BorderLayout());
 
         add(buttonPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
+        add(new JScrollPane(servicePortTable), BorderLayout.SOUTH);
     }
 
     private void update() {
@@ -63,8 +76,8 @@ public class ServicePanel extends JPanel implements ActionListener  {
 
         try {
             model.setServices(service.services("default"));
-        } catch (ApiException e) {
-            throw new RuntimeException(e);
+        } catch (ApiException ex) {
+            Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
         }
 
         model.fireTableDataChanged();
@@ -72,12 +85,12 @@ public class ServicePanel extends JPanel implements ActionListener  {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource().equals(refreshButton)) {
+        if (e.getSource().equals(refreshButton)) {
             try {
                 model.setServices(service.services("default"));
                 model.fireTableDataChanged();
-            } catch (ApiException err) {
-                throw new RuntimeException(err);
+            } catch (ApiException ex) {
+                Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
             }
         }
 
@@ -91,7 +104,7 @@ public class ServicePanel extends JPanel implements ActionListener  {
             dialog.add(new JLabel("Name:"));
             dialog.add(nameField);
 
-            JComboBox<String> types = new JComboBox<>(new String[] {"ClusterIP", "NodePort", "LoadBalancer"});
+            JComboBox<String> types = new JComboBox<>(new String[]{"ClusterIP", "NodePort", "LoadBalancer"});
             types.setSelectedIndex(1);
             dialog.add(types);
 
@@ -115,6 +128,18 @@ public class ServicePanel extends JPanel implements ActionListener  {
             var okButton = new JButton("OK");
             var cancelButton = new JButton("Cancel");
 
+            deleteButton.addActionListener(evt -> {
+                int row = table.getSelectedRow();
+
+                if(row != -1) {
+                    try {
+                        service.deleteService(model.getService(row).getName(), "default");
+                    } catch (ApiException ex) {
+                        Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
+                    }
+                }
+            });
+
             // OK button action
             okButton.addActionListener(e1 -> {
                 // contain at most 63 characters
@@ -122,7 +147,7 @@ public class ServicePanel extends JPanel implements ActionListener  {
                 // start with an alphanumeric character
                 // end with an alphanumeric character
                 try {
-                    Map<String,String> map = new HashMap<>();
+                    Map<String, String> map = new HashMap<>();
                     map.put("app", selectorField.getText());
 
                     var newService = new Service(null, nameField.getText(), "default");
@@ -140,7 +165,7 @@ public class ServicePanel extends JPanel implements ActionListener  {
                     service.addService(newService);
                     update();
                 } catch (ApiException ex) {
-                    throw new RuntimeException(ex);
+                    Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
 
                 dialog.dispose();
@@ -157,6 +182,19 @@ public class ServicePanel extends JPanel implements ActionListener  {
             dialog.pack();
             Util.centerComponent(dialog);
             dialog.setVisible(true);
+        }
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        int row = table.getSelectedRow();
+
+        if (row != -1) {
+            servicePortModel.setServicePorts(model.getService(row).getServicePorts());
+            servicePortModel.fireTableDataChanged();
+        } else {
+            servicePortModel.setServicePorts(new ArrayList<>());
+            servicePortModel.fireTableDataChanged();
         }
     }
 }
