@@ -8,20 +8,25 @@ import org.k8sui.model.Deployment;
 import org.k8sui.service.DeploymentService;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DeploymentPanel extends JPanel implements ActionListener {
+public class DeploymentPanel extends JPanel implements ActionListener, ListSelectionListener {
     JPanel buttonPanel = new JPanel();
     JButton refreshButton = new JButton("Refresh");
     JButton addButton = new JButton("Add");
     JButton deleteButton = new JButton("Delete");
     JTable table;
+    JTable containerTable;
     DeploymentModel model;
+    ContainerModel containerModel = new ContainerModel(new ArrayList<>());
     DeploymentService service = new DeploymentService();
 
     public DeploymentPanel() {
@@ -53,10 +58,14 @@ public class DeploymentPanel extends JPanel implements ActionListener {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getColumnModel().getColumn(3).setMaxWidth(80);
         table.getColumnModel().getColumn(3).setPreferredWidth(80);
+        table.getSelectionModel().addListSelectionListener(this);
+        containerTable = new JTable(containerModel);
+        containerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         setLayout(new BorderLayout());
         add(buttonPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
+        add(new JScrollPane(containerTable), BorderLayout.SOUTH);
     }
 
     private void update() {
@@ -77,7 +86,16 @@ public class DeploymentPanel extends JPanel implements ActionListener {
             update();
         }
         if (e.getSource().equals(deleteButton)) {
-            // Todo
+            int row = table.getSelectedRow();
+            if (row != -1) {
+                Deployment dp = model.getDeployment(row);
+                try {
+                    service.deleteDeployment("default", dp.getName());
+                } catch (ApiException ex) {
+                    Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
+                }
+                update();
+            }
         }
         if (e.getSource().equals(addButton)) {
             // Create the dialog
@@ -93,7 +111,7 @@ public class DeploymentPanel extends JPanel implements ActionListener {
             dialog.add(new JLabel("Image:"));
             dialog.add(imageField);
 
-            JComboBox<Integer> replicas = new JComboBox<>(new Integer[] {1,2,3,4,5,6,7,8,9});
+            JComboBox<Integer> replicas = new JComboBox<>(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
             replicas.setSelectedIndex(2);
             dialog.add(replicas);
 
@@ -114,11 +132,11 @@ public class DeploymentPanel extends JPanel implements ActionListener {
                 // start with an alphanumeric character
                 // end with an alphanumeric character
                 try {
-                    Map<String,String> map = new HashMap<>();
-                    map.put("app",nameField.getText());
+                    Map<String, String> map = new HashMap<>();
+                    map.put("app", nameField.getText());
 
                     Deployment newDeployment = new Deployment(null, input, "default");
-                    newDeployment.setReplicas((Integer)replicas.getSelectedItem());
+                    newDeployment.setReplicas((Integer) replicas.getSelectedItem());
                     newDeployment.setLabels(map);
                     newDeployment.setSelectors(map);
 
@@ -148,6 +166,18 @@ public class DeploymentPanel extends JPanel implements ActionListener {
             dialog.pack();
             Util.centerComponent(dialog);
             dialog.setVisible(true);
+        }
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        int row = table.getSelectedRow();
+        if (row != -1) {
+            containerModel.setContainers(model.getDeployment(row).getContainers());
+            containerModel.fireTableDataChanged();
+        } else {
+            containerModel.setContainers(new ArrayList<>());
+            containerModel.fireTableDataChanged();
         }
     }
 }

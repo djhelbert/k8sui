@@ -5,11 +5,13 @@ import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.models.*;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.Container;
+import org.k8sui.model.ContainerPort;
 import org.k8sui.model.Deployment;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 public class DeploymentService {
 
@@ -26,25 +28,29 @@ public class DeploymentService {
                         deployment.setReplicas(d.getSpec().getReplicas());
                     }
 
-                    if(d.getSpec().getTemplate() != null) {
-                        var containerList = d.getSpec().getTemplate().getSpec().getContainers();
+                    var containerList = d.getSpec().getTemplate().getSpec().getContainers();
 
-                        List<Container> containers = containerList.stream().map(c -> {
-                            Container cont = new Container();
-                            cont.setName(c.getName());
-                            cont.setImage(c.getImage());
+                    List<Container> containers = containerList.stream().map(c -> {
+                        Container cont = new Container();
+                        cont.setName(c.getName());
+                        cont.setImage(c.getImage());
 
-                            return cont;
-                        }).collect(Collectors.toList());
+                        if (c.getPorts() != null) {
+                            cont.setPorts(c.getPorts().stream().map(p -> {
+                                return new ContainerPort(p.getContainerPort());
+                            }).toList());
+                        }
 
-                        deployment.setContainers(containers);
-                    }
+                        return cont;
+                    }).collect(toList());
+
+                    deployment.setContainers(containers);
 
                     deployment.setSelectors(d.getSpec().getSelector().getMatchLabels());
                     deployment.setLabels(d.getMetadata().getLabels());
 
                     return deployment;
-                }).collect(Collectors.toList());
+                }).collect(toList());
     }
 
     public V1Deployment addDeployment(Deployment dep) throws ApiException {

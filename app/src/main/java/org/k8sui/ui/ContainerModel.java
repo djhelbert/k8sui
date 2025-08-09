@@ -16,10 +16,10 @@ public class ContainerModel extends AbstractTableModel {
     private List<Container> containers;
 
     public ContainerModel(List<Container> containers) {
-        setNodes(containers);
+        setContainers(containers);
     }
 
-    public void setNodes(List<Container> containers) {
+    public void setContainers(List<Container> containers) {
         this.containers = containers;
         Collections.sort(containers);
     }
@@ -47,7 +47,11 @@ public class ContainerModel extends AbstractTableModel {
             return containers.get(row).getImage();
         }
 
-        return containers.get(row).getPorts().toString();
+        if (containers.get(row).getPorts() != null) {
+            return containers.get(row).getPorts().toString();
+        } else {
+            return "";
+        }
     }
 
     @Override
