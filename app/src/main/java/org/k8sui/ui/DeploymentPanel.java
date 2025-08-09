@@ -128,6 +128,11 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
             okButton.addActionListener(e1 -> {
                 String input = nameField.getText();
 
+                if(!NameValidator.validName(nameField.getText())) {
+                    Util.showError(this, "Invalid Name", "Validation Error");
+                    return;
+                }
+
                 // contain at most 63 characters
                 // contain only lowercase alphanumeric characters or '-'
                 // start with an alphanumeric character
@@ -150,7 +155,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
                     service.addDeployment(newDeployment);
                     update();
                 } catch (ApiException ex) {
-                    throw new RuntimeException(ex);
+                    Util.showError(this, Util.getValue(ex.getResponseBody(),"reason"), "Error");
                 }
 
                 dialog.dispose();

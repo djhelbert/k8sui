@@ -51,7 +51,8 @@ public class DeploymentModel extends AbstractTableModel {
         } else if (col == 2) {
             return deployments.get(row).getNamespace();
         } else if (col == 3) {
-            return deployments.get(row).getReplicas();
+            var replicaStatus = deployments.get(row).getReadyReplicas().toString();
+            return replicaStatus + "/" + deployments.get(row).getReplicas();
         }
 
         if (deployments.get(row).getSelectors() == null) {

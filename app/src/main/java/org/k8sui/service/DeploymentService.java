@@ -24,6 +24,13 @@ public class DeploymentService {
                 .map(d -> {
                     Deployment deployment = new Deployment(d.getMetadata().getUid(), d.getMetadata().getName(), d.getMetadata().getNamespace());
 
+                    var status = d.getStatus();
+                    if(status != null) {
+                        deployment.setReadyReplicas(status.getAvailableReplicas());
+                    } else {
+                        deployment.setReadyReplicas(0);
+                    }
+
                     if (d.getSpec() != null) {
                         deployment.setReplicas(d.getSpec().getReplicas());
                     }
@@ -32,6 +39,7 @@ public class DeploymentService {
 
                     List<Container> containers = containerList.stream().map(c -> {
                         Container cont = new Container();
+
                         cont.setName(c.getName());
                         cont.setImage(c.getImage());
 
