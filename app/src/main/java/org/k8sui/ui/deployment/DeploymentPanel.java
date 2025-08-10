@@ -1,4 +1,4 @@
-package org.k8sui.ui;
+package org.k8sui.ui.deployment;
 
 import io.kubernetes.client.openapi.ApiException;
 import org.k8sui.App;
@@ -6,6 +6,7 @@ import org.k8sui.model.Container;
 import org.k8sui.model.ContainerPort;
 import org.k8sui.model.Deployment;
 import org.k8sui.service.DeploymentService;
+import org.k8sui.ui.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;

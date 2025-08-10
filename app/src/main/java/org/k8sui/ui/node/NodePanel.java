@@ -1,7 +1,8 @@
-package org.k8sui.ui;
+package org.k8sui.ui.node;
 
 import io.kubernetes.client.openapi.ApiException;
 import org.k8sui.service.NodeService;
+import org.k8sui.ui.Util;
 
 import javax.swing.*;
 import java.awt.*;

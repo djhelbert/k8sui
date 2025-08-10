@@ -1,10 +1,11 @@
-package org.k8sui.ui;
+package org.k8sui.ui.service;
 
 import io.kubernetes.client.openapi.ApiException;
 import org.k8sui.App;
 import org.k8sui.model.Service;
 import org.k8sui.model.ServicePort;
 import org.k8sui.service.ServiceService;
+import org.k8sui.ui.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -69,12 +70,13 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
         table.getSelectionModel().addListSelectionListener(this);
         servicePortTable = new JTable(servicePortModel);
         servicePortTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        var scrollPane = new JScrollPane(servicePortTable);
+        scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Service Ports"));
 
         setLayout(new BorderLayout());
-
         add(buttonPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
-        add(new JScrollPane(servicePortTable), BorderLayout.SOUTH);
+        add(scrollPane, BorderLayout.SOUTH);
     }
 
     @Override

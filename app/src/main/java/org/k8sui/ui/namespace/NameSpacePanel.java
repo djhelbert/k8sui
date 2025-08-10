@@ -1,9 +1,11 @@
-package org.k8sui.ui;
+package org.k8sui.ui.namespace;
 
 import io.kubernetes.client.openapi.ApiException;
 import org.k8sui.App;
 import org.k8sui.model.NameSpace;
 import org.k8sui.service.NameSpaceService;
+import org.k8sui.ui.NameValidator;
+import org.k8sui.ui.Util;
 
 import javax.swing.*;
 import java.awt.*;

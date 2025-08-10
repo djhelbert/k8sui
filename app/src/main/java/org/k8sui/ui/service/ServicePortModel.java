@@ -1,9 +1,8 @@
-package org.k8sui.ui;
+package org.k8sui.ui.service;
 
 import org.k8sui.model.ServicePort;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.Collections;
 import java.util.List;
 
 /**

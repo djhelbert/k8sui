@@ -1,4 +1,4 @@
-package org.k8sui.ui;
+package org.k8sui.ui.service;
 
 import org.k8sui.model.Service;
 

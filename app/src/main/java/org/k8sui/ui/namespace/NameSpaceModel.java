@@ -1,4 +1,4 @@
-package org.k8sui.ui;
+package org.k8sui.ui.namespace;
 
 import org.k8sui.model.NameSpace;
 

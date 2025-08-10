@@ -1,25 +1,24 @@
 package org.k8sui.ui;
 
+import org.k8sui.ui.deployment.DeploymentPanel;
+import org.k8sui.ui.namespace.NameSpacePanel;
+import org.k8sui.ui.node.NodePanel;
+import org.k8sui.ui.service.ServicePanel;
+
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 
 public class MainPanel extends JPanel {
-    static final JLabel label = new JLabel(" ");
 
     public MainPanel() {
         super();
         init();
     }
 
-    public static void setLabelText(String text) {
-        label.setText(text);
-    }
-
     private void init() {
-        label.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(5,5));
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Nodes", new NodePanel());
@@ -27,6 +26,5 @@ public class MainPanel extends JPanel {
         tabbedPane.addTab("Services", new ServicePanel());
         tabbedPane.addTab("Deployments", new DeploymentPanel());
         add(tabbedPane, BorderLayout.CENTER);
-        add(label, BorderLayout.SOUTH);
     }
 }

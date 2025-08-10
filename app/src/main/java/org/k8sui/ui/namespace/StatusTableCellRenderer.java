@@ -1,4 +1,4 @@
-package org.k8sui.ui;
+package org.k8sui.ui.namespace;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;

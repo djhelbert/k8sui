@@ -1,4 +1,4 @@
-package org.k8sui.ui;
+package org.k8sui.ui.node;
 
 import org.k8sui.model.Node;
 
