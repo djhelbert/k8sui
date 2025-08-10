@@ -12,7 +12,7 @@ public class ConfigMapData implements Comparable<ConfigMapData> {
     private String value;
 
     @Override
-    public int compareTo(ConfigMapData d) {
-        return key.compareTo(d.getKey());
+    public int compareTo(ConfigMapData data) {
+        return key.compareTo(data.getKey());
     }
 }

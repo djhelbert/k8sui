@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Deployment Table Model
+ * Config Map Table Model
  */
 public class ConfigMapModel extends AbstractTableModel {
 
@@ -16,8 +16,8 @@ public class ConfigMapModel extends AbstractTableModel {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private List<ConfigMap> maps;
 
-    public ConfigMapModel(List<ConfigMap> deploymentList) {
-        setMaps(deploymentList);
+    public ConfigMapModel(List<ConfigMap> maps) {
+        setMaps(maps);
     }
 
     public void setMaps(List<ConfigMap> maps) {
@@ -53,11 +53,10 @@ public class ConfigMapModel extends AbstractTableModel {
         } else if (col == 2) {
             return maps.get(row).getNameSpace();
         } else {
-            if (maps.get(row).getCreated() == null) {
+            if (maps.get(row).getCreationDate() == null) {
                 return "";
             }
-
-            return formatter.format(maps.get(row).getCreated());
+            return formatter.format(maps.get(row).getCreationDate());
         }
     }
 

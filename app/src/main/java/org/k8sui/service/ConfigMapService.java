@@ -13,27 +13,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.stream.Collectors.toList;
+
 public class ConfigMapService {
 
     private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
-    public List<ConfigMap> configMapList() throws ApiException {
-        var list = coreV1Api.listConfigMapForAllNamespaces().execute();
+    public List<ConfigMap> configMapList(String namespace) throws ApiException {
+        var list = coreV1Api.listNamespacedConfigMap(namespace).execute();
 
         return list.getItems().stream().map(cm -> {
             var configMap = new ConfigMap();
             configMap.setName(cm.getMetadata().getName());
             configMap.setUid(cm.getMetadata().getUid());
-            configMap.setCreated(cm.getMetadata().getCreationTimestamp());
+            configMap.setCreationDate(cm.getMetadata().getCreationTimestamp());
             configMap.setNameSpace(cm.getMetadata().getNamespace());
 
             var map = cm.getData();
 
-            List<ConfigMapData> configMapDataList = map.keySet().stream().map(k -> new ConfigMapData(k, map.get(k))).toList();
+            List<ConfigMapData> configMapDataList = map.keySet().stream()
+                    .map(k -> new ConfigMapData(k, map.get(k)))
+                    .collect(toList());
             configMap.setData(configMapDataList);
 
             return configMap;
-        }).toList();
+        }).collect(toList());
     }
 
     public void createConfigMap(ConfigMap configMap) throws ApiException {

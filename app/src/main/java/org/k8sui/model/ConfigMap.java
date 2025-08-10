@@ -13,12 +13,15 @@ import java.util.List;
 public class ConfigMap implements Comparable<ConfigMap> {
     private String uid;
     private String name;
-    private OffsetDateTime created;
+    private OffsetDateTime creationDate;
     private String nameSpace;
     private List<ConfigMapData> data;
 
     @Override
     public int compareTo(ConfigMap cm) {
+        if(cm == null) {
+            return 0;
+        }
         return name.compareTo(cm.getName());
     }
 }
