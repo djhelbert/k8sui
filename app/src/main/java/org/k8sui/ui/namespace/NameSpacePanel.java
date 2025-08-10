@@ -8,11 +8,13 @@ import org.k8sui.ui.NameValidator;
 import org.k8sui.ui.Util;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class NameSpacePanel extends JPanel implements ActionListener {
+public class NameSpacePanel extends JPanel implements ActionListener, ListSelectionListener {
     JPanel buttonPanel = new JPanel();
     JButton refreshButton = new JButton("Refresh");
     JButton addButton = new JButton("Add");
@@ -38,6 +40,7 @@ public class NameSpacePanel extends JPanel implements ActionListener {
         addButton.addActionListener(this);
         deleteButton.setIcon(Util.getImageIcon("delete.png"));
         deleteButton.addActionListener(this);
+        deleteButton.setEnabled(false);
         // Refresh button setup
         refreshButton.addActionListener(this);
         refreshButton.setIcon(Util.getImageIcon("undo.png"));
@@ -52,6 +55,7 @@ public class NameSpacePanel extends JPanel implements ActionListener {
         table.getColumnModel().getColumn(3).setMaxWidth(80);
         table.getColumnModel().getColumn(3).setPreferredWidth(80);
         table.setDefaultRenderer(String.class, new StatusTableCellRenderer());
+        table.getSelectionModel().addListSelectionListener(this);
 
         setLayout(new BorderLayout());
         add(buttonPanel, BorderLayout.NORTH);
@@ -59,6 +63,7 @@ public class NameSpacePanel extends JPanel implements ActionListener {
     }
 
     private void update() {
+        deleteButton.setEnabled(false);
         table.clearSelection();
 
         try {
@@ -131,6 +136,17 @@ public class NameSpacePanel extends JPanel implements ActionListener {
             dialog.pack();
             Util.centerComponent(dialog);
             dialog.setVisible(true);
+        }
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        int row = table.getSelectedRow();
+
+        if(row == -1) {
+            deleteButton.setEnabled(false);
+        } else {
+            deleteButton.setEnabled(!"default".equalsIgnoreCase(model.get(row).getNamespace()));
         }
     }
 }

@@ -23,6 +23,11 @@ public class ConfigMapDataModel extends AbstractTableModel {
         Collections.sort(data);
     }
 
+    public void addData(ConfigMapData configMapData) {
+        data.add(configMapData);
+        Collections.sort(data);
+    }
+
     public ConfigMapData getConfigMapData(int index) {
         return data.get(index);
     }

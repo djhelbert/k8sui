@@ -29,6 +29,9 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
     private final ServicePortModel servicePortModel = new ServicePortModel(new ArrayList<>());
     private final JButton deleteButton = new JButton("Delete");
     private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
+    private static final String CLUSTERIP = "ClusterIP";
+    private static final String NODEPORT = "NodePort";
+    private static final String LB = "LoadBalancer";
 
     public ServicePanel() {
         super();
@@ -125,7 +128,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
             dialog.add(new JLabel("Name:"));
             dialog.add(nameField);
 
-            JComboBox<String> types = new JComboBox<>(new String[]{"ClusterIP", "NodePort", "LoadBalancer"});
+            JComboBox<String> types = new JComboBox<>(new String[]{CLUSTERIP, NODEPORT, LB});
             types.setSelectedIndex(1);
             dialog.add(types);
 
@@ -176,8 +179,12 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
                         servicePort.setTargetPort(Integer.valueOf(targetPortField.getText()));
                     }
 
-                    if (nodePortField.getText() != null && !nodePortField.getText().isEmpty()) {
-                        servicePort.setNodePort(Integer.valueOf(nodePortField.getText()));
+                    if(NODEPORT.equals(newService.getType())) {
+                        if (nodePortField.getText() != null && !nodePortField.getText().isEmpty()) {
+                            servicePort.setNodePort(Integer.valueOf(nodePortField.getText()));
+                        }
+                    } else {
+                        servicePort.setNodePort(null);
                     }
 
                     newService.setServicePorts(List.of(servicePort));

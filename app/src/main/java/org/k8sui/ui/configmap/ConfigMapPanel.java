@@ -24,6 +24,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
     private final JPanel buttonPanel = new JPanel();
     private final JButton refreshButton = new JButton("Refresh");
     private final JButton addButton = new JButton("Add");
+    private final JButton addDataButton = new JButton("Add Data");
     private JTable table;
     private ConfigMapModel model;
     private final ConfigMapService service = new ConfigMapService();
@@ -49,6 +50,10 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
         addButton.addActionListener(this);
         deleteButton.setIcon(Util.getImageIcon("delete.png"));
         deleteButton.addActionListener(this);
+        deleteButton.setEnabled(false);
+        addDataButton.setIcon(Util.getImageIcon("add.png"));
+        addDataButton.addActionListener(this);
+        addDataButton.setEnabled(false);
         // Refresh button setup
         refreshButton.setIcon(Util.getImageIcon("undo.png"));
         refreshButton.addActionListener(this);
@@ -58,6 +63,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
         buttonPanel.add(refreshButton);
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
+        buttonPanel.add(addDataButton);
         // Table setup
         table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -97,11 +103,10 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
             } catch (ApiException ex) {
                 Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
             }
-        }
-        else if (e.getSource().equals(deleteButton)) {
+        } else if (e.getSource().equals(deleteButton)) {
             int row = table.getSelectedRow();
 
-            if(row != -1) {
+            if (row != -1) {
                 try {
                     service.deleteConfigMap(model.getConfigMap(row).getName(), nameSpaceListPanel.getNamespace());
                 } catch (ApiException ex) {
@@ -110,8 +115,47 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
             }
 
             update();
-        }
-        else if (e.getSource().equals(addButton)) {
+        } else if (e.getSource().equals(addDataButton)) {
+            // Create the dialog
+            var dialog = new JDialog(App.frame(), "Add Config Map Data", true);
+            dialog.setLayout(new FlowLayout());
+
+            var keyField = new JTextField(10);
+            dialog.add(new JLabel("Key:"));
+            dialog.add(keyField);
+
+            var valueField = new JTextField(10);
+            dialog.add(new JLabel("Value:"));
+            dialog.add(valueField);
+
+            // Create OK and Cancel buttons
+            var okButton = new JButton("OK");
+            var cancelButton = new JButton("Cancel");
+
+            okButton.addActionListener(e1 -> {
+                try {
+                    int row = table.getSelectedRow();
+                    service.addData(model.getConfigMap(row).getName(), nameSpaceListPanel.getNamespace(), keyField.getText(), valueField.getText());
+                    dataModel.addData(new ConfigMapData(model.getConfigMap(row).getName(), nameSpaceListPanel.getNamespace()));
+                    dataModel.fireTableDataChanged();
+                    dialog.dispose();
+                } catch (ApiException ex) {
+                    Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
+                }
+            });
+
+            // Cancel button action
+            cancelButton.addActionListener(e1 -> dialog.dispose());
+
+            // Add buttons to dialog
+            dialog.add(okButton);
+            dialog.add(cancelButton);
+
+            // Center the dialog relative to the frame
+            dialog.pack();
+            Util.centerComponent(dialog);
+            dialog.setVisible(true);
+        } else if (e.getSource().equals(addButton)) {
             // Create the dialog
             var dialog = new JDialog(App.frame(), "Add Config Map", true);
             dialog.setLayout(new FlowLayout());
@@ -135,7 +179,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
 
             // OK button action
             okButton.addActionListener(e1 -> {
-                if(!NameValidator.validName(nameField.getText())) {
+                if (!NameValidator.validName(nameField.getText())) {
                     Util.showError(this, "Invalid Name", "Validation Error");
                     return;
                 }
@@ -177,9 +221,13 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
         if (row != -1) {
             dataModel.setData(model.getConfigMap(row).getData());
             dataModel.fireTableDataChanged();
+            deleteButton.setEnabled(true);
+            addDataButton.setEnabled(true);
         } else {
             dataModel.setData(new ArrayList<>());
             dataModel.fireTableDataChanged();
+            deleteButton.setEnabled(false);
+            addDataButton.setEnabled(false);
         }
     }
 }
