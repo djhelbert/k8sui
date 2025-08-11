@@ -101,7 +101,7 @@ public class Util {
     }
 
     /**
-     * Center
+     * Center Component on Screen
      *
      * @param comp Component
      */
@@ -119,8 +119,15 @@ public class Util {
         comp.setLocation(x, y);
     }
 
-    public static String getValue(String json, String field) {
+    /**
+     * Get JSON Value
+     *
+     * @param json JSON String
+     * @param key  Key
+     * @return String
+     */
+    public static String getValue(String json, String key) {
         JSONObject jsonObject = new JSONObject(json);
-        return jsonObject.getString(field);
+        return jsonObject.getString(key);
     }
 }

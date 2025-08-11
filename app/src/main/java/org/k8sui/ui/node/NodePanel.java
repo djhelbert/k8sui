@@ -1,6 +1,7 @@
 package org.k8sui.ui.node;
 
 import io.kubernetes.client.openapi.ApiException;
+import lombok.extern.log4j.Log4j2;
 import org.k8sui.service.NodeService;
 import org.k8sui.ui.Util;
 
@@ -9,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+@Log4j2
 public class NodePanel extends JPanel implements ActionListener  {
     JPanel buttonPanel = new JPanel();
     JButton refreshButton = new JButton("Refresh");
@@ -25,7 +27,7 @@ public class NodePanel extends JPanel implements ActionListener  {
         try {
             nodeModel = new NodeModel(service.nodes());
         } catch (ApiException err) {
-            throw new RuntimeException(err);
+            log.error("Node Panel", err);
         }
 
         // Refresh button setup

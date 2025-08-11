@@ -1,6 +1,7 @@
 package org.k8sui.ui.namespace;
 
 import io.kubernetes.client.openapi.ApiException;
+import lombok.extern.log4j.Log4j2;
 import org.k8sui.App;
 import org.k8sui.model.NameSpace;
 import org.k8sui.service.NameSpaceService;
@@ -14,6 +15,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+@Log4j2
 public class NameSpacePanel extends JPanel implements ActionListener, ListSelectionListener {
     JPanel buttonPanel = new JPanel();
     JButton refreshButton = new JButton("Refresh");
@@ -32,7 +34,7 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
         try {
             model = new NameSpaceModel(service.nameSpaces());
         } catch (ApiException err) {
-            throw new RuntimeException(err);
+            log.error("Node Panel", err);
         }
 
         // Add button setup
@@ -82,6 +84,7 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
         }
         if (e.getSource().equals(deleteButton)) {
             int row = table.getSelectedRow();
+
             if(row != -1) {
                 NameSpace ns = model.get(row);
                 try {

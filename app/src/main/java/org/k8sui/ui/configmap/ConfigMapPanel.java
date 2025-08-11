@@ -1,6 +1,7 @@
 package org.k8sui.ui.configmap;
 
 import io.kubernetes.client.openapi.ApiException;
+import lombok.extern.log4j.Log4j2;
 import org.k8sui.App;
 import org.k8sui.model.ConfigMap;
 import org.k8sui.model.ConfigMapData;
@@ -20,6 +21,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Log4j2
 public class ConfigMapPanel extends JPanel implements ActionListener, ListSelectionListener, Updated {
     private final JPanel buttonPanel = new JPanel();
     private final JButton refreshButton = new JButton("Refresh");
@@ -28,7 +30,6 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
     private JTable table;
     private ConfigMapModel model;
     private final ConfigMapService service = new ConfigMapService();
-    private JTable dataTable;
     private final ConfigMapDataModel dataModel = new ConfigMapDataModel(new ArrayList<>());
     private final JButton deleteButton = new JButton("Delete");
     private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
@@ -42,7 +43,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
         try {
             model = new ConfigMapModel(service.configMapList(nameSpaceListPanel.getNamespace()));
         } catch (ApiException err) {
-            err.printStackTrace();
+            log.error("Node Panel", err);
         }
 
         // Setup add button
@@ -68,7 +69,8 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
         table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getSelectionModel().addListSelectionListener(this);
-        dataTable = new JTable(dataModel);
+
+        final JTable dataTable = new JTable(dataModel);
         dataTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         dataTable.getColumnModel().getColumn(0).setMaxWidth(150);
         dataTable.getColumnModel().getColumn(0).setPreferredWidth(150);

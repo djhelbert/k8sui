@@ -1,6 +1,7 @@
 package org.k8sui.ui.deployment;
 
 import io.kubernetes.client.openapi.ApiException;
+import lombok.extern.log4j.Log4j2;
 import org.k8sui.App;
 import org.k8sui.model.Container;
 import org.k8sui.model.ContainerPort;
@@ -19,13 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Log4j2
 public class DeploymentPanel extends JPanel implements ActionListener, ListSelectionListener, Updated {
     private final JPanel buttonPanel = new JPanel();
     private final JButton refreshButton = new JButton("Refresh");
     private final JButton addButton = new JButton("Add");
     private final JButton deleteButton = new JButton("Delete");
     private JTable table;
-    private JTable containerTable;
     private DeploymentModel model;
     private final ContainerModel containerModel = new ContainerModel(new ArrayList<>());
     private final DeploymentService service = new DeploymentService();
@@ -40,7 +41,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
         try {
             model = new DeploymentModel(service.listDeployments(nameSpaceListPanel.getNamespace()));
         } catch (ApiException err) {
-            err.printStackTrace();
+            log.error("Node Panel", err);
         }
 
         // Add button setup
@@ -63,7 +64,8 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
         table.getColumnModel().getColumn(3).setMaxWidth(80);
         table.getColumnModel().getColumn(3).setPreferredWidth(80);
         table.getSelectionModel().addListSelectionListener(this);
-        containerTable = new JTable(containerModel);
+
+        JTable containerTable = new JTable(containerModel);
         containerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         setLayout(new BorderLayout());
@@ -78,8 +80,8 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
 
         try {
             model.setDeployments(service.listDeployments(nameSpaceListPanel.getNamespace()));
-        } catch (ApiException e) {
-            e.printStackTrace();
+        } catch (ApiException err) {
+            log.error("Deployment Panel", err);
         }
 
         model.fireTableDataChanged();

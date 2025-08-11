@@ -1,6 +1,7 @@
 package org.k8sui.ui.service;
 
 import io.kubernetes.client.openapi.ApiException;
+import lombok.extern.log4j.Log4j2;
 import org.k8sui.App;
 import org.k8sui.model.Service;
 import org.k8sui.model.ServicePort;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Log4j2
 public class ServicePanel extends JPanel implements ActionListener, ListSelectionListener, Updated {
     private final JPanel buttonPanel = new JPanel();
     private final JButton refreshButton = new JButton("Refresh");
@@ -29,8 +31,8 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
     private final ServicePortModel servicePortModel = new ServicePortModel(new ArrayList<>());
     private final JButton deleteButton = new JButton("Delete");
     private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
-    private static final String CLUSTERIP = "ClusterIP";
-    private static final String NODEPORT = "NodePort";
+    private static final String CLUSTER_IP = "ClusterIP";
+    private static final String NODE_PORT = "NodePort";
     private static final String LB = "LoadBalancer";
 
     public ServicePanel() {
@@ -42,7 +44,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
         try {
             model = new ServiceModel(service.services(nameSpaceListPanel.getNamespace()));
         } catch (ApiException err) {
-            err.printStackTrace();
+            log.error("Service Panel", err);
         }
 
         // Setup add button
@@ -50,6 +52,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
         addButton.addActionListener(this);
         deleteButton.setIcon(Util.getImageIcon("delete.png"));
         deleteButton.addActionListener(this);
+        deleteButton.setEnabled(false);
         // Refresh button setup
         refreshButton.setIcon(Util.getImageIcon("undo.png"));
         refreshButton.addActionListener(this);
@@ -128,7 +131,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
             dialog.add(new JLabel("Name:"));
             dialog.add(nameField);
 
-            JComboBox<String> types = new JComboBox<>(new String[]{CLUSTERIP, NODEPORT, LB});
+            JComboBox<String> types = new JComboBox<>(new String[]{CLUSTER_IP, NODE_PORT, LB});
             types.setSelectedIndex(1);
             dialog.add(types);
 
@@ -179,7 +182,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
                         servicePort.setTargetPort(Integer.valueOf(targetPortField.getText()));
                     }
 
-                    if(NODEPORT.equals(newService.getType())) {
+                    if(NODE_PORT.equals(newService.getType())) {
                         if (nodePortField.getText() != null && !nodePortField.getText().isEmpty()) {
                             servicePort.setNodePort(Integer.valueOf(nodePortField.getText()));
                         }
@@ -219,9 +222,11 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
         if (row != -1) {
             servicePortModel.setServicePorts(model.getService(row).getServicePorts());
             servicePortModel.fireTableDataChanged();
+            deleteButton.setEnabled(true);
         } else {
             servicePortModel.setServicePorts(new ArrayList<>());
             servicePortModel.fireTableDataChanged();
+            deleteButton.setEnabled(false);
         }
     }
 }

@@ -1,11 +1,13 @@
 package org.k8sui.model;
 
 import lombok.Data;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.OffsetDateTime;
 
 @Data
+@ToString
 public class NameSpace implements Comparable<NameSpace> {
     private String uid;
     private String namespace;
@@ -20,12 +22,7 @@ public class NameSpace implements Comparable<NameSpace> {
     }
 
     @Override
-    public String toString() {
-        return "Namespace[" + getUid() + ":" + getNamespace() + ":" + getCreation() + ":" + getStatus() + "]";
-    }
-
-    @Override
-    public int compareTo(@NotNull NameSpace n) {
-        return namespace.compareTo(n.getNamespace());
+    public int compareTo(@NotNull NameSpace nameSpace) {
+        return this.namespace.compareTo(nameSpace.getNamespace());
     }
 }

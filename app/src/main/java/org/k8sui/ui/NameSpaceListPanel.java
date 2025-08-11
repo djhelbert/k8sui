@@ -1,13 +1,19 @@
 package org.k8sui.ui;
 
 import io.kubernetes.client.openapi.ApiException;
+import lombok.extern.log4j.Log4j2;
 import org.k8sui.model.NameSpace;
 import org.k8sui.service.NameSpaceService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Namespace List Panel
+ */
+@Log4j2
 public class NameSpaceListPanel extends JPanel {
     private JComboBox<Object> list;
     private final NameSpaceService service = new NameSpaceService();
@@ -23,19 +29,25 @@ public class NameSpaceListPanel extends JPanel {
     }
 
     public void update() {
-        List<String> nameSpaces = null;
+        List<String> nameSpaces = new ArrayList<>();
+
         try {
             nameSpaces = service.nameSpaces().stream().map(NameSpace::getNamespace).toList();
-        } catch (ApiException e) {
-            e.printStackTrace();
+        } catch (ApiException err) {
+            log.error("Node Panel", err);
         }
-        list = new JComboBox<>(nameSpaces.stream().toArray());
+
+        list = new JComboBox<>(nameSpaces.toArray());
         list.setSelectedIndex(0);
         list.revalidate();
         list.repaint();
     }
 
     public String getNamespace() {
+        if(list.getSelectedItem() == null) {
+            return null;
+        }
+
         return list.getSelectedItem().toString();
     }
 }

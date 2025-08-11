@@ -30,7 +30,7 @@ public class Container implements Comparable<Container> {
     private List<ContainerPort> ports;
 
     @Override
-    public int compareTo(@NotNull Container cont) {
-        return name.compareTo(cont.getName());
+    public int compareTo(@NotNull Container container) {
+        return name.compareTo(container.getName());
     }
 }
