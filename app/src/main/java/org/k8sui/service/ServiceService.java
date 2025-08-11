@@ -14,7 +14,8 @@ import org.k8sui.model.ServicePort;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 public class ServiceService {
 
@@ -49,7 +50,7 @@ public class ServiceService {
                                     }
 
                                     return servicePort;
-                                }).toList();
+                                }).collect(toList());
 
                                 service.setServicePorts(servicePortList);
                             }
@@ -57,7 +58,7 @@ public class ServiceService {
                             return service;
                         }
                 )
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     public V1Service addService(Service svc) throws ApiException {

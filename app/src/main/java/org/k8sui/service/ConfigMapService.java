@@ -1,6 +1,5 @@
 package org.k8sui.service;
 
-import io.kubernetes.client.custom.V1Patch;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
@@ -25,7 +24,7 @@ public class ConfigMapService {
 
         return list.getItems().stream().map(cm -> {
             var configMap = new ConfigMap();
-            configMap.setName(cm.getMetadata().getName());
+            configMap.setName(cm.getMetadata() == null ? null : cm.getMetadata().getName());
             configMap.setUid(cm.getMetadata().getUid());
             configMap.setCreationDate(cm.getMetadata().getCreationTimestamp());
             configMap.setNameSpace(cm.getMetadata().getNamespace());
@@ -64,6 +63,7 @@ public class ConfigMapService {
         var list = coreV1Api.listNamespacedConfigMap(nameSpace).execute();
         var option = list.getItems().stream().filter(i -> name.equalsIgnoreCase(i.getMetadata().getName())).findFirst();
         var v1ConfigMap = option.get();
+
         v1ConfigMap.getData().put(key, value);
 
         coreV1Api.replaceNamespacedConfigMap(name, nameSpace, v1ConfigMap).execute();
