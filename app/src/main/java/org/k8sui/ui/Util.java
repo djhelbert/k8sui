@@ -127,7 +127,7 @@ public class Util {
      * @return String
      */
     public static String getValue(String json, String key) {
-        JSONObject jsonObject = new JSONObject(json);
+        var jsonObject = new JSONObject(json);
         return jsonObject.getString(key);
     }
 }

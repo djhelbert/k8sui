@@ -21,7 +21,7 @@ public class MainPanel extends JPanel {
         setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         setLayout(new BorderLayout(5,5));
 
-        JTabbedPane tabbedPane = new JTabbedPane();
+        var tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Nodes", new NodePanel());
         tabbedPane.addTab("Namespaces", new NameSpacePanel());
         tabbedPane.addTab("Config Maps", new ConfigMapPanel());

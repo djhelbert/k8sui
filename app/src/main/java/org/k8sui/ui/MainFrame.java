@@ -1,5 +1,7 @@
 package org.k8sui.ui;
 
+import lombok.extern.log4j.Log4j2;
+
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
@@ -11,6 +13,7 @@ import java.awt.event.ActionListener;
  *
  * @author djhelbert
  */
+@Log4j2
 public class MainFrame extends JFrame implements ActionListener {
 
     private final static JMenuItem exitItem = new JMenuItem("Exit");
@@ -100,7 +103,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
             Util.showInfo(this, panel, "License");
         } catch (Exception err) {
-            err.printStackTrace();
+            log.error("Main Panel", err);
         }
     }
 

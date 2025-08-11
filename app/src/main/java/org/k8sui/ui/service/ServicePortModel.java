@@ -3,6 +3,7 @@ package org.k8sui.ui.service;
 import org.k8sui.model.ServicePort;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public class ServicePortModel extends AbstractTableModel {
 
     public void setServicePorts(List<ServicePort> servicePorts) {
         this.servicePorts = servicePorts;
-        //Collections.sort(servicePorts);
+        Collections.sort(servicePorts);
     }
 
     @Override

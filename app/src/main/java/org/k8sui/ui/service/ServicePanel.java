@@ -27,7 +27,6 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
     private JTable table;
     private ServiceModel model;
     private final ServiceService service = new ServiceService();
-    private JTable servicePortTable;
     private final ServicePortModel servicePortModel = new ServicePortModel(new ArrayList<>());
     private final JButton deleteButton = new JButton("Delete");
     private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
@@ -74,7 +73,9 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
         table.getColumnModel().getColumn(4).setMaxWidth(110);
         table.getColumnModel().getColumn(4).setPreferredWidth(110);
         table.getSelectionModel().addListSelectionListener(this);
-        servicePortTable = new JTable(servicePortModel);
+
+        // Setup service port table
+        JTable servicePortTable = new JTable(servicePortModel);
         servicePortTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         var scrollPane = new JScrollPane(servicePortTable);
         scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Service Ports"));
@@ -128,11 +129,11 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
 
             // Create text field
             var nameField = new JTextField(10);
-            dialog.add(new JLabel("Name:"));
+            dialog.add(new JLabel("Service Name:"));
             dialog.add(nameField);
 
             JComboBox<String> types = new JComboBox<>(new String[]{CLUSTER_IP, NODE_PORT, LB});
-            types.setSelectedIndex(1);
+            types.setSelectedIndex(0);
             dialog.add(types);
 
             var selectorField = new JTextField(20);
@@ -147,7 +148,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
             dialog.add(new JLabel("Target Port:"));
             dialog.add(targetPortField);
 
-            var nodePortField = new JTextField("30080", 4);
+            var nodePortField = new JTextField("", 4);
             dialog.add(new JLabel("Node Port:"));
             dialog.add(nodePortField);
 
@@ -168,7 +169,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
 
                     var newService = new Service(null, nameField.getText(), nameSpaceListPanel.getNamespace());
                     newService.setSelectors(map);
-                    newService.setType(types.getSelectedItem().toString());
+                    newService.setType(types.getSelectedItem() == null ? null : types.getSelectedItem().toString());
 
                     var servicePort = new ServicePort();
                     servicePort.setProtocol("TCP");
