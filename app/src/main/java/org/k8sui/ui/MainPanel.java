@@ -11,6 +11,9 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 
+/**
+ * Main Panel
+ */
 public class MainPanel extends JPanel {
 
     public MainPanel() {
@@ -23,12 +26,24 @@ public class MainPanel extends JPanel {
         setLayout(new BorderLayout(5,5));
 
         var tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Nodes", new NodePanel());
-        tabbedPane.addTab("Namespaces", new NameSpacePanel());
-        tabbedPane.addTab("Config Maps", new ConfigMapPanel());
-        tabbedPane.addTab("Secrets", new SecretPanel());
-        tabbedPane.addTab("Services", new ServicePanel());
-        tabbedPane.addTab("Deployments", new DeploymentPanel());
+        var nameSpacePanel = new NameSpacePanel();
+        var nodePanel = new NodePanel();
+        var configMapPanel = new ConfigMapPanel();
+        var secretsPanel = new SecretPanel();
+        var servicePanel = new ServicePanel();
+        var deploymentPanel = new DeploymentPanel();
+
+        nameSpacePanel.addNameSpaceObserver(configMapPanel.getNameSpaceListPanel());
+        nameSpacePanel.addNameSpaceObserver(secretsPanel.getNameSpaceListPanel());
+        nameSpacePanel.addNameSpaceObserver(servicePanel.getNameSpaceListPanel());
+        nameSpacePanel.addNameSpaceObserver(deploymentPanel.getNameSpaceListPanel());
+
+        tabbedPane.addTab("Nodes", nodePanel);
+        tabbedPane.addTab("Namespaces", nameSpacePanel);
+        tabbedPane.addTab("Config Maps", configMapPanel);
+        tabbedPane.addTab("Secrets", secretsPanel);
+        tabbedPane.addTab("Services", servicePanel);
+        tabbedPane.addTab("Deployments", deploymentPanel);
         add(tabbedPane, BorderLayout.CENTER);
     }
 }

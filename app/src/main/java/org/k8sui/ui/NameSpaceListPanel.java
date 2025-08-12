@@ -38,9 +38,9 @@ public class NameSpaceListPanel extends JPanel implements NameSpaceObserver {
         }
 
         list = new JComboBox<>(nameSpaces.toArray());
-        list.setSelectedIndex(0);
         list.revalidate();
         list.repaint();
+        list.setSelectedIndex(0);
     }
 
     public String getNamespace() {

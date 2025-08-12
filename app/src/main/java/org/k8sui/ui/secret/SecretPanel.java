@@ -1,6 +1,7 @@
 package org.k8sui.ui.secret;
 
 import io.kubernetes.client.openapi.ApiException;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.k8sui.App;
 import org.k8sui.model.Secret;
@@ -33,6 +34,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
     private final SecretService service = new SecretService();
     private final SecretDataModel dataModel = new SecretDataModel(new ArrayList<>());
     private final JButton deleteButton = new JButton("Delete");
+    @Getter
     private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
 
     public SecretPanel() {

@@ -1,6 +1,7 @@
 package org.k8sui.ui.configmap;
 
 import io.kubernetes.client.openapi.ApiException;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.k8sui.App;
 import org.k8sui.model.ConfigMap;
@@ -32,6 +33,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
     private final ConfigMapService service = new ConfigMapService();
     private final ConfigMapDataModel dataModel = new ConfigMapDataModel(new ArrayList<>());
     private final JButton deleteButton = new JButton("Delete");
+    @Getter
     private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
 
     public ConfigMapPanel() {

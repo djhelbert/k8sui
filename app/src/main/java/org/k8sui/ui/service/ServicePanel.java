@@ -1,6 +1,7 @@
 package org.k8sui.ui.service;
 
 import io.kubernetes.client.openapi.ApiException;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.k8sui.App;
 import org.k8sui.model.Service;
@@ -29,6 +30,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
     private final ServiceService service = new ServiceService();
     private final ServicePortModel servicePortModel = new ServicePortModel(new ArrayList<>());
     private final JButton deleteButton = new JButton("Delete");
+    @Getter
     private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
     private static final String CLUSTER_IP = "ClusterIP";
     private static final String NODE_PORT = "NodePort";

@@ -1,6 +1,7 @@
 package org.k8sui.ui.deployment;
 
 import io.kubernetes.client.openapi.ApiException;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.k8sui.App;
 import org.k8sui.model.Container;
@@ -30,6 +31,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
     private DeploymentModel model;
     private final ContainerModel containerModel = new ContainerModel(new ArrayList<>());
     private final DeploymentService service = new DeploymentService();
+    @Getter
     private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
 
     public DeploymentPanel() {
