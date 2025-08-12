@@ -1,11 +1,11 @@
-package org.k8sui.ui.configmap;
+package org.k8sui.ui.secret;
 
 import io.kubernetes.client.openapi.ApiException;
 import lombok.extern.log4j.Log4j2;
 import org.k8sui.App;
-import org.k8sui.model.ConfigMap;
-import org.k8sui.model.ConfigMapData;
-import org.k8sui.service.ConfigMapService;
+import org.k8sui.model.Secret;
+import org.k8sui.model.SecretData;
+import org.k8sui.service.SecretService;
 import org.k8sui.ui.NameSpaceListPanel;
 import org.k8sui.ui.NameValidator;
 import org.k8sui.ui.Updated;
@@ -19,29 +19,30 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Log4j2
-public class ConfigMapPanel extends JPanel implements ActionListener, ListSelectionListener, Updated {
+public class SecretPanel extends JPanel implements ActionListener, ListSelectionListener, Updated {
     private final JPanel buttonPanel = new JPanel();
     private final JButton refreshButton = new JButton("Refresh");
     private final JButton addButton = new JButton("Add");
     private final JButton addDataButton = new JButton("Add Data");
     private JTable table;
-    private ConfigMapModel model;
-    private final ConfigMapService service = new ConfigMapService();
-    private final ConfigMapDataModel dataModel = new ConfigMapDataModel(new ArrayList<>());
+    private SecretModel model;
+    private final SecretService service = new SecretService();
+    private final SecretDataModel dataModel = new SecretDataModel(new ArrayList<>());
     private final JButton deleteButton = new JButton("Delete");
     private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
 
-    public ConfigMapPanel() {
+    public SecretPanel() {
         super();
         init();
     }
 
     private void init() {
         try {
-            model = new ConfigMapModel(service.configMapList(nameSpaceListPanel.getNamespace()));
+            model = new SecretModel(service.secretList(nameSpaceListPanel.getNamespace()));
         } catch (ApiException err) {
             log.error("Node Panel", err);
         }
@@ -88,7 +89,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
         table.clearSelection();
 
         try {
-            model.setMaps(service.configMapList(nameSpaceListPanel.getNamespace()));
+            model.setSecrets(service.secretList(nameSpaceListPanel.getNamespace()));
         } catch (ApiException ex) {
             Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
         }
@@ -100,7 +101,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(refreshButton)) {
             try {
-                model.setMaps(service.configMapList(nameSpaceListPanel.getNamespace()));
+                model.setSecrets(service.secretList(nameSpaceListPanel.getNamespace()));
                 model.fireTableDataChanged();
             } catch (ApiException ex) {
                 Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
@@ -110,7 +111,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
 
             if (row != -1) {
                 try {
-                    service.deleteConfigMap(model.getConfigMap(row).getName(), nameSpaceListPanel.getNamespace());
+                    service.deleteSecret(model.getSecret(row).getName(), nameSpaceListPanel.getNamespace());
                 } catch (ApiException ex) {
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
@@ -119,7 +120,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
             update();
         } else if (e.getSource().equals(addDataButton)) {
             // Create the dialog
-            var dialog = new JDialog(App.frame(), "Add Config Map Data", true);
+            var dialog = new JDialog(App.frame(), "Add Secret Data", true);
             dialog.setLayout(new FlowLayout());
 
             var keyField = new JTextField(10);
@@ -137,8 +138,8 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
             okButton.addActionListener(e1 -> {
                 try {
                     int row = table.getSelectedRow();
-                    service.addData(model.getConfigMap(row).getName(), nameSpaceListPanel.getNamespace(), keyField.getText(), valueField.getText());
-                    dataModel.addData(new ConfigMapData(keyField.getText(), valueField.getText()));
+                    service.addSecret(model.getSecret(row).getName(), nameSpaceListPanel.getNamespace(), keyField.getText(), base64Encode(valueField.getText()));
+                    dataModel.addData(new SecretData(keyField.getText(), base64Encode(valueField.getText())));
                     dataModel.fireTableDataChanged();
                     dialog.dispose();
                 } catch (ApiException ex) {
@@ -187,13 +188,13 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
                 }
 
                 try {
-                    var newMap = new ConfigMap();
+                    var newMap = new Secret();
                     newMap.setCreationDate(OffsetDateTime.now());
                     newMap.setNameSpace(nameSpaceListPanel.getNamespace());
                     newMap.setName(nameField.getText());
-                    newMap.setData(List.of(new ConfigMapData(keyField.getText(), valueField.getText())));
+                    newMap.setData(List.of(new SecretData(keyField.getText(), base64Encode(valueField.getText()))));
 
-                    service.createConfigMap(newMap);
+                    service.createSecret(newMap);
                     update();
                 } catch (ApiException ex) {
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
@@ -221,7 +222,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
         int row = table.getSelectedRow();
 
         if (row != -1) {
-            dataModel.setData(model.getConfigMap(row).getData());
+            dataModel.setData(model.getSecret(row).getData());
             dataModel.fireTableDataChanged();
             deleteButton.setEnabled(true);
             addDataButton.setEnabled(true);
@@ -231,5 +232,9 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
             deleteButton.setEnabled(false);
             addDataButton.setEnabled(false);
         }
+    }
+
+    public byte[] base64Encode(String text) {
+        return Base64.getEncoder().encode(text.getBytes());
     }
 }

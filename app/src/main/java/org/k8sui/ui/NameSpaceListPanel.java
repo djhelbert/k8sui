@@ -14,7 +14,7 @@ import java.util.List;
  * Namespace List Panel
  */
 @Log4j2
-public class NameSpaceListPanel extends JPanel {
+public class NameSpaceListPanel extends JPanel implements NameSpaceObserver {
     private JComboBox<Object> list;
     private final NameSpaceService service = new NameSpaceService();
 
@@ -49,5 +49,16 @@ public class NameSpaceListPanel extends JPanel {
         }
 
         return list.getSelectedItem().toString();
+    }
+
+    @Override
+    public void nameSpaceChange(String namespace, NameSpaceOperation nameSpaceOperation) {
+        if(nameSpaceOperation == NameSpaceOperation.ADD) {
+            list.addItem(namespace);
+        } else {
+            list.removeItem(namespace);
+        }
+
+        update();
     }
 }

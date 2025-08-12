@@ -4,6 +4,7 @@ import org.k8sui.ui.configmap.ConfigMapPanel;
 import org.k8sui.ui.deployment.DeploymentPanel;
 import org.k8sui.ui.namespace.NameSpacePanel;
 import org.k8sui.ui.node.NodePanel;
+import org.k8sui.ui.secret.SecretPanel;
 import org.k8sui.ui.service.ServicePanel;
 
 import javax.swing.*;
@@ -25,6 +26,7 @@ public class MainPanel extends JPanel {
         tabbedPane.addTab("Nodes", new NodePanel());
         tabbedPane.addTab("Namespaces", new NameSpacePanel());
         tabbedPane.addTab("Config Maps", new ConfigMapPanel());
+        tabbedPane.addTab("Secrets", new SecretPanel());
         tabbedPane.addTab("Services", new ServicePanel());
         tabbedPane.addTab("Deployments", new DeploymentPanel());
         add(tabbedPane, BorderLayout.CENTER);
