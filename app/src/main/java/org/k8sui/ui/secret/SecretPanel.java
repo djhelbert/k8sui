@@ -123,7 +123,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
         } else if (e.getSource().equals(addDataButton)) {
             // Create the dialog
             var dialog = new JDialog(App.frame(), "Add Secret Data", true);
-            dialog.setLayout(new FlowLayout());
+            dialog.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
             var keyField = new JTextField(10);
             dialog.add(new JLabel("Key:"));
@@ -134,8 +134,8 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
             dialog.add(valueField);
 
             // Create OK and Cancel buttons
-            var okButton = new JButton("OK");
             var cancelButton = new JButton("Cancel");
+            var okButton = new JButton("OK");
 
             okButton.addActionListener(e1 -> {
                 try {
@@ -162,16 +162,16 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
             dialog.setVisible(true);
         } else if (e.getSource().equals(addButton)) {
             // Create the dialog
-            var dialog = new JDialog(App.frame(), "Add Config Map", true);
-            dialog.setLayout(new FlowLayout());
+            var dialog = new JDialog(App.frame(), "Add Secret", true);
+            dialog.setLayout(new FlowLayout(FlowLayout.LEFT,5,5));
 
             // Create text field
             var nameField = new JTextField(10);
-            dialog.add(new JLabel("Name:"));
+            dialog.add(new JLabel("Secret Name:"));
             dialog.add(nameField);
 
             var keyField = new JTextField(10);
-            dialog.add(new JLabel("Key:"));
+            dialog.add(new JLabel("Secret Key:"));
             dialog.add(keyField);
 
             var valueField = new JTextField(10);
@@ -180,7 +180,6 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
 
             // Create OK and Cancel buttons
             var okButton = new JButton("OK");
-            var cancelButton = new JButton("Cancel");
 
             // OK button action
             okButton.addActionListener(e1 -> {
@@ -206,6 +205,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
             });
 
             // Cancel button action
+            var cancelButton = new JButton("Cancel");
             cancelButton.addActionListener(e1 -> dialog.dispose());
 
             // Add buttons to dialog
