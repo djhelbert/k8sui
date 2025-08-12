@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class SecretDataModel extends AbstractTableModel {
 
-    private static final String[] headers = {"Key", "Value"};
+    private static final String[] headers = {"Key", "Value (Base64 Encoded)"};
     private List<SecretData> data;
 
     public SecretDataModel(List<SecretData> data) {
@@ -26,10 +26,6 @@ public class SecretDataModel extends AbstractTableModel {
     public void addData(SecretData secretData) {
         data.add(secretData);
         Collections.sort(data);
-    }
-
-    public SecretData getConfigMapData(int index) {
-        return data.get(index);
     }
 
     @Override
