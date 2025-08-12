@@ -42,8 +42,9 @@ public class MainPanel extends JPanel {
         tabbedPane.addTab("Namespaces", nameSpacePanel);
         tabbedPane.addTab("Config Maps", configMapPanel);
         tabbedPane.addTab("Secrets", secretsPanel);
-        tabbedPane.addTab("Services", servicePanel);
         tabbedPane.addTab("Deployments", deploymentPanel);
+        tabbedPane.addTab("Services", servicePanel);
+
         add(tabbedPane, BorderLayout.CENTER);
     }
 }
