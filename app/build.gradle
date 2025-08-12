@@ -4,10 +4,10 @@
  * This generated file contains a sample Java application project to get you started.
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/9.0.0/userguide/building_java_projects.html in the Gradle documentation.
  */
-
 plugins {
     id 'application'
     id 'java'
+    id("com.gradleup.shadow") version "9.0.1"
 }
 
 repositories {
@@ -15,7 +15,21 @@ repositories {
     mavenCentral()
 }
 
+version = '1.0.0'
+
+base {
+    archivesName = "k8sui"
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.k8sui.App'
+    }
+}
+
 dependencies {
+    implementation("com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.0.1")
+
     compileOnly 'org.projectlombok:lombok:1.18.38'
     annotationProcessor 'org.projectlombok:lombok:1.18.38'
 
