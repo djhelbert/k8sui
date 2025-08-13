@@ -138,6 +138,11 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
             var okButton = new JButton("OK");
 
             okButton.addActionListener(e1 -> {
+                if (!NameValidator.validName(keyField.getText())) {
+                    Util.showError(this, "Invalid Key Name", "Validation Error");
+                    return;
+                }
+
                 try {
                     int row = table.getSelectedRow();
                     service.addSecret(model.getSecret(row).getName(), nameSpaceListPanel.getNamespace(), keyField.getText(), base64Encode(valueField.getText()));
@@ -185,6 +190,11 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
             okButton.addActionListener(e1 -> {
                 if (!NameValidator.validName(nameField.getText())) {
                     Util.showError(this, "Invalid Name", "Validation Error");
+                    return;
+                }
+
+                if (!NameValidator.validName(keyField.getText())) {
+                    Util.showError(this, "Invalid Key Name", "Validation Error");
                     return;
                 }
 

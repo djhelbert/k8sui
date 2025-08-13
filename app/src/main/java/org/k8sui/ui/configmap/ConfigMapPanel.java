@@ -125,7 +125,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
             dialog.setLayout(new FlowLayout());
 
             var keyField = new JTextField(10);
-            dialog.add(new JLabel("Key:"));
+            dialog.add(new JLabel("Map Key:"));
             dialog.add(keyField);
 
             var valueField = new JTextField(10);
@@ -137,6 +137,11 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
             var cancelButton = new JButton("Cancel");
 
             okButton.addActionListener(e1 -> {
+                if (!NameValidator.validName(keyField.getText())) {
+                    Util.showError(this, "Invalid Key Name", "Validation Error");
+                    return;
+                }
+
                 try {
                     int row = table.getSelectedRow();
                     service.addData(model.getConfigMap(row).getName(), nameSpaceListPanel.getNamespace(), keyField.getText(), valueField.getText());
@@ -185,6 +190,11 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
             okButton.addActionListener(e1 -> {
                 if (!NameValidator.validName(nameField.getText())) {
                     Util.showError(this, "Invalid Name", "Validation Error");
+                    return;
+                }
+
+                if (!NameValidator.validName(keyField.getText())) {
+                    Util.showError(this, "Invalid Key Name", "Validation Error");
                     return;
                 }
 
