@@ -10,13 +10,16 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * Namespace List Panel
  */
 @Log4j2
 public class NameSpaceListPanel extends JPanel implements NameSpaceObserver {
-    private JComboBox<Object> list;
+    private JComboBox<String> list;
     private final NameSpaceService service = new NameSpaceService();
+    private NameSpaceComboModel model;
 
     public NameSpaceListPanel(Updated updatedObject) {
         super();
@@ -32,15 +35,14 @@ public class NameSpaceListPanel extends JPanel implements NameSpaceObserver {
         List<String> nameSpaces = new ArrayList<>();
 
         try {
-            nameSpaces = service.nameSpaces().stream().map(NameSpace::getNamespace).toList();
+            nameSpaces = service.nameSpaces().stream().map(NameSpace::getNamespace).collect(toList());
+            model = new NameSpaceComboModel(nameSpaces);
         } catch (ApiException err) {
             log.error("Node Panel", err);
         }
 
-        list = new JComboBox<>(nameSpaces.toArray());
-        list.revalidate();
-        list.repaint();
-        list.setSelectedIndex(0);
+        list = new JComboBox<>(model);
+        model.setSelectedItem(0);
     }
 
     public String getNamespace() {
@@ -54,11 +56,13 @@ public class NameSpaceListPanel extends JPanel implements NameSpaceObserver {
     @Override
     public void nameSpaceChange(String namespace, NameSpaceOperation nameSpaceOperation) {
         if(nameSpaceOperation == NameSpaceOperation.ADD) {
-            list.addItem(namespace);
+            model.addNameSpace(namespace);
         } else {
-            list.removeItem(namespace);
+            String temp = getNamespace();
+            model.removeNameSpace(namespace);
+            if(temp != null && temp.equalsIgnoreCase(namespace)) {
+                model.setSelectedItem(0);
+            }
         }
-
-        update();
     }
 }
