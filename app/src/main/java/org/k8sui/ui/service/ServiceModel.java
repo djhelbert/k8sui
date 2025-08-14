@@ -1,20 +1,21 @@
 package org.k8sui.ui.service;
 
 import org.k8sui.model.Service;
+import org.k8sui.ui.BaseTableModel;
 
-import javax.swing.table.AbstractTableModel;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * Service Model
  */
-public class ServiceModel extends AbstractTableModel {
+public class ServiceModel extends BaseTableModel {
 
     private static final String[] headers = {"UID", "Name", "Namespace", "Type", "Cluster IP", "Selectors"};
     private List<Service> services;
 
     public ServiceModel(List<Service> serviceList) {
+        super(headers);
         setServices(serviceList);
     }
 
@@ -30,16 +31,6 @@ public class ServiceModel extends AbstractTableModel {
     @Override
     public int getRowCount() {
         return services.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return headers.length;
-    }
-
-    @Override
-    public String getColumnName(int col) {
-        return headers[col];
     }
 
     @Override
@@ -61,10 +52,5 @@ public class ServiceModel extends AbstractTableModel {
         } else {
             return services.get(row).getSelectors().toString();
         }
-    }
-
-    @Override
-    public Class<String> getColumnClass(int col) {
-        return String.class;
     }
 }

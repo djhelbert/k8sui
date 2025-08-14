@@ -1,17 +1,18 @@
 package org.k8sui.ui.node;
 
 import org.k8sui.model.Node;
+import org.k8sui.ui.BaseTableModel;
 
-import javax.swing.table.AbstractTableModel;
 import java.util.Collections;
 import java.util.List;
 
-public class NodeModel extends AbstractTableModel {
+public class NodeModel extends BaseTableModel {
 
     private static final String[] headers = {"UID", "Name", "OS Image", "CPU", "Memory", "Internal IP"};
     private List<Node> nodes;
 
     public NodeModel(List<Node> nodes) {
+        super(headers);
         setNodes(nodes);
     }
 
@@ -23,16 +24,6 @@ public class NodeModel extends AbstractTableModel {
     @Override
     public int getRowCount() {
         return nodes.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return headers.length;
-    }
-
-    @Override
-    public String getColumnName(int col) {
-        return headers[col];
     }
 
     @Override
@@ -50,10 +41,5 @@ public class NodeModel extends AbstractTableModel {
         }
 
         return nodes.get(row).getIp();
-    }
-
-    @Override
-    public Class<String> getColumnClass(int col) {
-        return String.class;
     }
 }

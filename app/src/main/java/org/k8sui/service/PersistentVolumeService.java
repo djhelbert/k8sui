@@ -24,6 +24,7 @@ public class PersistentVolumeService {
             persistentVolume.setName(pv.getMetadata().getName());
             persistentVolume.setStorageClassName(pv.getSpec().getStorageClassName());
             persistentVolume.setNameSpace(pv.getMetadata().getNamespace());
+            persistentVolume.setPersistentVolumeReclaimPolicy(pv.getSpec().getPersistentVolumeReclaimPolicy());
 
             final Map<String, String> capacities = new HashMap<>();
             final Map<String, Quantity> capacityMap = pv.getSpec().getCapacity();

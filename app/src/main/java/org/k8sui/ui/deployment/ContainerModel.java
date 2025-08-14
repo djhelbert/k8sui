@@ -1,21 +1,21 @@
 package org.k8sui.ui.deployment;
 
 import org.k8sui.model.Container;
+import org.k8sui.ui.BaseTableModel;
 
-import javax.swing.table.AbstractTableModel;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * Container Table Model
  */
-public class ContainerModel extends AbstractTableModel {
+public class ContainerModel extends BaseTableModel {
 
     private static final String[] headers = {"Name", "Image", "Ports"};
-
     private List<Container> containers;
 
     public ContainerModel(List<Container> containers) {
+        super(headers);
         setContainers(containers);
     }
 
@@ -27,16 +27,6 @@ public class ContainerModel extends AbstractTableModel {
     @Override
     public int getRowCount() {
         return containers.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return headers.length;
-    }
-
-    @Override
-    public String getColumnName(int col) {
-        return headers[col];
     }
 
     @Override
@@ -52,10 +42,5 @@ public class ContainerModel extends AbstractTableModel {
         } else {
             return "";
         }
-    }
-
-    @Override
-    public Class<String> getColumnClass(int col) {
-        return String.class;
     }
 }

@@ -1,20 +1,21 @@
 package org.k8sui.ui.deployment;
 
 import org.k8sui.model.Deployment;
+import org.k8sui.ui.BaseTableModel;
 
-import javax.swing.table.AbstractTableModel;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * Deployment Table Model
  */
-public class DeploymentModel extends AbstractTableModel {
+public class DeploymentModel extends BaseTableModel {
 
     private static final String[] headers = {"UID", "Name", "Namespace", "Replicas", "Selector"};
     private List<Deployment> deployments;
 
     public DeploymentModel(List<Deployment> deploymentList) {
+        super(headers);
         setDeployments(deploymentList);
     }
 
@@ -30,16 +31,6 @@ public class DeploymentModel extends AbstractTableModel {
     @Override
     public int getRowCount() {
         return deployments.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return headers.length;
-    }
-
-    @Override
-    public String getColumnName(int col) {
-        return headers[col];
     }
 
     @Override
@@ -60,10 +51,5 @@ public class DeploymentModel extends AbstractTableModel {
         } else {
             return deployments.get(row).getSelectors().toString();
         }
-    }
-
-    @Override
-    public Class<String> getColumnClass(int col) {
-        return String.class;
     }
 }

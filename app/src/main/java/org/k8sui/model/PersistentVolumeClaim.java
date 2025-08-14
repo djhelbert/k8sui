@@ -13,18 +13,15 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class PersistentVolume implements Comparable<PersistentVolume> {
-    private String uid;
+public class PersistentVolumeClaim implements Comparable<PersistentVolumeClaim> {
     private String name;
     private String nameSpace;
     private String storageClassName;
-    private String persistentVolumeReclaimPolicy;
     private List<String> accessModes;
-    private Map<String, String> capacities;
-    private String hostPath;
+    private Map<String, String> resources;
 
     @Override
-    public int compareTo(@NotNull PersistentVolume pv) {
+    public int compareTo(@NotNull PersistentVolumeClaim pv) {
         return name.compareTo(pv.getName());
     }
 }

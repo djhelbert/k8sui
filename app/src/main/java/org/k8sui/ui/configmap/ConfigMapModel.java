@@ -1,8 +1,8 @@
 package org.k8sui.ui.configmap;
 
 import org.k8sui.model.ConfigMap;
+import org.k8sui.ui.BaseTableModel;
 
-import javax.swing.table.AbstractTableModel;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -10,13 +10,14 @@ import java.util.List;
 /**
  * Config Map Table Model
  */
-public class ConfigMapModel extends AbstractTableModel {
+public class ConfigMapModel extends BaseTableModel {
 
     private static final String[] headers = {"UID", "Name", "Namespace", "Created"};
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private List<ConfigMap> maps;
 
     public ConfigMapModel(List<ConfigMap> maps) {
+        super(headers);
         setMaps(maps);
     }
 
@@ -35,16 +36,6 @@ public class ConfigMapModel extends AbstractTableModel {
     }
 
     @Override
-    public int getColumnCount() {
-        return headers.length;
-    }
-
-    @Override
-    public String getColumnName(int col) {
-        return headers[col];
-    }
-
-    @Override
     public Object getValueAt(int row, int col) {
         if (col == 0) {
             return maps.get(row).getUid();
@@ -58,10 +49,5 @@ public class ConfigMapModel extends AbstractTableModel {
             }
             return formatter.format(maps.get(row).getCreationDate());
         }
-    }
-
-    @Override
-    public Class<String> getColumnClass(int col) {
-        return String.class;
     }
 }
