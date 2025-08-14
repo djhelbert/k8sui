@@ -3,9 +3,14 @@ package org.k8sui.service;
 import io.kubernetes.client.custom.Quantity;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
+import io.kubernetes.client.openapi.models.V1HostPathVolumeSource;
+import io.kubernetes.client.openapi.models.V1ObjectMeta;
+import io.kubernetes.client.openapi.models.V1PersistentVolume;
+import io.kubernetes.client.openapi.models.V1PersistentVolumeSpec;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.PersistentVolume;
 
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +50,36 @@ public class PersistentVolumeService {
         }).collect(toList());
 
         return volumes;
+    }
+
+    public void createPersistentVolume(PersistentVolume volume) throws ApiException {
+        var meta = new V1ObjectMeta();
+        meta.setName(volume.getName());
+        meta.setNamespace(volume.getNameSpace());
+        meta.setCreationTimestamp(OffsetDateTime.now());
+
+        var spec = new V1PersistentVolumeSpec();
+        spec.setAccessModes(volume.getAccessModes());
+        spec.setPersistentVolumeReclaimPolicy(volume.getPersistentVolumeReclaimPolicy());
+
+        var hostPath = new V1HostPathVolumeSource();
+        hostPath.setPath(volume.getHostPath());
+
+        spec.setHostPath(hostPath);
+
+        var v1pv = new V1PersistentVolume();
+        v1pv.setMetadata(meta);
+        v1pv.setSpec(spec);
+
+        final Map<String, Quantity> capacityMap = new HashMap<>();
+
+        for (String key : volume.getCapacities().keySet()) {
+            capacityMap.put(key, new Quantity(volume.getCapacities().get(key)));
+        }
+
+        spec.setCapacity(capacityMap);
+
+        coreV1Api.createPersistentVolume(v1pv).execute();
     }
 
     public void deletePersistentVolume(String name) throws ApiException {

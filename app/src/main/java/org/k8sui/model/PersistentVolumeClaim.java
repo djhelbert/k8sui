@@ -14,6 +14,7 @@ import java.util.Map;
 @AllArgsConstructor
 @ToString
 public class PersistentVolumeClaim implements Comparable<PersistentVolumeClaim> {
+    private String uid;
     private String name;
     private String nameSpace;
     private String storageClassName;
