@@ -30,6 +30,7 @@ public class PersistentVolumeService {
             persistentVolume.setStorageClassName(pv.getSpec().getStorageClassName());
             persistentVolume.setNameSpace(pv.getMetadata().getNamespace());
             persistentVolume.setPersistentVolumeReclaimPolicy(pv.getSpec().getPersistentVolumeReclaimPolicy());
+            persistentVolume.setLabels(pv.getMetadata().getLabels());
 
             final Map<String, String> capacities = new HashMap<>();
             final Map<String, Quantity> capacityMap = pv.getSpec().getCapacity();
@@ -44,8 +45,9 @@ public class PersistentVolumeService {
             persistentVolume.setAccessModes(accessModes);
 
             var hostPath = pv.getSpec().getHostPath();
-            persistentVolume.setHostPath(hostPath.getPath());
-
+            if(hostPath != null) {
+                persistentVolume.setHostPath(hostPath.getPath());
+            }
             return persistentVolume;
         }).collect(toList());
 
@@ -57,6 +59,7 @@ public class PersistentVolumeService {
         meta.setName(volume.getName());
         meta.setNamespace(volume.getNameSpace());
         meta.setCreationTimestamp(OffsetDateTime.now());
+        meta.setLabels(volume.getLabels());
 
         var spec = new V1PersistentVolumeSpec();
         spec.setAccessModes(volume.getAccessModes());

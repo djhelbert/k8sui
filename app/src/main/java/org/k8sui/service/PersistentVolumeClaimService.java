@@ -29,6 +29,7 @@ public class PersistentVolumeClaimService {
             persistentVolumeClaim.setName(pv.getMetadata().getName());
             persistentVolumeClaim.setStorageClassName(pv.getSpec().getStorageClassName());
             persistentVolumeClaim.setNameSpace(pv.getMetadata().getNamespace());
+            persistentVolumeClaim.setLabels(pv.getMetadata().getLabels());
 
             final Map<String, String> resources = new HashMap<>();
             final Map<String, Quantity> resourceMap = pv.getSpec().getResources().getRequests();
@@ -53,6 +54,7 @@ public class PersistentVolumeClaimService {
         meta.setName(claim.getName());
         meta.setNamespace(claim.getNameSpace());
         meta.setCreationTimestamp(OffsetDateTime.now());
+        meta.setLabels(claim.getLabels());
 
         var spec = new V1PersistentVolumeClaimSpec();
         spec.setAccessModes(claim.getAccessModes());

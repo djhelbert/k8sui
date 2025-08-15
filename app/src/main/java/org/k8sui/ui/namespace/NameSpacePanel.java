@@ -17,6 +17,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Log4j2
@@ -127,7 +128,7 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
 
             // OK button action
             okButton.addActionListener(e1 -> {
-                String nameSpace = nameField.getText();
+                var nameSpace = nameField.getText();
 
                 if(!NameValidator.validName(nameField.getText())) {
                     Util.showError(this, "Invalid Name", "Validation Error");
@@ -135,7 +136,7 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
                 }
 
                 try {
-                    service.createNamespace(nameSpace);
+                    service.createNamespace(nameSpace, new HashMap<>());
                     update();
                     nameSpaceChange(NameSpaceOperation.ADD, nameSpace);
                 } catch (ApiException ex) {

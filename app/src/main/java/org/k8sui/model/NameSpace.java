@@ -5,6 +5,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 @Data
 @ToString
@@ -13,6 +14,7 @@ public class NameSpace implements Comparable<NameSpace> {
     private String namespace;
     private OffsetDateTime creation;
     private String status;
+    private Map<String, String> labels;
 
     public NameSpace(String uid, String namespace, OffsetDateTime creation, String status) {
         this.uid = uid;

@@ -7,6 +7,7 @@ import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.NameSpace;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class NameSpaceService {
@@ -15,15 +16,19 @@ public class NameSpaceService {
 
     public List<NameSpace> nameSpaces() throws ApiException {
         return coreV1Api.listNamespace().execute().getItems().stream().map(item -> {
-            V1ObjectMeta data = item.getMetadata();
+            V1ObjectMeta meta = item.getMetadata();
             V1NamespaceStatus status = item.getStatus();
-            return new NameSpace(data.getUid(), data.getName(), data.getCreationTimestamp(), status.getPhase());
+
+            var nameSpace = new NameSpace(meta.getUid(), meta.getName(), meta.getCreationTimestamp(), status.getPhase());
+            nameSpace.setLabels(meta.getLabels());
+
+            return nameSpace;
         }).collect(Collectors.toList());
     }
 
-    public V1Namespace createNamespace(String name) throws ApiException {
+    public V1Namespace createNamespace(String name, Map<String, String> labels) throws ApiException {
         var namespace = new V1Namespace();
-        namespace.metadata(new V1ObjectMeta().name(name));
+        namespace.metadata(new V1ObjectMeta().name(name).labels(labels));
         return coreV1Api.createNamespace(namespace).execute();
     }
 

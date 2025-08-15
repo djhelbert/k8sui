@@ -6,6 +6,9 @@ import org.k8sui.ui.BaseTableModel;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Persistent Volume Model
+ */
 public class PersistentVolumeModel extends BaseTableModel {
 
     private static final String[] headers = {"UID", "Name", "Namespace", "Storage Class", "Host Path", "Reclaim Policy", "Access Modes"};
@@ -14,6 +17,10 @@ public class PersistentVolumeModel extends BaseTableModel {
     public PersistentVolumeModel(List<PersistentVolume> PersistentVolumes) {
         super(headers);
         setPersistentVolumes(PersistentVolumes);
+    }
+
+    public PersistentVolume getPersistentVolume(int row) {
+        return persistentVolumes.get(row);
     }
 
     public void setPersistentVolumes(List<PersistentVolume> PersistentVolumes) {

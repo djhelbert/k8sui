@@ -21,6 +21,7 @@ public class PersistentVolume implements Comparable<PersistentVolume> {
     private String persistentVolumeReclaimPolicy;
     private List<String> accessModes;
     private Map<String, String> capacities;
+    private Map<String, String> labels;
     private String hostPath;
 
     @Override
