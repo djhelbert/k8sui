@@ -23,14 +23,17 @@ public class NodeService {
             var status = item.getStatus();
             var info = status.getNodeInfo();
 
-            Node n = new Node(data.getUid(), data.getName(), status.getCapacity().get(CPU).getNumber().toString());
-            n.setImage(info.getOsImage());
-            n.setMemory(status.getCapacity().get(MEMORY).getNumber().toString());
+            Node node = new Node(data.getUid(), data.getName(), status.getCapacity().get(CPU).getNumber().toString());
+            node.setImage(info.getOsImage());
+            node.setMemory(status.getCapacity().get(MEMORY).getNumber().toString());
+            node.setLabels(data.getLabels());
 
-            var ip = status.getAddresses().stream().filter(a -> IP.equals(a.getType())).findFirst();
-            n.setIp(ip.orElseGet(V1NodeAddress::new).getAddress());
+            if(status.getAddresses() != null) {
+                var ip = status.getAddresses().stream().filter(a -> IP.equals(a.getType())).findFirst();
+                node.setIp(ip.orElseGet(V1NodeAddress::new).getAddress());
+            }
 
-            return n;
+            return node;
         }).collect(Collectors.toList());
     }
 }

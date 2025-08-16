@@ -16,6 +16,10 @@ public class NodeModel extends BaseTableModel {
         setNodes(nodes);
     }
 
+    public Node getNode(int row) {
+        return nodes.get(row);
+    }
+
     public void setNodes(List<Node> nodes) {
         this.nodes = nodes;
         Collections.sort(nodes);
