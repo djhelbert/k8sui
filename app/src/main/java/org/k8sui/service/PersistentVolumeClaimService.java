@@ -20,7 +20,7 @@ import static java.util.stream.Collectors.toList;
 public class PersistentVolumeClaimService {
     private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
-    public List<PersistentVolumeClaim> listPersistentVolumes(String nameSpace) throws ApiException {
+    public List<PersistentVolumeClaim> listPersistentVolumeClaims(String nameSpace) throws ApiException {
         var list = coreV1Api.listNamespacedPersistentVolumeClaim(nameSpace).execute();
 
         final List<PersistentVolumeClaim> volumes = list.getItems().stream().map(pv -> {

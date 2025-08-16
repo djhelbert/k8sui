@@ -15,9 +15,9 @@ public class PersistentVolumeClaimModel extends BaseTableModel {
     private static final String[] headers = {"UID", "Name", "Namespace", "Storage Class", "Access Modes"};
     private List<PersistentVolumeClaim> persistentVolumeClaims;
 
-    public PersistentVolumeClaimModel(List<PersistentVolume> PersistentVolumes) {
+    public PersistentVolumeClaimModel(List<PersistentVolumeClaim> claims) {
         super(headers);
-        setPersistentVolumes(persistentVolumeClaims);
+        setPersistentVolumes(claims);
     }
 
     public PersistentVolumeClaim getPersistentVolumeClaim(int row) {
