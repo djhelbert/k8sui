@@ -149,6 +149,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
                     dataModel.fireTableDataChanged();
                     dialog.dispose();
                 } catch (ApiException ex) {
+                    log.error("ConfigMap Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
             });
@@ -208,6 +209,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
                     service.createConfigMap(newMap);
                     update();
                 } catch (ApiException ex) {
+                    log.error("ConfigMap Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
 

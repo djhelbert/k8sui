@@ -98,6 +98,7 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
                 try {
                     service.deletePersistentVolume(pv.getName());
                 } catch (ApiException ex) {
+                    log.error("PV Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
                 update();
@@ -158,6 +159,7 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
                     service.createPersistentVolume(newPV);
                     update();
                 } catch (ApiException ex) {
+                    log.error("PV Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
 

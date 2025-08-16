@@ -101,6 +101,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
                 try {
                     service.deleteDeployment(dp.getNamespace(), dp.getName());
                 } catch (ApiException ex) {
+                    log.error("Node Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
                 update();
@@ -159,6 +160,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
                     service.addDeployment(newDeployment);
                     update();
                 } catch (ApiException ex) {
+                    log.error("Node Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(),"reason"), "Error");
                 }
 

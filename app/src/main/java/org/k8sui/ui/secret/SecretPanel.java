@@ -46,7 +46,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
         try {
             model = new SecretModel(service.secretList(nameSpaceListPanel.getNamespace()));
         } catch (ApiException err) {
-            log.error("Node Panel", err);
+            log.error("Secret Panel", err);
         }
 
         // Setup add button
@@ -93,6 +93,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
         try {
             model.setSecrets(service.secretList(nameSpaceListPanel.getNamespace()));
         } catch (ApiException ex) {
+            log.error("Secret Panel", ex);
             Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
         }
 
@@ -106,6 +107,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
                 model.setSecrets(service.secretList(nameSpaceListPanel.getNamespace()));
                 model.fireTableDataChanged();
             } catch (ApiException ex) {
+                log.error("Secret Panel", ex);
                 Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
             }
         } else if (e.getSource().equals(deleteButton)) {
@@ -115,6 +117,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
                 try {
                     service.deleteSecret(model.getSecret(row).getName(), nameSpaceListPanel.getNamespace());
                 } catch (ApiException ex) {
+                    log.error("Secret Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
             }
@@ -150,6 +153,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
                     dataModel.fireTableDataChanged();
                     dialog.dispose();
                 } catch (ApiException ex) {
+                    log.error("Secret Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
             });
@@ -208,6 +212,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
                     service.createSecret(newMap);
                     update();
                 } catch (ApiException ex) {
+                    log.error("Secret Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
 

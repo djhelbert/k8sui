@@ -95,6 +95,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
         try {
             model.setServices(service.services(nameSpaceListPanel.getNamespace()));
         } catch (ApiException ex) {
+            log.error("Service Panel", ex);
             Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
         }
 
@@ -108,6 +109,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
                 model.setServices(service.services(nameSpaceListPanel.getNamespace()));
                 model.fireTableDataChanged();
             } catch (ApiException ex) {
+                log.error("Service Panel", ex);
                 Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
             }
         }
@@ -118,6 +120,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
                 try {
                     service.deleteService(model.getService(row).getName(), nameSpaceListPanel.getNamespace());
                 } catch (ApiException ex) {
+                    log.error("Service Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
             }
@@ -198,6 +201,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
                     service.addService(newService);
                     update();
                 } catch (ApiException ex) {
+                    log.error("Service Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
 

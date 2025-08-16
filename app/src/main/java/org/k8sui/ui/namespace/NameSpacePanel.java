@@ -86,8 +86,8 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
 
         try {
             model.setNodes(service.nameSpaces());
-        } catch (ApiException e) {
-            throw new RuntimeException(e);
+        } catch (ApiException ex) {
+            log.error("Name Space Panel", ex);
         }
 
         model.fireTableDataChanged();
@@ -140,6 +140,7 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
                     update();
                     nameSpaceChange(NameSpaceOperation.ADD, nameSpace);
                 } catch (ApiException ex) {
+                    log.error("Name Space Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(),"reason"), "Error");
                 }
 
