@@ -46,6 +46,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
             model = new ServiceModel(service.services(nameSpaceListPanel.getNamespace()));
         } catch (ApiException err) {
             log.error("Service Panel", err);
+            model = new ServiceModel(new ArrayList<>());
         }
 
         // Setup add button

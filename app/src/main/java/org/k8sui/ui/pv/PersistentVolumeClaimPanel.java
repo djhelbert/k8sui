@@ -14,6 +14,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,8 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
         try {
             model = new PersistentVolumeClaimModel(service.listPersistentVolumeClaims(nameSpaceListPanel.getNamespace()));
         } catch (ApiException err) {
-            log.error("PV Panel", err);
+            log.error("PVC Panel", err);
+            model = new PersistentVolumeClaimModel(new ArrayList<>());
         }
 
         // Add button setup
@@ -64,13 +66,15 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
         table.getColumnModel().getColumn(3).setPreferredWidth(80);
         table.getSelectionModel().addListSelectionListener(this);
 
-        JTable containerTable = new JTable(mapTableModel);
-        containerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        var labelTable = new JTable(mapTableModel);
+        labelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        var scrollPane = new JScrollPane(labelTable);
+        scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Labels"));
 
         setLayout(new BorderLayout());
         add(buttonPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
-        add(new JScrollPane(containerTable), BorderLayout.SOUTH);
+        add(scrollPane, BorderLayout.SOUTH);
     }
 
     @Override
@@ -140,7 +144,7 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
 
             // OK button action
             okButton.addActionListener(e1 -> {
-                String input = nameField.getText();
+                String nameFieldText = nameField.getText();
 
                 if (!NameValidator.validName(nameField.getText())) {
                     Util.showError(this, "Invalid Name", "Validation Error");
@@ -155,6 +159,7 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
                     newPV.setName(nameField.getText());
                     newPV.setStorageClassName(storageClassField.getText());
                     newPV.setAccessModes(List.of(accessMode.getSelectedItem().toString()));
+                    newPV.setResources(map);
 
                     service.createPersistentVolumeClaim(newPV);
                     update();

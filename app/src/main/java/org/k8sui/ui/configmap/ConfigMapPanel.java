@@ -44,8 +44,9 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
     private void init() {
         try {
             model = new ConfigMapModel(service.configMapList(nameSpaceListPanel.getNamespace()));
-        } catch (ApiException err) {
-            log.error("Node Panel", err);
+        } catch (ApiException ex) {
+            log.error("ConfigMap Panel", ex);
+            model = new ConfigMapModel(new ArrayList<>());
         }
 
         // Setup add button
@@ -74,8 +75,8 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
 
         final JTable dataTable = new JTable(dataModel);
         dataTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        dataTable.getColumnModel().getColumn(0).setMaxWidth(150);
-        dataTable.getColumnModel().getColumn(0).setPreferredWidth(150);
+        dataTable.getColumnModel().getColumn(0).setMaxWidth(250);
+        dataTable.getColumnModel().getColumn(0).setPreferredWidth(250);
         var scrollPane = new JScrollPane(dataTable);
         scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Data"));
 
@@ -114,6 +115,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
                 try {
                     service.deleteConfigMap(model.getConfigMap(row).getName(), nameSpaceListPanel.getNamespace());
                 } catch (ApiException ex) {
+                    log.error("ConfigMap Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
             }

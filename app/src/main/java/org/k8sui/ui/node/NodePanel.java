@@ -12,6 +12,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @Log4j2
@@ -33,6 +34,7 @@ public class NodePanel extends JPanel implements ActionListener, ListSelectionLi
             nodeModel = new NodeModel(service.nodes());
         } catch (ApiException err) {
             log.error("Node Panel", err);
+            nodeModel = new NodeModel(new ArrayList<>());
         }
 
         // Refresh button setup
@@ -70,7 +72,7 @@ public class NodePanel extends JPanel implements ActionListener, ListSelectionLi
                 nodeModel.setNodes(service.nodes());
                 nodeModel.fireTableDataChanged();
             } catch (ApiException err) {
-                throw new RuntimeException(err);
+                log.error("Node Panel", err);
             }
         }
     }
@@ -78,6 +80,7 @@ public class NodePanel extends JPanel implements ActionListener, ListSelectionLi
     @Override
     public void valueChanged(ListSelectionEvent e) {
         int row = table.getSelectedRow();
+
         if (row != -1) {
             mapTableModel.setList(nodeModel.getNode(row).getLabels());
             mapTableModel.fireTableDataChanged();

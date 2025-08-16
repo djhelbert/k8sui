@@ -47,6 +47,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
             model = new SecretModel(service.secretList(nameSpaceListPanel.getNamespace()));
         } catch (ApiException err) {
             log.error("Secret Panel", err);
+            model = new SecretModel(new ArrayList<>());
         }
 
         // Setup add button
@@ -75,8 +76,8 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
 
         final JTable dataTable = new JTable(dataModel);
         dataTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        dataTable.getColumnModel().getColumn(0).setMaxWidth(150);
-        dataTable.getColumnModel().getColumn(0).setPreferredWidth(150);
+        dataTable.getColumnModel().getColumn(0).setMaxWidth(250);
+        dataTable.getColumnModel().getColumn(0).setPreferredWidth(250);
         var scrollPane = new JScrollPane(dataTable);
         scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Data"));
 

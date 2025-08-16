@@ -7,6 +7,8 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 /**
@@ -129,5 +131,19 @@ public class Util {
     public static String getValue(String json, String key) {
         var jsonObject = new JSONObject(json);
         return jsonObject.getString(key);
+    }
+
+    /**
+     * Is Valid Path
+     * @param path Folder Path
+     * @return boolean
+     */
+    public static boolean isValidPath(String path) {
+        try {
+            Paths.get(path);
+        } catch (InvalidPathException | NullPointerException ex) {
+            return false;
+        }
+        return true;
     }
 }

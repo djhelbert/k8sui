@@ -28,7 +28,7 @@ public class NameSpaceModel extends BaseTableModel {
         return namespaces.size();
     }
 
-    public NameSpace get(int row) {
+    public NameSpace getNameSpace(int row) {
         return namespaces.get(row);
     }
 

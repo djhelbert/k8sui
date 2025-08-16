@@ -64,6 +64,7 @@ public class PersistentVolumeService {
         var spec = new V1PersistentVolumeSpec();
         spec.setAccessModes(volume.getAccessModes());
         spec.setPersistentVolumeReclaimPolicy(volume.getPersistentVolumeReclaimPolicy());
+        spec.setStorageClassName(volume.getStorageClassName());
 
         var hostPath = new V1HostPathVolumeSource();
         hostPath.setPath(volume.getHostPath());

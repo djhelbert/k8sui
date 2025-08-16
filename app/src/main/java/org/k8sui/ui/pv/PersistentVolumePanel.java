@@ -14,6 +14,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
             model = new PersistentVolumeModel(service.listPersistentVolumes());
         } catch (ApiException err) {
             log.error("PV Panel", err);
+            model = new PersistentVolumeModel(new ArrayList<>());
         }
 
         // Add button setup
@@ -64,13 +66,15 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
         table.getColumnModel().getColumn(3).setPreferredWidth(80);
         table.getSelectionModel().addListSelectionListener(this);
 
-        JTable containerTable = new JTable(mapTableModel);
-        containerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JTable labelTable = new JTable(mapTableModel);
+        labelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        var scrollPane = new JScrollPane(labelTable);
+        scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Labels"));
 
         setLayout(new BorderLayout());
         add(buttonPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
-        add(new JScrollPane(containerTable), BorderLayout.SOUTH);
+        add(scrollPane, BorderLayout.SOUTH);
     }
 
     @Override
@@ -94,7 +98,8 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
         if (e.getSource().equals(deleteButton)) {
             int row = table.getSelectedRow();
             if (row != -1) {
-                PersistentVolume pv = model.getPersistentVolume(row);
+                var pv = model.getPersistentVolume(row);
+
                 try {
                     service.deletePersistentVolume(pv.getName());
                 } catch (ApiException ex) {
@@ -132,6 +137,10 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
             dialog.add(new JLabel("Reclaim Policy:"));
             dialog.add(reclaimField);
 
+            JTextField hostPathField = new JTextField( "/tmp", 8);
+            dialog.add(new JLabel("Host Path:"));
+            dialog.add(hostPathField);
+
             // Create OK and Cancel buttons
             JButton okButton = new JButton("OK");
             JButton cancelButton = new JButton("Cancel");
@@ -145,16 +154,23 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
                     return;
                 }
 
+                if(!Util.isValidPath(hostPathField.getText())) {
+                    Util.showError(this, "Invalid Host Path", "Validation Error");
+                    return;
+                }
+
                 try {
                     final Map<String, String> map = new HashMap<>();
                     map.put("storage", capacityField.getText());
 
                     PersistentVolume newPV = new PersistentVolume();
                     newPV.setName(nameField.getText());
+                    newPV.setNameSpace(nameSpaceListPanel.getNamespace());
                     newPV.setPersistentVolumeReclaimPolicy(reclaimField.getText());
                     newPV.setStorageClassName(storageClassField.getText());
                     newPV.setAccessModes(List.of(accessMode.getSelectedItem().toString()));
                     newPV.setCapacities(map);
+                    newPV.setHostPath(hostPathField.getText());
 
                     service.createPersistentVolume(newPV);
                     update();
@@ -183,6 +199,7 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
     @Override
     public void valueChanged(ListSelectionEvent e) {
         int row = table.getSelectedRow();
+
         if (row != -1) {
             mapTableModel.setList(model.getPersistentVolume(row).getLabels());
             mapTableModel.fireTableDataChanged();

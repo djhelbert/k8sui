@@ -3,12 +3,8 @@ package org.k8sui.ui.namespace;
 import io.kubernetes.client.openapi.ApiException;
 import lombok.extern.log4j.Log4j2;
 import org.k8sui.App;
-import org.k8sui.model.NameSpace;
 import org.k8sui.service.NameSpaceService;
-import org.k8sui.ui.NameSpaceObserver;
-import org.k8sui.ui.NameSpaceOperation;
-import org.k8sui.ui.NameValidator;
-import org.k8sui.ui.Util;
+import org.k8sui.ui.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -30,6 +26,7 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
     NameSpaceModel model;
     private final NameSpaceService service = new NameSpaceService();
     private final List<NameSpaceObserver> nameSpaceObservers = new ArrayList<>();
+    private final MapTableModel mapTableModel = new MapTableModel();
 
     public NameSpacePanel() {
         super();
@@ -65,9 +62,15 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
         table.setDefaultRenderer(String.class, new StatusTableCellRenderer());
         table.getSelectionModel().addListSelectionListener(this);
 
+        var labelTable = new JTable(mapTableModel);
+        labelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        var scrollPane = new JScrollPane(labelTable);
+        scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Labels"));
+
         setLayout(new BorderLayout());
         add(buttonPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
+        add(scrollPane, BorderLayout.SOUTH);
     }
 
     public void addNameSpaceObserver(NameSpaceObserver nso) {
@@ -75,7 +78,7 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
     }
 
     private void nameSpaceChange(NameSpaceOperation operation, String nameSpace) {
-        for(NameSpaceObserver nso : nameSpaceObservers) {
+        for (NameSpaceObserver nso : nameSpaceObservers) {
             nso.nameSpaceChange(nameSpace, operation);
         }
     }
@@ -101,12 +104,13 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
         if (e.getSource().equals(deleteButton)) {
             int row = table.getSelectedRow();
 
-            if(row != -1) {
-                NameSpace ns = model.get(row);
+            if (row != -1) {
+                var ns = model.getNameSpace(row);
+
                 try {
                     service.deleteNamespace(ns.getNamespace());
                 } catch (ApiException ex) {
-                    Util.showError(this, Util.getValue(ex.getResponseBody(),"reason"), "Error");
+                    Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
                 update();
                 nameSpaceChange(NameSpaceOperation.REMOVE, ns.getNamespace());
@@ -117,10 +121,17 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
             JDialog dialog = new JDialog(App.frame(), "Add Namespace", true);
             dialog.setLayout(new FlowLayout());
 
-            // Create text field
             JTextField nameField = new JTextField(20);
             dialog.add(new JLabel("Name:"));
             dialog.add(nameField);
+
+            JTextField labelKeyField = new JTextField(20);
+            dialog.add(new JLabel("Label Key:"));
+            dialog.add(labelKeyField);
+
+            JTextField labelValueField = new JTextField(20);
+            dialog.add(new JLabel("Value:"));
+            dialog.add(labelValueField);
 
             // Create OK and Cancel buttons
             JButton okButton = new JButton("OK");
@@ -130,18 +141,21 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
             okButton.addActionListener(e1 -> {
                 var nameSpace = nameField.getText();
 
-                if(!NameValidator.validName(nameField.getText())) {
+                HashMap<String, String> map = new HashMap<>();
+                map.put(labelKeyField.getText(), labelValueField.getText());
+
+                if (!NameValidator.validName(nameField.getText())) {
                     Util.showError(this, "Invalid Name", "Validation Error");
                     return;
                 }
 
                 try {
-                    service.createNamespace(nameSpace, new HashMap<>());
+                    service.createNamespace(nameSpace, map);
                     update();
                     nameSpaceChange(NameSpaceOperation.ADD, nameSpace);
                 } catch (ApiException ex) {
                     log.error("Name Space Panel", ex);
-                    Util.showError(this, Util.getValue(ex.getResponseBody(),"reason"), "Error");
+                    Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
 
                 dialog.dispose();
@@ -165,10 +179,13 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
     public void valueChanged(ListSelectionEvent e) {
         int row = table.getSelectedRow();
 
-        if(row == -1) {
+        if (row == -1) {
             deleteButton.setEnabled(false);
+            mapTableModel.fireTableDataChanged();
         } else {
-            deleteButton.setEnabled(!"default".equalsIgnoreCase(model.get(row).getNamespace()));
+            deleteButton.setEnabled(!"default".equalsIgnoreCase(model.getNameSpace(row).getNamespace()));
+            mapTableModel.setList(model.getNameSpace(row).getLabels());
+            mapTableModel.fireTableDataChanged();
         }
     }
 }
