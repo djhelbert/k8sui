@@ -28,7 +28,6 @@ public class PersistentVolumeService {
             persistentVolume.setUid(pv.getMetadata().getUid());
             persistentVolume.setName(pv.getMetadata().getName());
             persistentVolume.setStorageClassName(pv.getSpec().getStorageClassName());
-            persistentVolume.setNameSpace(pv.getMetadata().getNamespace());
             persistentVolume.setPersistentVolumeReclaimPolicy(pv.getSpec().getPersistentVolumeReclaimPolicy());
             persistentVolume.setLabels(pv.getMetadata().getLabels());
 
@@ -57,7 +56,6 @@ public class PersistentVolumeService {
     public void createPersistentVolume(PersistentVolume volume) throws ApiException {
         var meta = new V1ObjectMeta();
         meta.setName(volume.getName());
-        meta.setNamespace(volume.getNameSpace());
         meta.setCreationTimestamp(OffsetDateTime.now());
         meta.setLabels(volume.getLabels());
 

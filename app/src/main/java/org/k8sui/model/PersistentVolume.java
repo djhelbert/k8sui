@@ -16,7 +16,6 @@ import java.util.Map;
 public class PersistentVolume implements Comparable<PersistentVolume> {
     private String uid;
     private String name;
-    private String nameSpace;
     private String storageClassName;
     private String persistentVolumeReclaimPolicy;
     private List<String> accessModes;

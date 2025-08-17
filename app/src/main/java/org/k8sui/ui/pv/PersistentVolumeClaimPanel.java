@@ -62,8 +62,8 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
         // Table setup
         table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getColumnModel().getColumn(3).setMaxWidth(80);
-        table.getColumnModel().getColumn(3).setPreferredWidth(80);
+        table.getColumnModel().getColumn(3).setMaxWidth(120);
+        table.getColumnModel().getColumn(3).setPreferredWidth(120);
         table.getSelectionModel().addListSelectionListener(this);
 
         var labelTable = new JTable(mapTableModel);
@@ -113,55 +113,77 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
         if (e.getSource().equals(addButton)) {
             // Create the dialog
             JDialog dialog = new JDialog(App.frame(), "Add Persistent Volume Claim", true);
-            dialog.setLayout(new FlowLayout());
+            dialog.setLayout(new BorderLayout(5,5));
+
+            JPanel gridPanel = new JPanel(new GridLayout(7,2, 5,5));
 
             // Create text field
             JTextField nameField = new JTextField(10);
-            dialog.add(new JLabel("Name:"));
-            dialog.add(nameField);
+            gridPanel.add(new JLabel("Name:"));
+            gridPanel.add(nameField);
 
             // Create text field
             JTextField capacityField = new JTextField("1Gi", 3);
-            dialog.add(new JLabel("Capacity:"));
-            dialog.add(capacityField);
+            gridPanel.add(new JLabel("Capacity:"));
+            gridPanel.add(capacityField);
 
             JTextField storageClassField = new JTextField("standard", 20);
-            dialog.add(new JLabel("Storage Class Name:"));
-            dialog.add(storageClassField);
+            gridPanel.add(new JLabel("Storage Class Name:"));
+            gridPanel.add(storageClassField);
 
             JComboBox<String> accessMode = new JComboBox<>(new String[]{"ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany", "ReadWriteOncePod"});
             accessMode.setSelectedIndex(0);
-            dialog.add(new JLabel("Access Mode:"));
-            dialog.add(accessMode);
+            gridPanel.add(new JLabel("Access Mode:"));
+            gridPanel.add(accessMode);
 
             JTextField reclaimField = new JTextField("Retain", 8);
-            dialog.add(new JLabel("Reclaim Policy:"));
-            dialog.add(reclaimField);
+            gridPanel.add(new JLabel("Reclaim Policy:"));
+            gridPanel.add(reclaimField);
+
+            JTextField keyField = new JTextField("", 8);
+            gridPanel.add(new JLabel("Label Key:"));
+            gridPanel.add(keyField);
+
+            JTextField valueField = new JTextField("", 8);
+            gridPanel.add(new JLabel("Label Value:"));
+            gridPanel.add(valueField);
+
+            dialog.add(gridPanel, BorderLayout.CENTER);
 
             // Create OK and Cancel buttons
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             JButton okButton = new JButton("OK");
             JButton cancelButton = new JButton("Cancel");
+            buttonPanel.add(okButton);
+            buttonPanel.add(cancelButton);
+            dialog.add(buttonPanel, BorderLayout.SOUTH);
 
             // OK button action
             okButton.addActionListener(e1 -> {
                 String nameFieldText = nameField.getText();
 
-                if (!NameValidator.validName(nameField.getText())) {
+                if (!NameValidator.validName(nameFieldText)) {
                     Util.showError(this, "Invalid Name", "Validation Error");
                     return;
                 }
 
                 try {
-                    final Map<String, String> map = new HashMap<>();
-                    map.put("requests", capacityField.getText());
+                    final Map<String, String> resourceMap = new HashMap<>();
+                    resourceMap.put("storage", capacityField.getText());
 
-                    PersistentVolumeClaim newPV = new PersistentVolumeClaim();
-                    newPV.setName(nameField.getText());
-                    newPV.setStorageClassName(storageClassField.getText());
-                    newPV.setAccessModes(List.of(accessMode.getSelectedItem().toString()));
-                    newPV.setResources(map);
+                    final Map<String, String> labelMap = new HashMap<>();
+                    labelMap.put(keyField.getText(), valueField.getText());
 
-                    service.createPersistentVolumeClaim(newPV);
+                    var volumeClaim = new PersistentVolumeClaim();
+                    volumeClaim.setName(nameField.getText());
+                    volumeClaim.setStorageClassName(storageClassField.getText());
+                    volumeClaim.setAccessModes(List.of(accessMode.getSelectedItem().toString()));
+                    volumeClaim.setResources(resourceMap);
+                    volumeClaim.setNameSpace(nameSpaceListPanel.getNamespace());
+                    volumeClaim.setResources(resourceMap);
+                    volumeClaim.setLabels(labelMap);
+
+                    service.createPersistentVolumeClaim(volumeClaim);
                     update();
                 } catch (ApiException ex) {
                     log.error("PVC Panel", ex);
@@ -173,10 +195,6 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
 
             // Cancel button action
             cancelButton.addActionListener(e1 -> dialog.dispose());
-
-            // Add buttons to dialog
-            dialog.add(okButton);
-            dialog.add(cancelButton);
 
             // Center the dialog relative to the frame
             dialog.pack();

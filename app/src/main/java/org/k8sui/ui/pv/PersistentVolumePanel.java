@@ -29,8 +29,6 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
     private PersistentVolumeModel model;
     private final MapTableModel mapTableModel = new MapTableModel();
     private final PersistentVolumeService service = new PersistentVolumeService();
-    @Getter
-    private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
 
     public PersistentVolumePanel() {
         super();
@@ -55,15 +53,16 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
         refreshButton.setIcon(Util.getImageIcon("undo.png"));
         // Button panel setup
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.add(nameSpaceListPanel);
         buttonPanel.add(refreshButton);
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
         // Table setup
         table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getColumnModel().getColumn(3).setMaxWidth(80);
-        table.getColumnModel().getColumn(3).setPreferredWidth(80);
+        table.getColumnModel().getColumn(3).setMaxWidth(100);
+        table.getColumnModel().getColumn(3).setPreferredWidth(1000);
+        table.getColumnModel().getColumn(5).setMaxWidth(120);
+        table.getColumnModel().getColumn(5).setPreferredWidth(120);
         table.getSelectionModel().addListSelectionListener(this);
 
         JTable labelTable = new JTable(mapTableModel);
@@ -97,6 +96,7 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
         }
         if (e.getSource().equals(deleteButton)) {
             int row = table.getSelectedRow();
+
             if (row != -1) {
                 var pv = model.getPersistentVolume(row);
 
@@ -112,65 +112,84 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
         if (e.getSource().equals(addButton)) {
             // Create the dialog
             JDialog dialog = new JDialog(App.frame(), "Add Persistent Volume", true);
-            dialog.setLayout(new FlowLayout());
+            dialog.setLayout(new BorderLayout(5,5));
+
+            JPanel gridPanel = new JPanel(new GridLayout(8,2, 5,5));
 
             // Create text field
             JTextField nameField = new JTextField(10);
-            dialog.add(new JLabel("Name:"));
-            dialog.add(nameField);
+            gridPanel.add(new JLabel("Name:"));
+            gridPanel.add(nameField);
 
             // Create text field
             JTextField capacityField = new JTextField("1Gi", 3);
-            dialog.add(new JLabel("Capacity:"));
-            dialog.add(capacityField);
+            gridPanel.add(new JLabel("Capacity:"));
+            gridPanel.add(capacityField);
 
             JTextField storageClassField = new JTextField("standard", 20);
-            dialog.add(new JLabel("Storage Class Name:"));
-            dialog.add(storageClassField);
+            gridPanel.add(new JLabel("Storage Class Name:"));
+            gridPanel.add(storageClassField);
 
             JComboBox<String> accessMode = new JComboBox<>(new String[]{"ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany", "ReadWriteOncePod"});
             accessMode.setSelectedIndex(0);
-            dialog.add(new JLabel("Access Mode:"));
-            dialog.add(accessMode);
+            gridPanel.add(new JLabel("Access Mode:"));
+            gridPanel.add(accessMode);
 
-            JTextField reclaimField = new JTextField( "Retain", 8);
-            dialog.add(new JLabel("Reclaim Policy:"));
-            dialog.add(reclaimField);
+            JTextField reclaimField = new JTextField("Retain", 8);
+            gridPanel.add(new JLabel("Reclaim Policy:"));
+            gridPanel.add(reclaimField);
 
-            JTextField hostPathField = new JTextField( "/tmp", 8);
-            dialog.add(new JLabel("Host Path:"));
-            dialog.add(hostPathField);
+            JTextField hostPathField = new JTextField("/tmp", 8);
+            gridPanel.add(new JLabel("Host Path:"));
+            gridPanel.add(hostPathField);
+
+            JTextField keyField = new JTextField("", 8);
+            gridPanel.add(new JLabel("Label Key:"));
+            gridPanel.add(keyField);
+
+            JTextField valueField = new JTextField("", 8);
+            gridPanel.add(new JLabel("Label Value:"));
+            gridPanel.add(valueField);
+
+            dialog.add(gridPanel, BorderLayout.CENTER);
 
             // Create OK and Cancel buttons
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             JButton okButton = new JButton("OK");
             JButton cancelButton = new JButton("Cancel");
+            buttonPanel.add(okButton);
+            buttonPanel.add(cancelButton);
+            dialog.add(buttonPanel, BorderLayout.SOUTH);
 
             // OK button action
             okButton.addActionListener(e1 -> {
-                String input = nameField.getText();
+                String nameFieldText = nameField.getText();
 
-                if (!NameValidator.validName(nameField.getText())) {
+                if (!NameValidator.validName(nameFieldText)) {
                     Util.showError(this, "Invalid Name", "Validation Error");
                     return;
                 }
 
-                if(!Util.isValidPath(hostPathField.getText())) {
+                if (!Util.isValidPath(hostPathField.getText())) {
                     Util.showError(this, "Invalid Host Path", "Validation Error");
                     return;
                 }
 
                 try {
-                    final Map<String, String> map = new HashMap<>();
-                    map.put("storage", capacityField.getText());
+                    final Map<String, String> capacityMap = new HashMap<>();
+                    capacityMap.put("storage", capacityField.getText());
 
-                    PersistentVolume newPV = new PersistentVolume();
+                    final Map<String, String> labelMap = new HashMap<>();
+                    labelMap.put(keyField.getText(), valueField.getText());
+
+                    var newPV = new PersistentVolume();
                     newPV.setName(nameField.getText());
-                    newPV.setNameSpace(nameSpaceListPanel.getNamespace());
                     newPV.setPersistentVolumeReclaimPolicy(reclaimField.getText());
                     newPV.setStorageClassName(storageClassField.getText());
                     newPV.setAccessModes(List.of(accessMode.getSelectedItem().toString()));
-                    newPV.setCapacities(map);
+                    newPV.setCapacities(capacityMap);
                     newPV.setHostPath(hostPathField.getText());
+                    newPV.setLabels(labelMap);
 
                     service.createPersistentVolume(newPV);
                     update();
@@ -184,10 +203,6 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
 
             // Cancel button action
             cancelButton.addActionListener(e1 -> dialog.dispose());
-
-            // Add buttons to dialog
-            dialog.add(okButton);
-            dialog.add(cancelButton);
 
             // Center the dialog relative to the frame
             dialog.pack();

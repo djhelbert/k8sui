@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class PersistentVolumeModel extends BaseTableModel {
 
-    private static final String[] headers = {"UID", "Name", "Namespace", "Storage Class", "Host Path", "Reclaim Policy", "Access Modes"};
+    private static final String[] headers = {"UID", "Name", "Capacity", "Storage Class", "Host Path", "Reclaim Policy", "Access Modes"};
     private List<PersistentVolume> persistentVolumes;
 
     public PersistentVolumeModel(List<PersistentVolume> PersistentVolumes) {
@@ -40,7 +40,7 @@ public class PersistentVolumeModel extends BaseTableModel {
         } else if (col == 1) {
             return persistentVolumes.get(row).getName();
         } else if (col == 2) {
-            return persistentVolumes.get(row).getNameSpace();
+            return persistentVolumes.get(row).getCapacities().toString();
         } else if (col == 3) {
             return persistentVolumes.get(row).getStorageClassName();
         } else if (col == 4) {

@@ -41,7 +41,6 @@ public class MainPanel extends JPanel {
         nameSpacePanel.addNameSpaceObserver(secretsPanel.getNameSpaceListPanel());
         nameSpacePanel.addNameSpaceObserver(servicePanel.getNameSpaceListPanel());
         nameSpacePanel.addNameSpaceObserver(deploymentPanel.getNameSpaceListPanel());
-        nameSpacePanel.addNameSpaceObserver(persistentVolumePanel.getNameSpaceListPanel());
         nameSpacePanel.addNameSpaceObserver(persistentVolumeClaimPanel.getNameSpaceListPanel());
 
         tabbedPane.addTab("Nodes", nodePanel);

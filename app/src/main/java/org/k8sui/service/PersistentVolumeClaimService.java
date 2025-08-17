@@ -59,19 +59,20 @@ public class PersistentVolumeClaimService {
         var spec = new V1PersistentVolumeClaimSpec();
         spec.setAccessModes(claim.getAccessModes());
 
-        var volumeClaim = new V1PersistentVolumeClaim();
-        volumeClaim.setMetadata(meta);
-        volumeClaim.setSpec(spec);
-
-        final Map<String, Quantity> requestMap = new HashMap<>();
+        final Map<String, Quantity> resourceMap = new HashMap<>();
 
         for (String key : claim.getResources().keySet()) {
-            requestMap.put(key, new Quantity(claim.getResources().get(key)));
+            resourceMap.put(key, new Quantity(claim.getResources().get(key)));
         }
 
         var requirements = new V1VolumeResourceRequirements();
-        requirements.setRequests(requestMap);
+        requirements.setRequests(resourceMap);
+
         spec.setResources(requirements);
+
+        var volumeClaim = new V1PersistentVolumeClaim();
+        volumeClaim.setMetadata(meta);
+        volumeClaim.setSpec(spec);
 
         coreV1Api.createNamespacedPersistentVolumeClaim(claim.getNameSpace(), volumeClaim).execute();
     }
