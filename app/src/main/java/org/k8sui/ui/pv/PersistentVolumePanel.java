@@ -1,12 +1,14 @@
 package org.k8sui.ui.pv;
 
 import io.kubernetes.client.openapi.ApiException;
-import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.k8sui.App;
 import org.k8sui.model.PersistentVolume;
 import org.k8sui.service.PersistentVolumeService;
-import org.k8sui.ui.*;
+import org.k8sui.ui.MapTableModel;
+import org.k8sui.ui.NameValidator;
+import org.k8sui.ui.Updated;
+import org.k8sui.ui.Util;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;

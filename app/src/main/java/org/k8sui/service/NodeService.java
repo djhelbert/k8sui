@@ -12,8 +12,6 @@ import java.util.stream.Collectors;
 public class NodeService {
     private final CoreV1Api coreV1Api = CoreApiSupplier.api();
     private static final String CPU = "cpu";
-    private static final String ARCH = "architecture";
-    private static final String IMAGE = "osImage";
     private static final String MEMORY = "memory";
     private static final String IP = "InternalIP";
 

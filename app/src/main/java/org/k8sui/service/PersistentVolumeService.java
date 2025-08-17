@@ -23,7 +23,7 @@ public class PersistentVolumeService {
     public List<PersistentVolume> listPersistentVolumes() throws ApiException {
         var list = coreV1Api.listPersistentVolume().execute();
 
-        final List<PersistentVolume> volumes = list.getItems().stream().map(pv -> {
+        return list.getItems().stream().map(pv -> {
             var persistentVolume = new PersistentVolume();
             persistentVolume.setUid(pv.getMetadata().getUid());
             persistentVolume.setName(pv.getMetadata().getName());
@@ -49,8 +49,6 @@ public class PersistentVolumeService {
             }
             return persistentVolume;
         }).collect(toList());
-
-        return volumes;
     }
 
     public void createPersistentVolume(PersistentVolume volume) throws ApiException {

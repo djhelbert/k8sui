@@ -23,7 +23,7 @@ public class PersistentVolumeClaimService {
     public List<PersistentVolumeClaim> listPersistentVolumeClaims(String nameSpace) throws ApiException {
         var list = coreV1Api.listNamespacedPersistentVolumeClaim(nameSpace).execute();
 
-        final List<PersistentVolumeClaim> volumes = list.getItems().stream().map(pv -> {
+        return list.getItems().stream().map(pv -> {
             var persistentVolumeClaim = new PersistentVolumeClaim();
             persistentVolumeClaim.setUid(pv.getMetadata().getUid());
             persistentVolumeClaim.setName(pv.getMetadata().getName());
@@ -45,8 +45,6 @@ public class PersistentVolumeClaimService {
 
             return persistentVolumeClaim;
         }).collect(toList());
-
-        return volumes;
     }
 
     public void createPersistentVolumeClaim(PersistentVolumeClaim claim) throws ApiException {

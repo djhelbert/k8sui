@@ -1,6 +1,5 @@
 package org.k8sui.ui.pv;
 
-import org.k8sui.model.PersistentVolume;
 import org.k8sui.model.PersistentVolumeClaim;
 import org.k8sui.ui.BaseTableModel;
 
