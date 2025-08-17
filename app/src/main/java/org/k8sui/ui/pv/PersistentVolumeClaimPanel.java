@@ -62,8 +62,10 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
         // Table setup
         table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getColumnModel().getColumn(3).setMaxWidth(120);
-        table.getColumnModel().getColumn(3).setPreferredWidth(120);
+        table.getColumnModel().getColumn(3).setMaxWidth(110);
+        table.getColumnModel().getColumn(3).setPreferredWidth(110);
+        table.getColumnModel().getColumn(5).setMaxWidth(90);
+        table.getColumnModel().getColumn(5).setPreferredWidth(90);
         table.getSelectionModel().addListSelectionListener(this);
 
         var labelTable = new JTable(mapTableModel);
@@ -102,7 +104,7 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
                 PersistentVolumeClaim pvc = model.getPersistentVolumeClaim(row);
 
                 try {
-                    service.deletePersistentVolume(pvc.getName());
+                    service.deletePersistentVolumeClaim(nameSpaceListPanel.getNamespace(), pvc.getName());
                 } catch (ApiException ex) {
                     log.error("PVC Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
@@ -135,10 +137,6 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
             accessMode.setSelectedIndex(0);
             gridPanel.add(new JLabel("Access Mode:"));
             gridPanel.add(accessMode);
-
-            JTextField reclaimField = new JTextField("Retain", 8);
-            gridPanel.add(new JLabel("Reclaim Policy:"));
-            gridPanel.add(reclaimField);
 
             JTextField keyField = new JTextField("", 8);
             gridPanel.add(new JLabel("Label Key:"));
@@ -178,9 +176,8 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
                     volumeClaim.setName(nameField.getText());
                     volumeClaim.setStorageClassName(storageClassField.getText());
                     volumeClaim.setAccessModes(List.of(accessMode.getSelectedItem().toString()));
-                    volumeClaim.setResources(resourceMap);
+                    volumeClaim.setCapacities(resourceMap);
                     volumeClaim.setNameSpace(nameSpaceListPanel.getNamespace());
-                    volumeClaim.setResources(resourceMap);
                     volumeClaim.setLabels(labelMap);
 
                     service.createPersistentVolumeClaim(volumeClaim);

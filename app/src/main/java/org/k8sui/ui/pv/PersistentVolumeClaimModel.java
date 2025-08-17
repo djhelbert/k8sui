@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class PersistentVolumeClaimModel extends BaseTableModel {
 
-    private static final String[] headers = {"UID", "Name", "Namespace", "Storage Class", "Access Modes"};
+    private static final String[] headers = {"UID", "Name", "Namespace", "Storage Class", "Creation Date", "Status", "Access Modes"};
     private List<PersistentVolumeClaim> persistentVolumeClaims;
 
     public PersistentVolumeClaimModel(List<PersistentVolumeClaim> claims) {
@@ -43,6 +43,10 @@ public class PersistentVolumeClaimModel extends BaseTableModel {
             return persistentVolumeClaims.get(row).getNameSpace();
         } else if (col == 3) {
             return persistentVolumeClaims.get(row).getStorageClassName();
+        } else if (col == 4) {
+            return persistentVolumeClaims.get(row).getCreation().toString();
+        } else if (col == 5) {
+            return persistentVolumeClaims.get(row).getStatus();
         }
 
         return persistentVolumeClaims.get(row).getAccessModes().toString();

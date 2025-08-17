@@ -30,6 +30,8 @@ public class PersistentVolumeClaimService {
             persistentVolumeClaim.setStorageClassName(pv.getSpec().getStorageClassName());
             persistentVolumeClaim.setNameSpace(pv.getMetadata().getNamespace());
             persistentVolumeClaim.setLabels(pv.getMetadata().getLabels());
+            persistentVolumeClaim.setCreation(pv.getMetadata().getCreationTimestamp());
+            persistentVolumeClaim.setStatus(pv.getStatus().getPhase());
 
             final Map<String, String> resources = new HashMap<>();
             final Map<String, Quantity> resourceMap = pv.getSpec().getResources().getRequests();
@@ -38,7 +40,7 @@ public class PersistentVolumeClaimService {
                 resources.put(key, resourceMap.get(key).toSuffixedString());
             }
 
-            persistentVolumeClaim.setResources(resources);
+            persistentVolumeClaim.setCapacities(resources);
 
             List<String> accessModes = pv.getSpec().getAccessModes();
             persistentVolumeClaim.setAccessModes(accessModes);
@@ -59,8 +61,8 @@ public class PersistentVolumeClaimService {
 
         final Map<String, Quantity> resourceMap = new HashMap<>();
 
-        for (String key : claim.getResources().keySet()) {
-            resourceMap.put(key, new Quantity(claim.getResources().get(key)));
+        for (String key : claim.getCapacities().keySet()) {
+            resourceMap.put(key, new Quantity(claim.getCapacities().get(key)));
         }
 
         var requirements = new V1VolumeResourceRequirements();
@@ -75,7 +77,13 @@ public class PersistentVolumeClaimService {
         coreV1Api.createNamespacedPersistentVolumeClaim(claim.getNameSpace(), volumeClaim).execute();
     }
 
-    public void deletePersistentVolume(String name) throws ApiException {
-        coreV1Api.deletePersistentVolume(name).execute();
+    /**
+     * Delete Persistent Volume Claim
+     * @param nameSpace Name Space
+     * @param name Name
+     * @throws ApiException API Exception
+     */
+    public void deletePersistentVolumeClaim(String nameSpace, String name) throws ApiException {
+        coreV1Api.deleteNamespacedPersistentVolumeClaim(name, nameSpace).execute();
     }
 }

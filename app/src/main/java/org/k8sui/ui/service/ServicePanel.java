@@ -138,6 +138,7 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
             dialog.add(new JLabel("Service Name:"));
             dialog.add(nameField);
 
+            dialog.add(new JLabel("Type:"));
             JComboBox<String> types = new JComboBox<>(new String[]{CLUSTER_IP, NODE_PORT, LB});
             types.setSelectedIndex(0);
             dialog.add(types);

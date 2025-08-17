@@ -139,7 +139,8 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
             gridPanel.add(new JLabel("Access Mode:"));
             gridPanel.add(accessMode);
 
-            JTextField reclaimField = new JTextField("Retain", 8);
+            JComboBox<String> reclaimField = new JComboBox<>(new String[]{"Delete", "Retain"});
+            reclaimField.setSelectedIndex(0);
             gridPanel.add(new JLabel("Reclaim Policy:"));
             gridPanel.add(reclaimField);
 
@@ -188,7 +189,7 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
 
                     var newPV = new PersistentVolume();
                     newPV.setName(nameField.getText());
-                    newPV.setPersistentVolumeReclaimPolicy(reclaimField.getText());
+                    newPV.setPersistentVolumeReclaimPolicy(reclaimField.getSelectedItem().toString());
                     newPV.setStorageClassName(storageClassField.getText());
                     newPV.setAccessModes(List.of(accessMode.getSelectedItem().toString()));
                     newPV.setCapacities(capacityMap);
