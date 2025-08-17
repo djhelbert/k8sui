@@ -65,6 +65,8 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
         table.getColumnModel().getColumn(3).setPreferredWidth(1000);
         table.getColumnModel().getColumn(5).setMaxWidth(120);
         table.getColumnModel().getColumn(5).setPreferredWidth(120);
+        table.getColumnModel().getColumn(6).setMaxWidth(90);
+        table.getColumnModel().getColumn(6).setPreferredWidth(90);
         table.getSelectionModel().addListSelectionListener(this);
 
         JTable labelTable = new JTable(mapTableModel);

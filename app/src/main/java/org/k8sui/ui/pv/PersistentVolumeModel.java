@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class PersistentVolumeModel extends BaseTableModel {
 
-    private static final String[] headers = {"UID", "Name", "Capacity", "Storage Class", "Host Path", "Reclaim Policy", "Access Modes"};
+    private static final String[] headers = {"UID", "Name", "Capacity", "Storage Class", "Host Path", "Reclaim Policy", "Status", "Access Modes"};
     private List<PersistentVolume> persistentVolumes;
 
     public PersistentVolumeModel(List<PersistentVolume> PersistentVolumes) {
@@ -47,6 +47,8 @@ public class PersistentVolumeModel extends BaseTableModel {
             return persistentVolumes.get(row).getHostPath();
         } else if (col == 5) {
             return persistentVolumes.get(row).getPersistentVolumeReclaimPolicy();
+        } else if (col == 6) {
+            return persistentVolumes.get(row).getStatus();
         }
 
         return persistentVolumes.get(row).getAccessModes().toString();

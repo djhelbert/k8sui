@@ -39,6 +39,7 @@ public class PersistentVolumeService {
             }
 
             persistentVolume.setCapacities(capacities);
+            persistentVolume.setStatus(pv.getStatus().getPhase());
 
             List<String> accessModes = pv.getSpec().getAccessModes();
             persistentVolume.setAccessModes(accessModes);

@@ -18,6 +18,7 @@ public class PersistentVolume implements Comparable<PersistentVolume> {
     private String name;
     private String storageClassName;
     private String persistentVolumeReclaimPolicy;
+    private String status;
     private List<String> accessModes;
     private Map<String, String> capacities;
     private Map<String, String> labels;
