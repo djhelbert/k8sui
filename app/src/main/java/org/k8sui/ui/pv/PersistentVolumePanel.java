@@ -174,9 +174,16 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
                     Util.showError(this, "Invalid Name", "Validation Error");
                     return;
                 }
-
                 if (!Util.isValidPath(hostPathField.getText())) {
                     Util.showError(this, "Invalid Host Path", "Validation Error");
+                    return;
+                }
+                if (!Util.isQuantity(capacityField.getText())) {
+                    Util.showError(this, "Invalid Capacity", "Validation Error");
+                    return;
+                }
+                if (!NameValidator.validName(keyField.getText())) {
+                    Util.showError(this, "Invalid Key Name", "Validation Error");
                     return;
                 }
 

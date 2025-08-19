@@ -110,6 +110,7 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
                 try {
                     service.deleteNamespace(ns.getNamespace());
                 } catch (ApiException ex) {
+                    log.error("Name Space Panel", ex);
                     Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
                 }
                 update();
@@ -130,7 +131,7 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
             dialog.add(labelKeyField);
 
             JTextField labelValueField = new JTextField(20);
-            dialog.add(new JLabel("Value:"));
+            dialog.add(new JLabel("Label Value:"));
             dialog.add(labelValueField);
 
             // Create OK and Cancel buttons
@@ -146,6 +147,11 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
 
                 if (!NameValidator.validName(nameField.getText())) {
                     Util.showError(this, "Invalid Name", "Validation Error");
+                    return;
+                }
+
+                if (!NameValidator.validName(labelKeyField.getText())) {
+                    Util.showError(this, "Invalid Key Name", "Validation Error");
                     return;
                 }
 

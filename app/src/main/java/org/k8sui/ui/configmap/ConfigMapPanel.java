@@ -131,7 +131,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
             dialog.add(keyField);
 
             var valueField = new JTextField(10);
-            dialog.add(new JLabel("Value:"));
+            dialog.add(new JLabel("Map Value:"));
             dialog.add(valueField);
 
             // Create OK and Cancel buttons
@@ -174,7 +174,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
 
             // Create text field
             var nameField = new JTextField(10);
-            dialog.add(new JLabel("Map Name:"));
+            dialog.add(new JLabel("Name:"));
             dialog.add(nameField);
 
             var keyField = new JTextField(10);
@@ -182,7 +182,7 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
             dialog.add(keyField);
 
             var valueField = new JTextField(10);
-            dialog.add(new JLabel("Value:"));
+            dialog.add(new JLabel("Map Value:"));
             dialog.add(valueField);
 
             // Create OK and Cancel buttons

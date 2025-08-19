@@ -1,5 +1,6 @@
 package org.k8sui.ui;
 
+import io.kubernetes.client.custom.Quantity;
 import org.json.JSONObject;
 
 import javax.swing.*;
@@ -145,5 +146,14 @@ public class Util {
             return false;
         }
         return true;
+    }
+
+    public static boolean isQuantity(String qty) {
+        try {
+            var q = new Quantity(qty);
+            return true;
+        } catch(Throwable t) {
+            return false;
+        }
     }
 }

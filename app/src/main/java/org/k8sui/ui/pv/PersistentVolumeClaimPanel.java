@@ -164,6 +164,14 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
                     Util.showError(this, "Invalid Name", "Validation Error");
                     return;
                 }
+                if (!Util.isQuantity(capacityField.getText())) {
+                    Util.showError(this, "Invalid Capacity", "Validation Error");
+                    return;
+                }
+                if (!NameValidator.validName(keyField.getText())) {
+                    Util.showError(this, "Invalid Key Name", "Validation Error");
+                    return;
+                }
 
                 try {
                     final Map<String, String> resourceMap = new HashMap<>();

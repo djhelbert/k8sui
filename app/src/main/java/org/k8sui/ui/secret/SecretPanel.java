@@ -130,16 +130,16 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
             dialog.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
             var keyField = new JTextField(10);
-            dialog.add(new JLabel("Key:"));
+            dialog.add(new JLabel("Secret Key:"));
             dialog.add(keyField);
 
             var valueField = new JTextField(10);
-            dialog.add(new JLabel("Value:"));
+            dialog.add(new JLabel("Secret Value:"));
             dialog.add(valueField);
 
             // Create OK and Cancel buttons
-            var cancelButton = new JButton("Cancel");
             var okButton = new JButton("OK");
+            var cancelButton = new JButton("Cancel");
 
             okButton.addActionListener(e1 -> {
                 if (!NameValidator.validName(keyField.getText())) {
@@ -176,16 +176,16 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
             dialog.setLayout(new FlowLayout(FlowLayout.LEFT,5,5));
 
             // Create text field
-            var nameField = new JTextField(10);
+            var secretNameField = new JTextField(10);
             dialog.add(new JLabel("Secret Name:"));
-            dialog.add(nameField);
+            dialog.add(secretNameField);
 
             var keyField = new JTextField(10);
             dialog.add(new JLabel("Secret Key:"));
             dialog.add(keyField);
 
             var valueField = new JTextField(10);
-            dialog.add(new JLabel("Value:"));
+            dialog.add(new JLabel("Secret Value:"));
             dialog.add(valueField);
 
             // Create OK and Cancel buttons
@@ -193,7 +193,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
 
             // OK button action
             okButton.addActionListener(e1 -> {
-                if (!NameValidator.validName(nameField.getText())) {
+                if (!NameValidator.validName(secretNameField.getText())) {
                     Util.showError(this, "Invalid Name", "Validation Error");
                     return;
                 }
@@ -207,7 +207,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
                     var newMap = new Secret();
                     newMap.setCreationDate(OffsetDateTime.now());
                     newMap.setNameSpace(nameSpaceListPanel.getNamespace());
-                    newMap.setName(nameField.getText());
+                    newMap.setName(secretNameField.getText());
                     newMap.setData(List.of(new SecretData(keyField.getText(), base64Encode(valueField.getText()))));
 
                     service.createSecret(newMap);
