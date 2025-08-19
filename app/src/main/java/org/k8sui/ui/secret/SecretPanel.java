@@ -7,10 +7,7 @@ import org.k8sui.App;
 import org.k8sui.model.Secret;
 import org.k8sui.model.SecretData;
 import org.k8sui.service.SecretService;
-import org.k8sui.ui.NameSpaceListPanel;
-import org.k8sui.ui.NameValidator;
-import org.k8sui.ui.Updated;
-import org.k8sui.ui.Util;
+import org.k8sui.ui.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -142,7 +139,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
             var cancelButton = new JButton("Cancel");
 
             okButton.addActionListener(e1 -> {
-                if (!NameValidator.validName(keyField.getText())) {
+                if (!KeyValidator.validName(keyField.getText())) {
                     Util.showError(this, "Invalid Key Name", "Validation Error");
                     return;
                 }
@@ -198,7 +195,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
                     return;
                 }
 
-                if (!NameValidator.validName(keyField.getText())) {
+                if (!KeyValidator.validName(keyField.getText())) {
                     Util.showError(this, "Invalid Key Name", "Validation Error");
                     return;
                 }

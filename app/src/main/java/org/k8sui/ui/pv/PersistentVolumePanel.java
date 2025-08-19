@@ -5,10 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.k8sui.App;
 import org.k8sui.model.PersistentVolume;
 import org.k8sui.service.PersistentVolumeService;
-import org.k8sui.ui.MapTableModel;
-import org.k8sui.ui.NameValidator;
-import org.k8sui.ui.Updated;
-import org.k8sui.ui.Util;
+import org.k8sui.ui.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -182,7 +179,7 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
                     Util.showError(this, "Invalid Capacity", "Validation Error");
                     return;
                 }
-                if (!NameValidator.validName(keyField.getText())) {
+                if (!KeyValidator.validName(keyField.getText())) {
                     Util.showError(this, "Invalid Key Name", "Validation Error");
                     return;
                 }

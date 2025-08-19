@@ -168,7 +168,7 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
                     Util.showError(this, "Invalid Capacity", "Validation Error");
                     return;
                 }
-                if (!NameValidator.validName(keyField.getText())) {
+                if (!KeyValidator.validName(keyField.getText())) {
                     Util.showError(this, "Invalid Key Name", "Validation Error");
                     return;
                 }
