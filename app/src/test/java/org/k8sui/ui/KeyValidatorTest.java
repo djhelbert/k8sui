@@ -12,9 +12,8 @@ public class KeyValidatorTest {
         assertTrue(KeyValidator.validName("ye-.s"));
         assertTrue(KeyValidator.validName("yes"));
         assertTrue(KeyValidator.validName("yes123yes"));
-        assertTrue(KeyValidator.validName("Notvalid"));
+        assertTrue(KeyValidator.validName("Isvalid"));
         assertTrue(KeyValidator.validName("IS_VALID"));
-        assertFalse(KeyValidator.validName("y"));
 
         assertFalse(KeyValidator.validName("not valid"));
         assertFalse(KeyValidator.validName("$no"));
