@@ -144,11 +144,11 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
             dialog.add(types);
 
             var selectorField = new JTextField(20);
-            dialog.add(new JLabel("Selector:"));
+            dialog.add(new JLabel("Selector (app):"));
             dialog.add(selectorField);
 
             var portField = new JTextField("80", 4);
-            dialog.add(new JLabel("Port:"));
+            dialog.add(new JLabel("Service Port:"));
             dialog.add(portField);
 
             var targetPortField = new JTextField("80", 4);
@@ -162,6 +162,10 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
             // Create OK and Cancel buttons
             var okButton = new JButton("OK");
             var cancelButton = new JButton("Cancel");
+
+            // Add buttons to dialog
+            dialog.add(okButton);
+            dialog.add(cancelButton);
 
             // OK button action
             okButton.addActionListener(e1 -> {
@@ -212,10 +216,6 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
 
             // Cancel button action
             cancelButton.addActionListener(e1 -> dialog.dispose());
-
-            // Add buttons to dialog
-            dialog.add(okButton);
-            dialog.add(cancelButton);
 
             // Center the dialog relative to the frame
             dialog.pack();
