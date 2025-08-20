@@ -38,6 +38,9 @@ import org.k8sui.model.Deployment;
 import org.k8sui.model.DeploymentVolume;
 import org.k8sui.model.VolumeMount;
 
+/**
+ * Deployment Service
+ */
 public class DeploymentService {
 
   private final AppsV1Api appsV1Api = CoreApiSupplier.app();
@@ -180,6 +183,13 @@ public class DeploymentService {
     return appsV1Api.createNamespacedDeployment(deployment.getNamespace(), v1Deployment).execute();
   }
 
+  /**
+   * Delete Deployment
+   * @param nameSpace Name Space
+   * @param name Name
+   * @return V1Status
+   * @throws ApiException API Exception
+   */
   public V1Status deleteDeployment(String nameSpace, String name) throws ApiException {
     return appsV1Api.deleteNamespacedDeployment(name, nameSpace).execute();
   }

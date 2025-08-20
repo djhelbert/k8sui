@@ -1,4 +1,15 @@
+/**
+ * k8sui Copyright (C) 2025 This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version. This program is
+ * distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+ * Public License for more details. You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.k8sui.service;
+
+import static java.util.stream.Collectors.toList;
 
 import io.kubernetes.client.custom.IntOrString;
 import io.kubernetes.client.openapi.ApiException;
@@ -7,16 +18,16 @@ import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1Service;
 import io.kubernetes.client.openapi.models.V1ServicePort;
 import io.kubernetes.client.openapi.models.V1ServiceSpec;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.Service;
 import org.k8sui.model.ServicePort;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.stream.Collectors.toList;
-
+/**
+ * Service API Service
+ */
 public class ServiceService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
@@ -84,6 +95,13 @@ public class ServiceService {
     return coreV1Api.createNamespacedService(svc.getNamespace(), v1Service).execute();
   }
 
+  /**
+   * Delete Service
+   * @param name Service Name
+   * @param namespace Name Space
+   * @return V1Service
+   * @throws ApiException API Exception
+   */
   public V1Service deleteService(String name, String namespace) throws ApiException {
     return coreV1Api.deleteNamespacedService(name, namespace).execute();
   }
