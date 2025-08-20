@@ -82,11 +82,16 @@ public class DeploymentService {
             return cont;
           }).collect(toList());
 
-          List<DeploymentVolume> deploymentVolumes = d.getSpec().getTemplate()
-              .getSpec().getVolumes()
-              .stream()
-              .map(v-> new DeploymentVolume(v.getName(),v.getPersistentVolumeClaim().getClaimName()))
-              .toList();
+          List<DeploymentVolume> deploymentVolumes = new ArrayList<>();
+
+          if(d.getSpec().getTemplate().getSpec() != null && d.getSpec().getTemplate().getSpec().getVolumes() != null) {
+            deploymentVolumes = d.getSpec().getTemplate()
+                .getSpec().getVolumes()
+                .stream().filter(v -> v.getPersistentVolumeClaim() != null)
+                .map(v -> new DeploymentVolume(v.getName(),
+                    v.getPersistentVolumeClaim().getClaimName()))
+                .toList();
+          }
 
           deployment.setVolumes(deploymentVolumes);
           deployment.setContainers(containers);

@@ -12,13 +12,17 @@ package org.k8sui.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class DeploymentVolume {
+
   private String name;
   private String claimName;
+
+  @Override
+  public String toString() {
+    return claimName;
+  }
 }

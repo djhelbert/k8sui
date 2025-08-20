@@ -7,7 +7,7 @@
  * Public License for more details. You should have received a copy of the GNU General Public
  * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.k8sui.ui.namespace;
+package org.k8sui.ui.pv;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -17,7 +17,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 /**
  * Status Table Cell Renderer
  */
-public class StatusTableCellRenderer extends DefaultTableCellRenderer {
+public class BoundTableCellRenderer extends DefaultTableCellRenderer {
 
     private static final Color DARK_GREEN = new Color(51, 102, 0);
 
@@ -26,10 +26,8 @@ public class StatusTableCellRenderer extends DefaultTableCellRenderer {
         var comp = super.getTableCellRendererComponent(t, o, selected, focus, r, c);
         var s = t.getModel().getValueAt(r, c).toString();
 
-        if (s.equalsIgnoreCase("active")) {
+        if (s.equalsIgnoreCase("bound")) {
             comp.setForeground(DARK_GREEN);
-        } else if (s.equalsIgnoreCase("terminating")) {
-            comp.setForeground(Color.RED);
         } else {
             comp.setForeground(Color.BLACK);
         }

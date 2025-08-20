@@ -29,6 +29,11 @@ public class PersistentVolumeClaimService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
+  public List<String> listPersistentVolumeClaimNames(String nameSpace) throws ApiException {
+    var list = coreV1Api.listNamespacedPersistentVolumeClaim(nameSpace).execute();
+    return list.getItems().stream().map(pv -> pv.getMetadata().getName()).toList();
+  }
+
   public List<PersistentVolumeClaim> listPersistentVolumeClaims(String nameSpace)
       throws ApiException {
     var list = coreV1Api.listNamespacedPersistentVolumeClaim(nameSpace).execute();
