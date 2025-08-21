@@ -33,7 +33,7 @@ public class SecretService {
   public List<String> secretListNames(String namespace) throws ApiException {
     var list = coreV1Api.listNamespacedSecret(namespace).execute();
     return list.getItems().stream()
-        .filter(s -> s.getMetadata().getName() != null)
+        .filter(s -> s.getMetadata() != null && s.getMetadata().getName() != null)
         .map(s -> s.getMetadata().getName()).toList();
   }
 

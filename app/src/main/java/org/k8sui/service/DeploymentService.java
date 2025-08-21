@@ -25,7 +25,6 @@ import io.kubernetes.client.openapi.models.V1PersistentVolumeClaimVolumeSource;
 import io.kubernetes.client.openapi.models.V1PodSpec;
 import io.kubernetes.client.openapi.models.V1PodTemplateSpec;
 import io.kubernetes.client.openapi.models.V1SecretEnvSource;
-import io.kubernetes.client.openapi.models.V1Status;
 import io.kubernetes.client.openapi.models.V1Volume;
 import io.kubernetes.client.openapi.models.V1VolumeMount;
 import java.time.OffsetDateTime;
@@ -79,9 +78,8 @@ public class DeploymentService {
             cont.setImagePullPolicy(c.getImagePullPolicy());
 
             if (c.getPorts() != null) {
-              cont.setPorts(c.getPorts().stream().map(p -> {
-                return new ContainerPort(p.getContainerPort());
-              }).toList());
+              cont.setPorts(
+                  c.getPorts().stream().map(p -> new ContainerPort(p.getContainerPort())).toList());
             }
 
             if (c.getEnvFrom() != null) {
@@ -217,10 +215,9 @@ public class DeploymentService {
    *
    * @param nameSpace Name Space
    * @param name      Name
-   * @return V1Status
    * @throws ApiException API Exception
    */
-  public V1Status deleteDeployment(String nameSpace, String name) throws ApiException {
-    return appsV1Api.deleteNamespacedDeployment(name, nameSpace).execute();
+  public void deleteDeployment(String nameSpace, String name) throws ApiException {
+    appsV1Api.deleteNamespacedDeployment(name, nameSpace).execute();
   }
 }

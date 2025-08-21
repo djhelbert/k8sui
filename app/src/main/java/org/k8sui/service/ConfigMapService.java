@@ -37,10 +37,10 @@ public class ConfigMapService {
 
     return list.getItems().stream().map(cm -> {
       var configMap = new ConfigMap();
-      configMap.setName(cm.getMetadata() == null ? null : cm.getMetadata().getName());
       configMap.setUid(cm.getMetadata().getUid());
-      configMap.setCreationDate(cm.getMetadata().getCreationTimestamp());
       configMap.setNameSpace(cm.getMetadata().getNamespace());
+      configMap.setName(cm.getMetadata() == null ? null : cm.getMetadata().getName());
+      configMap.setCreationDate(cm.getMetadata().getCreationTimestamp());
 
       var map = cm.getData();
 
@@ -84,6 +84,12 @@ public class ConfigMapService {
     coreV1Api.replaceNamespacedConfigMap(name, nameSpace, v1ConfigMap).execute();
   }
 
+  /**
+   * Delete Config Map
+   * @param name Name
+   * @param nameSpace Name Space
+   * @throws ApiException API Exception
+   */
   public void deleteConfigMap(String name, String nameSpace) throws ApiException {
     coreV1Api.deleteNamespacedConfigMap(name, nameSpace).execute();
   }

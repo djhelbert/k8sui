@@ -99,10 +99,9 @@ public class ServiceService {
    * Delete Service
    * @param name Service Name
    * @param namespace Name Space
-   * @return V1Service
    * @throws ApiException API Exception
    */
-  public V1Service deleteService(String name, String namespace) throws ApiException {
-    return coreV1Api.deleteNamespacedService(name, namespace).execute();
+  public void deleteService(String name, String namespace) throws ApiException {
+    coreV1Api.deleteNamespacedService(name, namespace).execute();
   }
 }

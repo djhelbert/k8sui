@@ -15,7 +15,6 @@ import io.kubernetes.client.openapi.models.V1DeleteOptions;
 import io.kubernetes.client.openapi.models.V1Namespace;
 import io.kubernetes.client.openapi.models.V1NamespaceStatus;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
-import io.kubernetes.client.openapi.models.V1Status;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -39,14 +38,20 @@ public class NameSpaceService {
     }).collect(Collectors.toList());
   }
 
-  public V1Namespace createNamespace(String name, Map<String, String> labels) throws ApiException {
+  public void createNamespace(String name, Map<String, String> labels) throws ApiException {
     var namespace = new V1Namespace();
     namespace.metadata(new V1ObjectMeta().name(name).labels(labels));
-    return coreV1Api.createNamespace(namespace).execute();
+    coreV1Api.createNamespace(namespace).execute();
   }
 
-  public V1Status deleteNamespace(String name) throws ApiException {
+  /**
+   * Delete Name Space
+   *
+   * @param name Name
+   * @throws ApiException API Exception
+   */
+  public void deleteNamespace(String name) throws ApiException {
     V1DeleteOptions deleteOptions = new V1DeleteOptions();
-    return coreV1Api.deleteNamespace(name).execute();
+    coreV1Api.deleteNamespace(name).execute();
   }
 }
