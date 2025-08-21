@@ -118,7 +118,7 @@ public class DeploymentService {
         }).collect(toList());
   }
 
-  public V1Deployment addDeployment(Deployment deployment) throws ApiException {
+  public void addDeployment(Deployment deployment) throws ApiException {
     // Create a deployment
     V1Deployment v1Deployment = new V1Deployment();
 
@@ -207,7 +207,7 @@ public class DeploymentService {
       }
     }
 
-    return appsV1Api.createNamespacedDeployment(deployment.getNamespace(), v1Deployment).execute();
+    appsV1Api.createNamespacedDeployment(deployment.getNamespace(), v1Deployment).execute();
   }
 
   /**

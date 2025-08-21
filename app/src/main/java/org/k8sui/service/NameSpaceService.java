@@ -51,7 +51,6 @@ public class NameSpaceService {
    * @throws ApiException API Exception
    */
   public void deleteNamespace(String name) throws ApiException {
-    V1DeleteOptions deleteOptions = new V1DeleteOptions();
     coreV1Api.deleteNamespace(name).execute();
   }
 }

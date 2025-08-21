@@ -19,7 +19,7 @@ public class App {
 
   private static MainFrame frame;
 
-  public static void main(String[] args) throws ApiException {
+  public static void main(String[] args) {
     try {
       UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
     } catch (Exception err) {

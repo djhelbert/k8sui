@@ -6,7 +6,7 @@ import javax.swing.table.AbstractTableModel;
  * Base Table Model
  */
 public abstract class BaseTableModel extends AbstractTableModel  {
-    String[] headers;
+    final String[] headers;
 
     public BaseTableModel(String[] headers) {
         this.headers = headers;

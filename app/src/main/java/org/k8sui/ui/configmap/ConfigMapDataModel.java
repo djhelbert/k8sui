@@ -42,10 +42,6 @@ public class ConfigMapDataModel extends BaseTableModel {
     Collections.sort(data);
   }
 
-  public ConfigMapData getConfigMapData(int index) {
-    return data.get(index);
-  }
-
   @Override
   public int getRowCount() {
     return data.size();

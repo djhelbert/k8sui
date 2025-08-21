@@ -72,7 +72,12 @@ public class ServiceService {
         .collect(toList());
   }
 
-  public V1Service addService(Service svc) throws ApiException {
+  /**
+   * Add Service
+   * @param svc Service
+   * @throws ApiException API Exception
+   */
+  public void addService(Service svc) throws ApiException {
     V1Service v1Service = new V1Service();
     V1ObjectMeta metadata = new V1ObjectMeta();
     metadata.setName(svc.getName());
@@ -92,7 +97,7 @@ public class ServiceService {
     v1ServiceSpec.setPorts(Collections.singletonList(v1ServicePort));
     v1Service.setSpec(v1ServiceSpec);
 
-    return coreV1Api.createNamespacedService(svc.getNamespace(), v1Service).execute();
+    coreV1Api.createNamespacedService(svc.getNamespace(), v1Service).execute();
   }
 
   /**
