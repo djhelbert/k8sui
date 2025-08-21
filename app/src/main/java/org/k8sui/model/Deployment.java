@@ -9,12 +9,11 @@
  */
 package org.k8sui.model;
 
+import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.Map;
 
 @Data
 @ToString
@@ -30,7 +29,10 @@ public class Deployment implements Comparable<Deployment> {
   private List<Container> containers;
   private List<DeploymentVolume> volumes;
 
-  public Deployment(String uid, @NotNull String name, @NotNull String namespace) {
+  public Deployment() {
+  }
+
+  public Deployment(String uid, String name, String namespace) {
     this.uid = uid;
     this.namespace = namespace;
     this.name = name;

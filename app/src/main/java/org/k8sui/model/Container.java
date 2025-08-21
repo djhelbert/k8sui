@@ -24,6 +24,7 @@ public class Container implements Comparable<Container> {
   private String image;
   private String imagePullPolicy;
   private String configMapRef;
+  private String secretRef;
   private List<VolumeMount> volumeMounts;
   private List<ContainerPort> ports;
 

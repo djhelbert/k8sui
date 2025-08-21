@@ -13,24 +13,25 @@ import static java.util.stream.Collectors.toList;
 
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
-import io.kubernetes.client.openapi.models.V1ConfigMapKeySelector;
+import io.kubernetes.client.openapi.models.V1ConfigMapEnvSource;
 import io.kubernetes.client.openapi.models.V1Container;
 import io.kubernetes.client.openapi.models.V1ContainerPort;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1DeploymentSpec;
-import io.kubernetes.client.openapi.models.V1EnvVar;
-import io.kubernetes.client.openapi.models.V1EnvVarSource;
+import io.kubernetes.client.openapi.models.V1EnvFromSource;
 import io.kubernetes.client.openapi.models.V1LabelSelector;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1PersistentVolumeClaimVolumeSource;
 import io.kubernetes.client.openapi.models.V1PodSpec;
 import io.kubernetes.client.openapi.models.V1PodTemplateSpec;
+import io.kubernetes.client.openapi.models.V1SecretEnvSource;
 import io.kubernetes.client.openapi.models.V1Status;
 import io.kubernetes.client.openapi.models.V1Volume;
 import io.kubernetes.client.openapi.models.V1VolumeMount;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.Container;
 import org.k8sui.model.ContainerPort;
@@ -50,12 +51,16 @@ public class DeploymentService {
 
     return deploymentList.getItems().stream()
         .map(d -> {
-          Deployment deployment = new Deployment(d.getMetadata().getUid(),
-              d.getMetadata().getName(), d.getMetadata().getNamespace());
+          Deployment deployment = new Deployment();
+
+          if (d.getMetadata() != null) {
+            deployment = new Deployment(d.getMetadata().getUid(), d.getMetadata().getName(),
+                d.getMetadata().getNamespace());
+          }
 
           var status = d.getStatus();
 
-          if (status != null) {
+          if (status != null && status.getAvailableReplicas() != null) {
             deployment.setReadyReplicas(status.getAvailableReplicas());
           } else {
             deployment.setReadyReplicas(0);
@@ -79,12 +84,25 @@ public class DeploymentService {
               }).toList());
             }
 
+            if (c.getEnvFrom() != null) {
+              Optional<V1EnvFromSource> configMapSrc = c.getEnvFrom().stream()
+                  .filter(from -> from.getConfigMapRef() != null).findFirst();
+              Optional<V1EnvFromSource> secretSrc = c.getEnvFrom().stream()
+                  .filter(from -> from.getSecretRef() != null).findFirst();
+
+              configMapSrc.ifPresent(v1EnvFromSource -> cont.setConfigMapRef(
+                  v1EnvFromSource.getConfigMapRef().getName()));
+              secretSrc.ifPresent(v1EnvFromSource -> cont.setSecretRef(
+                  v1EnvFromSource.getSecretRef().getName()));
+            }
+
             return cont;
           }).collect(toList());
 
           List<DeploymentVolume> deploymentVolumes = new ArrayList<>();
 
-          if(d.getSpec().getTemplate().getSpec() != null && d.getSpec().getTemplate().getSpec().getVolumes() != null) {
+          if (d.getSpec().getTemplate().getSpec() != null
+              && d.getSpec().getTemplate().getSpec().getVolumes() != null) {
             deploymentVolumes = d.getSpec().getTemplate()
                 .getSpec().getVolumes()
                 .stream().filter(v -> v.getPersistentVolumeClaim() != null)
@@ -131,27 +149,32 @@ public class DeploymentService {
       v1Container.setImage(c.getImage());
       v1Container.setImagePullPolicy(c.getImagePullPolicy());
 
-      final List<V1EnvVar> envVars = new ArrayList<>();
+      final List<V1EnvFromSource> envFromSources = new ArrayList<>();
 
       if (c.getConfigMapRef() != null && !c.getConfigMapRef().isEmpty()) {
-        var envVar = new V1EnvVar();
-        envVar.setValueFrom(new V1EnvVarSource().configMapKeyRef(
-            new V1ConfigMapKeySelector().name(c.getConfigMapRef())));
-        envVars.add(envVar);
+        var envFromSource = new V1EnvFromSource();
+        envFromSource.setConfigMapRef(new V1ConfigMapEnvSource().name(c.getConfigMapRef()));
+        envFromSources.add(envFromSource);
       }
 
-      if (!envVars.isEmpty()) {
-        v1Container.setEnv(envVars);
+      if (c.getSecretRef() != null && !c.getSecretRef().isEmpty()) {
+        var envFromSource = new V1EnvFromSource();
+        envFromSource.setSecretRef(new V1SecretEnvSource().name(c.getSecretRef()));
+        envFromSources.add(envFromSource);
+      }
+
+      if (!envFromSources.isEmpty()) {
+        v1Container.setEnvFrom(envFromSources);
       }
 
       v1Container.setPorts(
           c.getPorts().stream().map(p -> new V1ContainerPort().containerPort(p.getContainerPort()))
               .toList());
 
-      if(c.getVolumeMounts() != null && !c.getVolumeMounts().isEmpty()) {
+      if (c.getVolumeMounts() != null && !c.getVolumeMounts().isEmpty()) {
         List<V1VolumeMount> volumeMounts = new ArrayList<>();
 
-        for(VolumeMount vm : c.getVolumeMounts()) {
+        for (VolumeMount vm : c.getVolumeMounts()) {
           var mount = new V1VolumeMount();
           mount.setMountPath(vm.getMountPath());
           mount.setName(vm.getName());
@@ -164,11 +187,12 @@ public class DeploymentService {
       return v1Container;
     }).toList();
 
-    if(deployment.getVolumes() != null && !deployment.getVolumes().isEmpty()) {
+    if (deployment.getVolumes() != null && !deployment.getVolumes().isEmpty()) {
       List<V1Volume> volumes = new ArrayList<>();
 
-      for(DeploymentVolume dv : deployment.getVolumes()) {
-        volumes.add(new V1Volume().name(dv.getName()).persistentVolumeClaim(new V1PersistentVolumeClaimVolumeSource().claimName(dv.getClaimName())));
+      for (DeploymentVolume dv : deployment.getVolumes()) {
+        volumes.add(new V1Volume().name(dv.getName()).persistentVolumeClaim(
+            new V1PersistentVolumeClaimVolumeSource().claimName(dv.getClaimName())));
       }
 
       template.setSpec(new V1PodSpec().containers(v1ContainerList).volumes(volumes));
@@ -190,8 +214,9 @@ public class DeploymentService {
 
   /**
    * Delete Deployment
+   *
    * @param nameSpace Name Space
-   * @param name Name
+   * @param name      Name
    * @return V1Status
    * @throws ApiException API Exception
    */
