@@ -23,9 +23,19 @@ import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.Secret;
 import org.k8sui.model.SecretData;
 
+/**
+ * Secret Service
+ */
 public class SecretService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
+
+  public List<String> secretListNames(String namespace) throws ApiException {
+    var list = coreV1Api.listNamespacedSecret(namespace).execute();
+    return list.getItems().stream()
+        .filter(s -> s.getMetadata().getName() != null)
+        .map(s -> s.getMetadata().getName()).toList();
+  }
 
   public List<Secret> secretList(String namespace) throws ApiException {
     var list = coreV1Api.listNamespacedSecret(namespace).execute();
@@ -86,6 +96,12 @@ public class SecretService {
     }
   }
 
+  /**
+   * Delete Secret
+   * @param name Secret Name
+   * @param nameSpace Name Space
+   * @throws ApiException API Exception
+   */
   public void deleteSecret(String name, String nameSpace) throws ApiException {
     coreV1Api.deleteNamespacedSecret(name, nameSpace).execute();
   }

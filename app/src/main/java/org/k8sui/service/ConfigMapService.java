@@ -27,6 +27,11 @@ public class ConfigMapService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
+  public List<String> configMapListNames(String namespace) throws ApiException {
+    var list = coreV1Api.listNamespacedConfigMap(namespace).execute();
+    return list.getItems().stream().map(cm -> cm.getMetadata().getName()).toList();
+  }
+
   public List<ConfigMap> configMapList(String namespace) throws ApiException {
     var list = coreV1Api.listNamespacedConfigMap(namespace).execute();
 
@@ -42,6 +47,7 @@ public class ConfigMapService {
       List<ConfigMapData> configMapDataList = map.keySet().stream()
           .map(k -> new ConfigMapData(k, map.get(k)))
           .collect(toList());
+
       configMap.setData(configMapDataList);
 
       return configMap;
