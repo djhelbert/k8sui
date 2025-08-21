@@ -12,6 +12,7 @@ package org.k8sui.ui.deployment;
 import io.kubernetes.client.openapi.ApiException;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -132,33 +133,50 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
     if (e.getSource().equals(addButton)) {
       // Create the dialog
       JDialog dialog = new JDialog(App.frame(), "Add Deployment", true);
-      dialog.setLayout(new FlowLayout());
+      dialog.setLayout(new BorderLayout(5, 5));
+
+      var gridPanel = new JPanel(new GridLayout(7, 2, 5, 5));
 
       // Create text field
-      JTextField nameField = new JTextField(10);
-      dialog.add(new JLabel("Name:"));
-      dialog.add(nameField);
+      var nameField = new JTextField(30);
+      gridPanel.add(new JLabel("Name:"));
+      gridPanel.add(nameField);
 
-      JTextField imageField = new JTextField(20);
-      dialog.add(new JLabel("Image:"));
-      dialog.add(imageField);
+      var selectorField = new JTextField(30);
+      gridPanel.add(new JLabel("Selector (app):"));
+      gridPanel.add(selectorField);
 
-      JComboBox<String> imagePullPolicyField = new JComboBox<>(new String[]{"Always", "IfNotPresent"});
-      dialog.add(new JLabel("Pull Policy:"));
-      dialog.add(imagePullPolicyField);
+      var imageField = new JTextField();
+      gridPanel.add(new JLabel("Image:"));
+      gridPanel.add(imageField);
 
-      dialog.add(new JLabel("Replicas:"));
-      JComboBox<Integer> replicas = new JComboBox<>(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13});
+      JComboBox<String> imgPullPolicyList = new JComboBox<>(new String[]{"Always", "IfNotPresent"});
+      gridPanel.add(new JLabel("Pull Policy:"));
+      gridPanel.add(imgPullPolicyList);
+
+      gridPanel.add(new JLabel("Replicas:"));
+      JComboBox<Integer> replicas = new JComboBox<>(
+          new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13});
       replicas.setSelectedIndex(2);
-      dialog.add(replicas);
+      gridPanel.add(replicas);
 
-      JTextField portField = new JTextField("80", 4);
-      dialog.add(new JLabel("Port:"));
-      dialog.add(portField);
+      var portField = new JTextField("80");
+      gridPanel.add(new JLabel("Port:"));
+      gridPanel.add(portField);
+
+      var mountPathField = new JTextField(30);
+      gridPanel.add(new JLabel("Mount Path:"));
+      gridPanel.add(mountPathField);
+
+      dialog.add(gridPanel, BorderLayout.CENTER);
 
       // Create OK and Cancel buttons
+      JPanel buttonPanel = new JPanel(new FlowLayout());
       JButton okButton = new JButton("OK");
       JButton cancelButton = new JButton("Cancel");
+      buttonPanel.add(okButton);
+      buttonPanel.add(cancelButton);
+      dialog.add(buttonPanel, BorderLayout.SOUTH);
 
       // OK button action
       okButton.addActionListener(e1 -> {
@@ -171,14 +189,14 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
 
         try {
           Map<String, String> map = new HashMap<>();
-          map.put("app", nameField.getText());
+          map.put("app", selectorField.getText());
 
-          Deployment newDeployment = new Deployment(null, input, nameSpaceListPanel.getNamespace());
+          var newDeployment = new Deployment(null, input, nameSpaceListPanel.getNamespace());
           newDeployment.setReplicas((Integer) replicas.getSelectedItem());
           newDeployment.setLabels(map);
           newDeployment.setSelectors(map);
 
-          Container container = new Container();
+          var container = new Container();
           container.setName(nameField.getText());
           container.setImage(imageField.getText());
           container.setPorts(List.of(new ContainerPort(Integer.parseInt(portField.getText()))));
@@ -195,11 +213,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
       });
 
       // Cancel button action
-      cancelButton.addActionListener(e1 -> dialog.dispose());
-
-      // Add buttons to dialog
-      dialog.add(okButton);
-      dialog.add(cancelButton);
+      cancelButton.addActionListener(ae -> dialog.dispose());
 
       // Center the dialog relative to the frame
       dialog.pack();
@@ -211,6 +225,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
   @Override
   public void valueChanged(ListSelectionEvent e) {
     int row = table.getSelectedRow();
+
     if (row != -1) {
       containerModel.setContainers(model.getDeployment(row).getContainers());
       containerModel.fireTableDataChanged();

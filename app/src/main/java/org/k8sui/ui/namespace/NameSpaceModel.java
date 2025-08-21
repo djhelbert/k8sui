@@ -55,9 +55,9 @@ public class NameSpaceModel extends BaseTableModel {
     } else if (col == 2) {
       if (namespaces.get(row).getCreation() == null) {
         return "";
+      } else {
+        return formatter.format(namespaces.get(row).getCreation());
       }
-
-      return formatter.format(namespaces.get(row).getCreation());
     }
 
     return namespaces.get(row).getStatus();

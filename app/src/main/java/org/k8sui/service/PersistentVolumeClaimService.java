@@ -40,22 +40,31 @@ public class PersistentVolumeClaimService {
 
     return list.getItems().stream().map(pv -> {
       var persistentVolumeClaim = new PersistentVolumeClaim();
-      persistentVolumeClaim.setUid(pv.getMetadata().getUid());
-      persistentVolumeClaim.setName(pv.getMetadata().getName());
-      persistentVolumeClaim.setStorageClassName(pv.getSpec().getStorageClassName());
-      persistentVolumeClaim.setNameSpace(pv.getMetadata().getNamespace());
-      persistentVolumeClaim.setLabels(pv.getMetadata().getLabels());
-      persistentVolumeClaim.setCreation(pv.getMetadata().getCreationTimestamp());
-      persistentVolumeClaim.setStatus(pv.getStatus().getPhase());
 
-      final Map<String, String> resources = new HashMap<>();
-      final Map<String, Quantity> resourceMap = pv.getSpec().getResources().getRequests();
-
-      for (String key : resourceMap.keySet()) {
-        resources.put(key, resourceMap.get(key).toSuffixedString());
+      if(pv.getMetadata() != null) {
+        persistentVolumeClaim.setUid(pv.getMetadata().getUid());
+        persistentVolumeClaim.setName(pv.getMetadata().getName());
+        persistentVolumeClaim.setNameSpace(pv.getMetadata().getNamespace());
+        persistentVolumeClaim.setLabels(pv.getMetadata().getLabels());
+        persistentVolumeClaim.setCreation(pv.getMetadata().getCreationTimestamp());
       }
 
-      persistentVolumeClaim.setCapacities(resources);
+      if(pv.getSpec() != null) {
+        persistentVolumeClaim.setStorageClassName(pv.getSpec().getStorageClassName());
+
+        final Map<String, String> resources = new HashMap<>();
+        final Map<String, Quantity> resourceMap = pv.getSpec().getResources().getRequests();
+
+        for (String key : resourceMap.keySet()) {
+          resources.put(key, resourceMap.get(key).toSuffixedString());
+        }
+
+        persistentVolumeClaim.setCapacities(resources);
+      }
+
+      if(pv.getStatus() != null) {
+        persistentVolumeClaim.setStatus(pv.getStatus().getPhase());
+      }
 
       List<String> accessModes = pv.getSpec().getAccessModes();
       persistentVolumeClaim.setAccessModes(accessModes);
