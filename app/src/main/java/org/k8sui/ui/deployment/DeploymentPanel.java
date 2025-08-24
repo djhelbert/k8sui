@@ -16,14 +16,17 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -36,7 +39,12 @@ import org.k8sui.App;
 import org.k8sui.model.Container;
 import org.k8sui.model.ContainerPort;
 import org.k8sui.model.Deployment;
+import org.k8sui.model.DeploymentVolume;
+import org.k8sui.model.VolumeMount;
+import org.k8sui.service.ConfigMapService;
 import org.k8sui.service.DeploymentService;
+import org.k8sui.service.PersistentVolumeClaimService;
+import org.k8sui.service.SecretService;
 import org.k8sui.ui.NameSpaceListPanel;
 import org.k8sui.ui.NameValidator;
 import org.k8sui.ui.Updated;
@@ -54,6 +62,9 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
   private DeploymentModel model;
   private final ContainerModel containerModel = new ContainerModel(new ArrayList<>());
   private final DeploymentService service = new DeploymentService();
+  private final ConfigMapService configMapService = new ConfigMapService();
+  private final SecretService secretService = new SecretService();
+  private final PersistentVolumeClaimService pvcService = new PersistentVolumeClaimService();
   @Getter
   private final NameSpaceListPanel nameSpaceListPanel = new NameSpaceListPanel(this);
 
@@ -90,13 +101,16 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
     table.getColumnModel().getColumn(3).setPreferredWidth(80);
     table.getSelectionModel().addListSelectionListener(this);
 
-    JTable containerTable = new JTable(containerModel);
+    var containerTable = new JTable(containerModel);
     containerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    var scrollPane = new JScrollPane(containerTable);
+    scrollPane.setBorder(
+        BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Containers"));
 
     setLayout(new BorderLayout());
     add(buttonPanel, BorderLayout.NORTH);
     add(new JScrollPane(table), BorderLayout.CENTER);
-    add(new JScrollPane(containerTable), BorderLayout.SOUTH);
+    add(scrollPane, BorderLayout.SOUTH);
   }
 
   @Override
@@ -135,7 +149,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
       JDialog dialog = new JDialog(App.frame(), "Add Deployment", true);
       dialog.setLayout(new BorderLayout(5, 5));
 
-      var gridPanel = new JPanel(new GridLayout(7, 2, 5, 5));
+      var gridPanel = new JPanel(new GridLayout(10, 2, 5, 5));
 
       // Create text field
       var nameField = new JTextField(30);
@@ -155,7 +169,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
       gridPanel.add(imgPullPolicyList);
 
       gridPanel.add(new JLabel("Replicas:"));
-      JComboBox<Integer> replicas = new JComboBox<>(
+      final JComboBox<Integer> replicas = new JComboBox<>(
           new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13});
       replicas.setSelectedIndex(2);
       gridPanel.add(replicas);
@@ -164,7 +178,22 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
       gridPanel.add(new JLabel("Port:"));
       gridPanel.add(portField);
 
-      var mountPathField = new JTextField(30);
+      var configMapRadio = new JRadioButton("Environment From ConfigMap:");
+      gridPanel.add(configMapRadio);
+      var configMapList = new JComboBox<>(configMapService.configMapListNames(nameSpaceListPanel.getNamespace()).toArray(new String[0]));
+      gridPanel.add(configMapList);
+
+      var secretRadio = new JRadioButton("Environment From Secret:");
+      final JComboBox<String> secretList = new JComboBox<>(secretService.secretListNames(nameSpaceListPanel.getNamespace()).toArray(new String[0]));
+      gridPanel.add(secretRadio);
+      gridPanel.add(secretList);
+
+      var pvcRadio = new JRadioButton("Persistent Volume Claim:");
+      final JComboBox<String> pvcList = new JComboBox<>(pvcService.listPersistentVolumeClaimNames(nameSpaceListPanel.getNamespace()).toArray(new String[0]));
+      gridPanel.add(pvcRadio);
+      gridPanel.add(pvcList);
+
+      var mountPathField = new JTextField("/data");
       gridPanel.add(new JLabel("Mount Path:"));
       gridPanel.add(mountPathField);
 
@@ -201,6 +230,17 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
           container.setImage(imageField.getText());
           container.setPorts(List.of(new ContainerPort(Integer.parseInt(portField.getText()))));
           newDeployment.setContainers(List.of(container));
+
+          if(secretRadio.isSelected()) {
+            container.setSecretRef(secretList.getSelectedItem().toString());
+          }
+          if(configMapRadio.isSelected()) {
+            container.setConfigMapRef(configMapList.getSelectedItem().toString());
+          }
+          if(pvcRadio.isSelected()) {
+            container.setVolumeMounts(List.of(new VolumeMount("volume", mountPathField.getText())));
+            newDeployment.setVolumes(List.of(new DeploymentVolume("volume", pvcList.getSelectedItem().toString())));
+          }
 
           service.addDeployment(newDeployment);
           update();

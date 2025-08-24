@@ -14,21 +14,30 @@ import static java.util.stream.Collectors.toList;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
+import io.kubernetes.client.openapi.models.V1ConfigMapList;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.ConfigMap;
 import org.k8sui.model.ConfigMapData;
 
+@Log4j2
 public class ConfigMapService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
-  public List<String> configMapListNames(String namespace) throws ApiException {
-    var list = coreV1Api.listNamespacedConfigMap(namespace).execute();
+  public List<String> configMapListNames(String namespace) {
+    V1ConfigMapList list = null;
+    try {
+      list = coreV1Api.listNamespacedConfigMap(namespace).execute();
+    } catch (ApiException e) {
+      log.error("ConfigMapService", e);
+    }
     return list.getItems().stream().map(cm -> cm.getMetadata().getName()).toList();
   }
 

@@ -16,21 +16,29 @@ import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1PersistentVolumeClaim;
+import io.kubernetes.client.openapi.models.V1PersistentVolumeClaimList;
 import io.kubernetes.client.openapi.models.V1PersistentVolumeClaimSpec;
 import io.kubernetes.client.openapi.models.V1VolumeResourceRequirements;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.log4j.Log4j2;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.PersistentVolumeClaim;
 
+@Log4j2
 public class PersistentVolumeClaimService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
-  public List<String> listPersistentVolumeClaimNames(String nameSpace) throws ApiException {
-    var list = coreV1Api.listNamespacedPersistentVolumeClaim(nameSpace).execute();
+  public List<String> listPersistentVolumeClaimNames(String nameSpace) {
+    V1PersistentVolumeClaimList list = null;
+    try {
+      list = coreV1Api.listNamespacedPersistentVolumeClaim(nameSpace).execute();
+    } catch (ApiException e) {
+      log.error("PersistentVolumeClaimService", e);
+    }
     return list.getItems().stream().map(pv -> pv.getMetadata().getName()).toList();
   }
 

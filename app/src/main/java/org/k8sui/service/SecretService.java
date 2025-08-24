@@ -15,10 +15,12 @@ import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1Secret;
+import io.kubernetes.client.openapi.models.V1SecretList;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.log4j.Log4j2;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.Secret;
 import org.k8sui.model.SecretData;
@@ -26,12 +28,20 @@ import org.k8sui.model.SecretData;
 /**
  * Secret Service
  */
+@Log4j2
 public class SecretService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
-  public List<String> secretListNames(String namespace) throws ApiException {
-    var list = coreV1Api.listNamespacedSecret(namespace).execute();
+  public List<String> secretListNames(String namespace) {
+    V1SecretList list = null;
+
+    try {
+      list = coreV1Api.listNamespacedSecret(namespace).execute();
+    } catch (ApiException e) {
+      throw new RuntimeException(e);
+    }
+
     return list.getItems().stream()
         .filter(s -> s.getMetadata() != null && s.getMetadata().getName() != null)
         .map(s -> s.getMetadata().getName()).toList();

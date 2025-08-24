@@ -89,10 +89,17 @@ public class ServiceService {
 
     var v1ServicePort = new V1ServicePort();
     v1ServicePort.setName(svc.getServicePorts().getFirst().getName());
-    v1ServicePort.setPort(svc.getServicePorts().getFirst().getPort());
-    v1ServicePort.setTargetPort(new IntOrString(svc.getServicePorts().getFirst().getTargetPort()));
     v1ServicePort.setProtocol(svc.getServicePorts().getFirst().getProtocol());
-    v1ServicePort.setNodePort(svc.getServicePorts().getFirst().getNodePort());
+    v1ServicePort.setPort(svc.getServicePorts().getFirst().getPort());
+
+    if(svc.getServicePorts() != null && !svc.getServicePorts().isEmpty()) {
+      v1ServicePort.setTargetPort(
+          new IntOrString(svc.getServicePorts().getFirst().getTargetPort()));
+    }
+
+    if("NodePort".equalsIgnoreCase(svc.getType())) {
+      v1ServicePort.setNodePort(svc.getServicePorts().getFirst().getNodePort());
+    }
 
     v1ServiceSpec.setPorts(Collections.singletonList(v1ServicePort));
     v1Service.setSpec(v1ServiceSpec);
