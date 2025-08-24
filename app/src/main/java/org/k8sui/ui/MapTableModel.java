@@ -38,15 +38,6 @@ public class MapTableModel extends BaseTableModel {
     list = map.keySet().stream().map(k -> new KeyValuePair(k, map.get(k))).toList();
   }
 
-  public Map<String, String> getMap() {
-    final Map<String, String> map = new HashMap<>();
-
-    for (KeyValuePair kvp : list) {
-      map.put(kvp.getKey(), kvp.getValue());
-    }
-    return map;
-  }
-
   @Override
   public int getRowCount() {
     return list.size();

@@ -11,7 +11,6 @@ package org.k8sui.service;
 
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.models.V1DeleteOptions;
 import io.kubernetes.client.openapi.models.V1Namespace;
 import io.kubernetes.client.openapi.models.V1NamespaceStatus;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;

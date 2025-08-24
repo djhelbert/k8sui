@@ -20,7 +20,6 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.ConfigMap;

@@ -9,12 +9,13 @@
  */
 package org.k8sui;
 
-import io.kubernetes.client.openapi.ApiException;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
+import lombok.extern.log4j.Log4j2;
 import org.k8sui.ui.MainFrame;
 import org.k8sui.ui.Util;
 
+@Log4j2
 public class App {
 
   private static MainFrame frame;
@@ -23,7 +24,7 @@ public class App {
     try {
       UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
     } catch (Exception err) {
-      err.printStackTrace();
+      log.error("Main", err);
     }
 
     frame = new MainFrame();

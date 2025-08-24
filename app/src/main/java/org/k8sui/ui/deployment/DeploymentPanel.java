@@ -16,7 +16,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -231,13 +230,13 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
           container.setPorts(List.of(new ContainerPort(Integer.parseInt(portField.getText()))));
           newDeployment.setContainers(List.of(container));
 
-          if(secretRadio.isSelected()) {
+          if(secretRadio.isSelected() && secretList.getSelectedItem() != null) {
             container.setSecretRef(secretList.getSelectedItem().toString());
           }
-          if(configMapRadio.isSelected()) {
+          if(configMapRadio.isSelected() && configMapList.getSelectedItem() != null) {
             container.setConfigMapRef(configMapList.getSelectedItem().toString());
           }
-          if(pvcRadio.isSelected()) {
+          if(pvcRadio.isSelected() && pvcList.getSelectedItem() != null) {
             container.setVolumeMounts(List.of(new VolumeMount("volume", mountPathField.getText())));
             newDeployment.setVolumes(List.of(new DeploymentVolume("volume", pvcList.getSelectedItem().toString())));
           }
