@@ -33,6 +33,8 @@ public class NameSpaceService {
           status.getPhase());
       nameSpace.setLabels(meta.getLabels());
 
+      nameSpace.setAnnotations(meta.getAnnotations());
+
       return nameSpace;
     }).collect(Collectors.toList());
   }

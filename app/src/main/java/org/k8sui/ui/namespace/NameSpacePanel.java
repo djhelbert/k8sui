@@ -12,6 +12,7 @@ package org.k8sui.ui.namespace;
 import io.kubernetes.client.openapi.ApiException;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -44,11 +45,12 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
   private final JButton refreshButton = new JButton("Refresh");
   private final JButton addButton = new JButton("Add");
   private final JButton deleteButton = new JButton("Delete");
-  JTable table;
-  NameSpaceModel model;
+  JTable namespaceTable;
+  NameSpaceModel nameSpaceModel;
   private final NameSpaceService service = new NameSpaceService();
   private final List<NameSpaceObserver> nameSpaceObservers = new ArrayList<>();
-  private final MapTableModel mapTableModel = new MapTableModel();
+  private final MapTableModel labelTableModel = new MapTableModel();
+  private final MapTableModel annotationTableModel = new MapTableModel();
 
   public NameSpacePanel() {
     super();
@@ -57,7 +59,7 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
 
   private void init() {
     try {
-      model = new NameSpaceModel(service.nameSpaces());
+      nameSpaceModel = new NameSpaceModel(service.nameSpaces());
     } catch (ApiException err) {
       log.error("Node Panel", err);
     }
@@ -77,23 +79,34 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
     buttonPanel.add(addButton);
     buttonPanel.add(deleteButton);
     // Table setup
-    table = new JTable(model);
-    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    table.getColumnModel().getColumn(3).setMaxWidth(80);
-    table.getColumnModel().getColumn(3).setPreferredWidth(80);
-    table.setDefaultRenderer(String.class, new StatusTableCellRenderer());
-    table.getSelectionModel().addListSelectionListener(this);
+    namespaceTable = new JTable(nameSpaceModel);
+    namespaceTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    namespaceTable.getColumnModel().getColumn(3).setMaxWidth(80);
+    namespaceTable.getColumnModel().getColumn(3).setPreferredWidth(80);
+    namespaceTable.setDefaultRenderer(String.class, new StatusTableCellRenderer());
+    namespaceTable.getSelectionModel().addListSelectionListener(this);
 
-    var labelTable = new JTable(mapTableModel);
+    var southPanel = new JPanel(new GridLayout(1, 2));
+
+    var labelTable = new JTable(labelTableModel);
     labelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    var scrollPane = new JScrollPane(labelTable);
-    scrollPane.setBorder(
+    var labelScrollPane = new JScrollPane(labelTable);
+    labelScrollPane.setBorder(
         BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Labels"));
 
-    setLayout(new BorderLayout());
+    var annotationTable = new JTable(annotationTableModel);
+    annotationTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    var annotationScrollPane = new JScrollPane(annotationTable);
+    annotationScrollPane.setBorder(
+        BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Annotations"));
+
+    southPanel.add(labelScrollPane);
+    southPanel.add(annotationScrollPane);
+
+    setLayout(new BorderLayout(5, 5));
     add(buttonPanel, BorderLayout.NORTH);
-    add(new JScrollPane(table), BorderLayout.CENTER);
-    add(scrollPane, BorderLayout.SOUTH);
+    add(new JScrollPane(namespaceTable), BorderLayout.CENTER);
+    add(southPanel, BorderLayout.SOUTH);
   }
 
   public void addNameSpaceObserver(NameSpaceObserver nso) {
@@ -108,15 +121,15 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
 
   private void update() {
     deleteButton.setEnabled(false);
-    table.clearSelection();
+    namespaceTable.clearSelection();
 
     try {
-      model.setNodes(service.nameSpaces());
+      nameSpaceModel.setNodes(service.nameSpaces());
     } catch (ApiException ex) {
       log.error("Name Space Panel", ex);
     }
 
-    model.fireTableDataChanged();
+    nameSpaceModel.fireTableDataChanged();
   }
 
   @Override
@@ -125,10 +138,10 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
       update();
     }
     if (e.getSource().equals(deleteButton)) {
-      int row = table.getSelectedRow();
+      int row = namespaceTable.getSelectedRow();
 
       if (row != -1) {
-        var ns = model.getNameSpace(row);
+        var ns = nameSpaceModel.getNameSpace(row);
 
         try {
           service.deleteNamespace(ns.getNamespace());
@@ -206,15 +219,17 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
 
   @Override
   public void valueChanged(ListSelectionEvent e) {
-    int row = table.getSelectedRow();
+    int row = namespaceTable.getSelectedRow();
 
     if (row == -1) {
       deleteButton.setEnabled(false);
-      mapTableModel.fireTableDataChanged();
     } else {
-      deleteButton.setEnabled(!"default".equalsIgnoreCase(model.getNameSpace(row).getNamespace()));
-      mapTableModel.setList(model.getNameSpace(row).getLabels());
-      mapTableModel.fireTableDataChanged();
+      deleteButton.setEnabled(
+          !"default".equalsIgnoreCase(nameSpaceModel.getNameSpace(row).getNamespace()));
+      labelTableModel.setList(nameSpaceModel.getNameSpace(row).getLabels());
+      annotationTableModel.setList(nameSpaceModel.getNameSpace(row).getAnnotations());
     }
+    labelTableModel.fireTableDataChanged();
+    annotationTableModel.fireTableDataChanged();
   }
 }

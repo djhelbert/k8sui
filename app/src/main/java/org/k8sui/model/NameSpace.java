@@ -24,6 +24,7 @@ public class NameSpace implements Comparable<NameSpace> {
   private OffsetDateTime creation;
   private String status;
   private Map<String, String> labels;
+  private Map<String, String> annotations;
 
   public NameSpace(String uid, String namespace, OffsetDateTime creation, String status) {
     this.uid = uid;
