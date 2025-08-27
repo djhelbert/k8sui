@@ -31,6 +31,7 @@ public class PersistentVolume implements Comparable<PersistentVolume> {
   private List<String> accessModes;
   private Map<String, String> capacities;
   private Map<String, String> labels;
+  private Map<String, String> annotations;
   private String hostPath;
 
   @Override

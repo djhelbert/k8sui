@@ -54,6 +54,7 @@ public class PersistentVolumeClaimService {
         persistentVolumeClaim.setName(pv.getMetadata().getName());
         persistentVolumeClaim.setNameSpace(pv.getMetadata().getNamespace());
         persistentVolumeClaim.setLabels(pv.getMetadata().getLabels());
+        persistentVolumeClaim.setAnnotations(pv.getMetadata().getAnnotations());
         persistentVolumeClaim.setCreation(pv.getMetadata().getCreationTimestamp());
       }
 

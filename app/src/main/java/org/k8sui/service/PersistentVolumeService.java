@@ -40,6 +40,7 @@ public class PersistentVolumeService {
       persistentVolume.setPersistentVolumeReclaimPolicy(
           pv.getSpec().getPersistentVolumeReclaimPolicy());
       persistentVolume.setLabels(pv.getMetadata().getLabels());
+      persistentVolume.setAnnotations(pv.getMetadata().getAnnotations());
 
       final Map<String, String> capacities = new HashMap<>();
       final Map<String, Quantity> capacityMap = pv.getSpec().getCapacity();

@@ -33,6 +33,7 @@ public class PersistentVolumeClaim implements Comparable<PersistentVolumeClaim> 
   private Map<String, String> labels;
   private List<String> accessModes;
   private Map<String, String> capacities;
+  private Map<String, String> annotations;
 
   @Override
   public int compareTo(@NotNull PersistentVolumeClaim pv) {

@@ -49,10 +49,11 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
   private final JButton refreshButton = new JButton("Refresh");
   private final JButton addButton = new JButton("Add");
   private final JButton deleteButton = new JButton("Delete");
-  private JTable table;
-  private PersistentVolumeModel model;
-  private final MapTableModel mapTableModel = new MapTableModel();
+  private JTable pvcTable;
+  private PersistentVolumeModel pvcModel;
+  private final MapTableModel labelTableModel = new MapTableModel();
   private final PersistentVolumeService service = new PersistentVolumeService();
+  private final MapTableModel annotationTableModel = new MapTableModel();
 
   public PersistentVolumePanel() {
     super();
@@ -61,10 +62,10 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
 
   private void init() {
     try {
-      model = new PersistentVolumeModel(service.listPersistentVolumes());
+      pvcModel = new PersistentVolumeModel(service.listPersistentVolumes());
     } catch (ApiException err) {
       log.error("PV Panel", err);
-      model = new PersistentVolumeModel(new ArrayList<>());
+      pvcModel = new PersistentVolumeModel(new ArrayList<>());
     }
 
     // Add button setup
@@ -81,40 +82,51 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
     buttonPanel.add(addButton);
     buttonPanel.add(deleteButton);
     // Table setup
-    table = new JTable(model);
-    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    table.getColumnModel().getColumn(3).setMaxWidth(100);
-    table.getColumnModel().getColumn(3).setPreferredWidth(1000);
-    table.getColumnModel().getColumn(5).setMaxWidth(120);
-    table.getColumnModel().getColumn(5).setPreferredWidth(120);
-    table.getColumnModel().getColumn(6).setMaxWidth(90);
-    table.getColumnModel().getColumn(6).setPreferredWidth(90);
-    table.getSelectionModel().addListSelectionListener(this);
-    table.setDefaultRenderer(String.class, new BoundTableCellRenderer());
+    pvcTable = new JTable(pvcModel);
+    pvcTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    pvcTable.getColumnModel().getColumn(3).setMaxWidth(100);
+    pvcTable.getColumnModel().getColumn(3).setPreferredWidth(1000);
+    pvcTable.getColumnModel().getColumn(5).setMaxWidth(120);
+    pvcTable.getColumnModel().getColumn(5).setPreferredWidth(120);
+    pvcTable.getColumnModel().getColumn(6).setMaxWidth(90);
+    pvcTable.getColumnModel().getColumn(6).setPreferredWidth(90);
+    pvcTable.getSelectionModel().addListSelectionListener(this);
+    pvcTable.setDefaultRenderer(String.class, new BoundTableCellRenderer());
 
-    JTable labelTable = new JTable(mapTableModel);
+    var southPanel = new JPanel(new GridLayout(1, 2));
+
+    var labelTable = new JTable(labelTableModel);
     labelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    var scrollPane = new JScrollPane(labelTable);
-    scrollPane.setBorder(
+    var labelScrollPane = new JScrollPane(labelTable);
+    labelScrollPane.setBorder(
         BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Labels"));
+
+    var annotationTable = new JTable(annotationTableModel);
+    annotationTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    var annotationScrollPane = new JScrollPane(annotationTable);
+    annotationScrollPane.setBorder(
+        BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Annotations"));
+
+    southPanel.add(labelScrollPane);
+    southPanel.add(annotationScrollPane);
 
     setLayout(new BorderLayout());
     add(buttonPanel, BorderLayout.NORTH);
-    add(new JScrollPane(table), BorderLayout.CENTER);
-    add(scrollPane, BorderLayout.SOUTH);
+    add(new JScrollPane(pvcTable), BorderLayout.CENTER);
+    add(southPanel, BorderLayout.SOUTH);
   }
 
   @Override
   public void update() {
-    table.clearSelection();
+    pvcTable.clearSelection();
 
     try {
-      model.setPersistentVolumes(service.listPersistentVolumes());
+      pvcModel.setPersistentVolumes(service.listPersistentVolumes());
     } catch (ApiException err) {
       log.error("PV Panel", err);
     }
 
-    model.fireTableDataChanged();
+    pvcModel.fireTableDataChanged();
   }
 
   @Override
@@ -123,10 +135,10 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
       update();
     }
     if (e.getSource().equals(deleteButton)) {
-      int row = table.getSelectedRow();
+      int row = pvcTable.getSelectedRow();
 
       if (row != -1) {
-        var pv = model.getPersistentVolume(row);
+        var pv = pvcModel.getPersistentVolume(row);
 
         try {
           service.deletePersistentVolume(pv.getName());
@@ -250,14 +262,18 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
 
   @Override
   public void valueChanged(ListSelectionEvent e) {
-    int row = table.getSelectedRow();
+    int row = pvcTable.getSelectedRow();
 
     if (row != -1) {
-      mapTableModel.setList(model.getPersistentVolume(row).getLabels());
-      mapTableModel.fireTableDataChanged();
+      labelTableModel.setList(pvcModel.getPersistentVolume(row).getLabels());
+      labelTableModel.fireTableDataChanged();
+      annotationTableModel.setList(pvcModel.getPersistentVolume(row).getAnnotations());
+      annotationTableModel.fireTableDataChanged();
     } else {
-      mapTableModel.setList(new HashMap<>());
-      mapTableModel.fireTableDataChanged();
+      labelTableModel.setList(new HashMap<>());
+      labelTableModel.fireTableDataChanged();
+      annotationTableModel.setList(new HashMap<>());
+      annotationTableModel.fireTableDataChanged();
     }
   }
 }
