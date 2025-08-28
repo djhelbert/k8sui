@@ -77,6 +77,16 @@ public class DeploymentService {
             cont.setImage(c.getImage());
             cont.setImagePullPolicy(c.getImagePullPolicy());
 
+            List<VolumeMount> volumeMounts = new ArrayList<>();
+
+            if(c.getVolumeMounts() != null) {
+              for(V1VolumeMount vm : c.getVolumeMounts()) {
+                volumeMounts.add(new VolumeMount(vm.getName(), vm.getMountPath()));
+              }
+            }
+
+            cont.setVolumeMounts(volumeMounts);
+
             if (c.getPorts() != null) {
               cont.setPorts(
                   c.getPorts().stream().map(p -> new ContainerPort(p.getContainerPort())).toList());

@@ -23,6 +23,6 @@ public class DeploymentVolume {
 
   @Override
   public String toString() {
-    return claimName;
+    return name + ":" + claimName;
   }
 }
