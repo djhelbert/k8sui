@@ -12,6 +12,7 @@ package org.k8sui.ui.service;
 import io.kubernetes.client.openapi.ApiException;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import org.k8sui.App;
 import org.k8sui.model.Service;
 import org.k8sui.model.ServicePort;
 import org.k8sui.service.ServiceService;
+import org.k8sui.ui.MapTableModel;
 import org.k8sui.ui.NameSpaceListPanel;
 import org.k8sui.ui.NameValidator;
 import org.k8sui.ui.Updated;
@@ -47,8 +49,9 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
   private final JPanel buttonPanel = new JPanel();
   private final JButton refreshButton = new JButton("Refresh");
   private final JButton addButton = new JButton("Add");
-  private JTable table;
-  private ServiceModel model;
+  private JTable serviceTable;
+  private ServiceModel serviceModel;
+  private final MapTableModel labelTableModel = new MapTableModel();
   private final ServiceService service = new ServiceService();
   private final ServicePortModel servicePortModel = new ServicePortModel(new ArrayList<>());
   private final JButton deleteButton = new JButton("Delete");
@@ -68,10 +71,10 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
 
   private void init() {
     try {
-      model = new ServiceModel(service.services(nameSpaceListPanel.getNamespace()));
+      serviceModel = new ServiceModel(service.services(nameSpaceListPanel.getNamespace()));
     } catch (ApiException err) {
       log.error("Service Panel", err);
-      model = new ServiceModel(new ArrayList<>());
+      serviceModel = new ServiceModel(new ArrayList<>());
     }
 
     // Setup add button
@@ -90,61 +93,72 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
     buttonPanel.add(addButton);
     buttonPanel.add(deleteButton);
     // Table setup
-    table = new JTable(model);
-    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    table.getColumnModel().getColumn(1).setMaxWidth(120);
-    table.getColumnModel().getColumn(1).setPreferredWidth(120);
-    table.getColumnModel().getColumn(2).setMaxWidth(110);
-    table.getColumnModel().getColumn(2).setPreferredWidth(110);
-    table.getColumnModel().getColumn(3).setMaxWidth(90);
-    table.getColumnModel().getColumn(3).setPreferredWidth(90);
-    table.getColumnModel().getColumn(4).setMaxWidth(110);
-    table.getColumnModel().getColumn(4).setPreferredWidth(110);
-    table.getSelectionModel().addListSelectionListener(this);
+    serviceTable = new JTable(serviceModel);
+    serviceTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    serviceTable.getColumnModel().getColumn(1).setMaxWidth(120);
+    serviceTable.getColumnModel().getColumn(1).setPreferredWidth(120);
+    serviceTable.getColumnModel().getColumn(2).setMaxWidth(110);
+    serviceTable.getColumnModel().getColumn(2).setPreferredWidth(110);
+    serviceTable.getColumnModel().getColumn(3).setMaxWidth(90);
+    serviceTable.getColumnModel().getColumn(3).setPreferredWidth(90);
+    serviceTable.getColumnModel().getColumn(4).setMaxWidth(110);
+    serviceTable.getColumnModel().getColumn(4).setPreferredWidth(110);
+    serviceTable.getSelectionModel().addListSelectionListener(this);
+
+    var southPanel = new JPanel(new GridLayout(1, 2));
 
     // Setup service port table
     JTable servicePortTable = new JTable(servicePortModel);
     servicePortTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    var scrollPane = new JScrollPane(servicePortTable);
-    scrollPane.setBorder(
+    var servicePortScrollPane = new JScrollPane(servicePortTable);
+    servicePortScrollPane.setBorder(
         BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Service Ports"));
+
+    var labelTable = new JTable(labelTableModel);
+    labelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    var labelScrollPane = new JScrollPane(labelTable);
+    labelScrollPane.setBorder(
+        BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Labels"));
+
+    southPanel.add(servicePortScrollPane);
+    southPanel.add(labelScrollPane);
 
     setLayout(new BorderLayout());
     add(buttonPanel, BorderLayout.NORTH);
-    add(new JScrollPane(table), BorderLayout.CENTER);
-    add(scrollPane, BorderLayout.SOUTH);
+    add(new JScrollPane(serviceTable), BorderLayout.CENTER);
+    add(southPanel, BorderLayout.SOUTH);
   }
 
   @Override
   public void update() {
-    table.clearSelection();
+    serviceTable.clearSelection();
 
     try {
-      model.setServices(service.services(nameSpaceListPanel.getNamespace()));
+      serviceModel.setServices(service.services(nameSpaceListPanel.getNamespace()));
     } catch (ApiException ex) {
       log.error("Service Panel", ex);
       Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
     }
 
-    model.fireTableDataChanged();
+    serviceModel.fireTableDataChanged();
   }
 
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource().equals(refreshButton)) {
       try {
-        model.setServices(service.services(nameSpaceListPanel.getNamespace()));
-        model.fireTableDataChanged();
+        serviceModel.setServices(service.services(nameSpaceListPanel.getNamespace()));
+        serviceModel.fireTableDataChanged();
       } catch (ApiException ex) {
         log.error("Service Panel", ex);
         Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
       }
     } else if (e.getSource().equals(deleteButton)) {
-      int row = table.getSelectedRow();
+      int row = serviceTable.getSelectedRow();
 
       if (row != -1) {
         try {
-          service.deleteService(model.getService(row).getName(), nameSpaceListPanel.getNamespace());
+          service.deleteService(serviceModel.getService(row).getName(), nameSpaceListPanel.getNamespace());
         } catch (ApiException ex) {
           log.error("Service Panel", ex);
           Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
@@ -155,41 +169,55 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
     } else if (e.getSource().equals(addButton)) {
       // Create the dialog
       var dialog = new JDialog(App.frame(), "Add Service", true);
-      dialog.setLayout(new FlowLayout());
+
+      dialog.setLayout(new BorderLayout(5, 5));
+
+      var gridPanel = new JPanel(new GridLayout(8, 2, 5, 5));
+      var buttonPanel = new JPanel(new FlowLayout());
 
       // Create text field
-      var nameField = new JTextField(10);
-      dialog.add(new JLabel("Service Name:"));
-      dialog.add(nameField);
+      var nameField = new JTextField(9);
+      gridPanel.add(new JLabel("Service Name:"));
+      gridPanel.add(nameField);
 
-      dialog.add(new JLabel("Type:"));
+      gridPanel.add(new JLabel("Type:"));
       JComboBox<String> types = new JComboBox<>(new String[]{CLUSTER_IP, NODE_PORT, LB});
       types.setSelectedIndex(0);
-      dialog.add(types);
+      gridPanel.add(types);
 
-      var selectorField = new JTextField(20);
-      dialog.add(new JLabel("Selector (app):"));
-      dialog.add(selectorField);
+      var selectorField = new JTextField(10);
+      gridPanel.add(new JLabel("Selector (app):"));
+      gridPanel.add(selectorField);
 
       var portField = new JTextField("80", 4);
-      dialog.add(new JLabel("Service Port:"));
-      dialog.add(portField);
+      gridPanel.add(new JLabel("Service Port:"));
+      gridPanel.add(portField);
 
       var targetPortField = new JTextField("80", 4);
-      dialog.add(new JLabel("Target Port:"));
-      dialog.add(targetPortField);
+      gridPanel.add(new JLabel("Target Port:"));
+      gridPanel.add(targetPortField);
 
       var nodePortField = new JTextField("", 4);
-      dialog.add(new JLabel("Node Port:"));
-      dialog.add(nodePortField);
+      gridPanel.add(new JLabel("Node Port:"));
+      gridPanel.add(nodePortField);
+
+      JTextField labelKeyField = new JTextField(20);
+      gridPanel.add(new JLabel("Label Key:"));
+      gridPanel.add(labelKeyField);
+
+      JTextField labelValueField = new JTextField(20);
+      gridPanel.add(new JLabel("Label Value:"));
+      gridPanel.add(labelValueField);
 
       // Create OK and Cancel buttons
       var okButton = new JButton("OK");
       var cancelButton = new JButton("Cancel");
 
       // Add buttons to dialog
-      dialog.add(okButton);
-      dialog.add(cancelButton);
+      buttonPanel.add(okButton);
+      buttonPanel.add(cancelButton);
+      dialog.add(buttonPanel, BorderLayout.SOUTH);
+      dialog.add(gridPanel, BorderLayout.CENTER);
 
       // OK button action
       okButton.addActionListener(e1 -> {
@@ -198,13 +226,22 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
           return;
         }
 
+        if (!NameValidator.validName(labelKeyField.getText())) {
+          Util.showError(this, "Invalid Key Name", "Validation Error");
+          return;
+        }
+
         try {
-          Map<String, String> map = new HashMap<>();
-          map.put("app", selectorField.getText());
+          Map<String, String> selectorMap = new HashMap<>();
+          selectorMap.put("app", selectorField.getText());
+
+          HashMap<String, String> labelMap = new HashMap<>();
+          labelMap.put(labelKeyField.getText(), labelValueField.getText());
 
           var newService = new Service(null, nameField.getText(),
               nameSpaceListPanel.getNamespace());
-          newService.setSelectors(map);
+          newService.setSelectors(selectorMap);
+          newService.setLabels(labelMap);
           newService.setType(
               types.getSelectedItem() == null ? null : types.getSelectedItem().toString());
 
@@ -252,15 +289,19 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
 
   @Override
   public void valueChanged(ListSelectionEvent e) {
-    int row = table.getSelectedRow();
+    int row = serviceTable.getSelectedRow();
 
     if (row != -1) {
-      servicePortModel.setServicePorts(model.getService(row).getServicePorts());
+      servicePortModel.setServicePorts(serviceModel.getService(row).getServicePorts());
       servicePortModel.fireTableDataChanged();
+      labelTableModel.setList(serviceModel.getService(row).getLabels());
+      labelTableModel.fireTableDataChanged();
       deleteButton.setEnabled(true);
     } else {
       servicePortModel.setServicePorts(new ArrayList<>());
       servicePortModel.fireTableDataChanged();
+      labelTableModel.setList(new HashMap<>());
+      labelTableModel.fireTableDataChanged();
       deleteButton.setEnabled(false);
     }
   }

@@ -25,8 +25,16 @@ public class Service implements Comparable<Service> {
   private String type;
   private String clusterIp;
   private Map<String, String> selectors;
+  private Map<String, String> labels;
   private List<ServicePort> servicePorts;
 
+  /**
+   * Constructor
+   *
+   * @param uid       UID
+   * @param name      Name
+   * @param namespace Name Space
+   */
   public Service(String uid, String name, String namespace) {
     this.uid = uid;
     this.namespace = namespace;
@@ -34,7 +42,7 @@ public class Service implements Comparable<Service> {
   }
 
   @Override
-  public int compareTo(@NotNull Service svc) {
-    return name.compareTo(svc.getName());
+  public int compareTo(@NotNull Service service) {
+    return name.compareTo(service.getName());
   }
 }

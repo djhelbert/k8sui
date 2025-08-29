@@ -32,6 +32,13 @@ public class ServiceService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
+  /**
+   * Service List
+   *
+   * @param nameSpace Name Space
+   * @return Service List
+   * @throws ApiException API Exception
+   */
   public List<Service> services(String nameSpace) throws ApiException {
     var serviceList = coreV1Api.listNamespacedService(nameSpace).execute();
 
@@ -40,10 +47,14 @@ public class ServiceService {
               Service service = new Service(s.getMetadata().getUid(), s.getMetadata().getName(),
                   s.getMetadata().getNamespace());
 
-              Map<String, String> map = s.getSpec().getSelector();
-              service.setSelectors(map);
-              service.setType(s.getSpec().getType());
-              service.setClusterIp(s.getSpec().getClusterIP());
+              if (s.getSpec() != null) {
+                Map<String, String> map = s.getSpec().getSelector();
+                service.setSelectors(map);
+                service.setType(s.getSpec().getType());
+                service.setClusterIp(s.getSpec().getClusterIP());
+              }
+
+              service.setLabels(s.getMetadata().getLabels());
 
               List<V1ServicePort> v1ServicePorts = s.getSpec().getPorts();
 
@@ -74,12 +85,14 @@ public class ServiceService {
 
   /**
    * Add Service
+   *
    * @param svc Service
    * @throws ApiException API Exception
    */
   public void addService(Service svc) throws ApiException {
     V1Service v1Service = new V1Service();
     V1ObjectMeta metadata = new V1ObjectMeta();
+    metadata.setLabels(svc.getLabels());
     metadata.setName(svc.getName());
     v1Service.setMetadata(metadata);
 
@@ -92,12 +105,12 @@ public class ServiceService {
     v1ServicePort.setProtocol(svc.getServicePorts().getFirst().getProtocol());
     v1ServicePort.setPort(svc.getServicePorts().getFirst().getPort());
 
-    if(svc.getServicePorts() != null && !svc.getServicePorts().isEmpty()) {
+    if (svc.getServicePorts() != null && !svc.getServicePorts().isEmpty()) {
       v1ServicePort.setTargetPort(
           new IntOrString(svc.getServicePorts().getFirst().getTargetPort()));
     }
 
-    if("NodePort".equalsIgnoreCase(svc.getType())) {
+    if ("NodePort".equalsIgnoreCase(svc.getType())) {
       v1ServicePort.setNodePort(svc.getServicePorts().getFirst().getNodePort());
     }
 
@@ -109,7 +122,8 @@ public class ServiceService {
 
   /**
    * Delete Service
-   * @param name Service Name
+   *
+   * @param name      Service Name
    * @param namespace Name Space
    * @throws ApiException API Exception
    */
