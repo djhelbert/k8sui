@@ -20,6 +20,7 @@ import io.kubernetes.client.openapi.models.V1PersistentVolumeClaimList;
 import io.kubernetes.client.openapi.models.V1PersistentVolumeClaimSpec;
 import io.kubernetes.client.openapi.models.V1VolumeResourceRequirements;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,21 +28,44 @@ import lombok.extern.log4j.Log4j2;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.PersistentVolumeClaim;
 
+/**
+ * Persistent Volume Claim Service
+ */
 @Log4j2
 public class PersistentVolumeClaimService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
+  /**
+   * List Persistent Volume Claim Names
+   *
+   * @param nameSpace Name Space
+   * @return String List
+   */
   public List<String> listPersistentVolumeClaimNames(String nameSpace) {
     V1PersistentVolumeClaimList list = null;
+
     try {
       list = coreV1Api.listNamespacedPersistentVolumeClaim(nameSpace).execute();
     } catch (ApiException e) {
       log.error("PersistentVolumeClaimService", e);
     }
-    return list.getItems().stream().map(pv -> pv.getMetadata().getName()).toList();
+
+    if (list != null) {
+      return list.getItems().stream().map(pv -> pv.getMetadata() != null ? pv.getMetadata()
+          .getName() : null).toList();
+    } else {
+      return new ArrayList<>();
+    }
   }
 
+  /**
+   * List Persistent Volume Claims by Name Space
+   *
+   * @param nameSpace Name Space
+   * @return PVC List
+   * @throws ApiException API Exception
+   */
   public List<PersistentVolumeClaim> listPersistentVolumeClaims(String nameSpace)
       throws ApiException {
     var list = coreV1Api.listNamespacedPersistentVolumeClaim(nameSpace).execute();
@@ -49,7 +73,7 @@ public class PersistentVolumeClaimService {
     return list.getItems().stream().map(pv -> {
       var persistentVolumeClaim = new PersistentVolumeClaim();
 
-      if(pv.getMetadata() != null) {
+      if (pv.getMetadata() != null) {
         persistentVolumeClaim.setUid(pv.getMetadata().getUid());
         persistentVolumeClaim.setName(pv.getMetadata().getName());
         persistentVolumeClaim.setNameSpace(pv.getMetadata().getNamespace());
@@ -58,20 +82,26 @@ public class PersistentVolumeClaimService {
         persistentVolumeClaim.setCreation(pv.getMetadata().getCreationTimestamp());
       }
 
-      if(pv.getSpec() != null) {
+      if (pv.getSpec() != null) {
         persistentVolumeClaim.setStorageClassName(pv.getSpec().getStorageClassName());
 
         final Map<String, String> resources = new HashMap<>();
-        final Map<String, Quantity> resourceMap = pv.getSpec().getResources().getRequests();
+        final Map<String, Quantity> resourceMap;
 
-        for (String key : resourceMap.keySet()) {
-          resources.put(key, resourceMap.get(key).toSuffixedString());
+        if (pv.getSpec().getResources() != null) {
+          resourceMap = pv.getSpec().getResources().getRequests();
+
+          if (resourceMap != null) {
+            for (String key : resourceMap.keySet()) {
+              resources.put(key, resourceMap.get(key).toSuffixedString());
+            }
+          }
         }
 
         persistentVolumeClaim.setCapacities(resources);
       }
 
-      if(pv.getStatus() != null) {
+      if (pv.getStatus() != null) {
         persistentVolumeClaim.setStatus(pv.getStatus().getPhase());
       }
 
@@ -82,6 +112,12 @@ public class PersistentVolumeClaimService {
     }).collect(toList());
   }
 
+  /**
+   * Create Persistent Volume Claim
+   *
+   * @param claim PVC
+   * @throws ApiException API Exception
+   */
   public void createPersistentVolumeClaim(PersistentVolumeClaim claim) throws ApiException {
     var meta = new V1ObjectMeta();
     meta.setName(claim.getName());

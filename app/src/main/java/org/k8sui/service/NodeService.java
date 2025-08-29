@@ -12,6 +12,7 @@ package org.k8sui.service;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1NodeAddress;
+import io.kubernetes.client.openapi.models.V1NodeSystemInfo;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.k8sui.CoreApiSupplier;
@@ -24,21 +25,44 @@ public class NodeService {
   private static final String MEMORY = "memory";
   private static final String IP = "InternalIP";
 
+  /**
+   * Get Node List
+   *
+   * @return Node List
+   * @throws ApiException API Exception
+   */
   public List<Node> nodes() throws ApiException {
     return coreV1Api.listNode().execute().getItems().stream().map(item -> {
+      Node node = new Node();
+
       var data = item.getMetadata();
       var status = item.getStatus();
-      var info = status.getNodeInfo();
 
-      Node node = new Node(data.getUid(), data.getName(),
-          status.getCapacity().get(CPU).getNumber().toString());
-      node.setImage(info.getOsImage());
-      node.setMemory(status.getCapacity().get(MEMORY).getNumber().toString());
-      node.setLabels(data.getLabels());
+      if (data != null) {
+        node.setLabels(data.getLabels());
+        node.setName(data.getName());
+        node.setUid(data.getUid());
+      }
 
-      if (status.getAddresses() != null) {
-        var ip = status.getAddresses().stream().filter(a -> IP.equals(a.getType())).findFirst();
-        node.setIp(ip.orElseGet(V1NodeAddress::new).getAddress());
+      V1NodeSystemInfo info = null;
+      if (status != null) {
+        info = status.getNodeInfo();
+      }
+
+      if (info != null) {
+        node.setImage(info.getOsImage());
+      }
+
+      if (status != null) {
+        if (status.getCapacity() != null) {
+          node.setCpu(status.getCapacity().get(CPU).getNumber().toString());
+          node.setMemory(status.getCapacity().get(MEMORY).getNumber().toString());
+        }
+
+        if (status.getAddresses() != null) {
+          var ip = status.getAddresses().stream().filter(a -> IP.equals(a.getType())).findFirst();
+          node.setIp(ip.orElseGet(V1NodeAddress::new).getAddress());
+        }
       }
 
       return node;

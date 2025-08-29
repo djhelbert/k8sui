@@ -14,6 +14,7 @@ import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Namespace;
 import io.kubernetes.client.openapi.models.V1NamespaceStatus;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,21 +25,41 @@ public class NameSpaceService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
+  /**
+   * Get Name Space List
+   *
+   * @return Name Space List
+   * @throws ApiException API Exception
+   */
   public List<NameSpace> nameSpaces() throws ApiException {
     return coreV1Api.listNamespace().execute().getItems().stream().map(item -> {
       V1ObjectMeta meta = item.getMetadata();
       V1NamespaceStatus status = item.getStatus();
 
-      var nameSpace = new NameSpace(meta.getUid(), meta.getName(), meta.getCreationTimestamp(),
-          status.getPhase());
-      nameSpace.setLabels(meta.getLabels());
+      var nameSpace = new NameSpace(meta == null ? "" : meta.getUid(),
+          meta == null ? "" : meta.getName(),
+          meta == null ? OffsetDateTime.now() : meta.getCreationTimestamp(),
+          status == null ? "" : status.getPhase());
 
-      nameSpace.setAnnotations(meta.getAnnotations());
+      if (meta != null) {
+        nameSpace.setLabels(meta.getLabels());
+      }
+
+      if (meta != null) {
+        nameSpace.setAnnotations(meta.getAnnotations());
+      }
 
       return nameSpace;
     }).collect(Collectors.toList());
   }
 
+  /**
+   * Create Name Space
+   *
+   * @param name   Name
+   * @param labels Label Map
+   * @throws ApiException API Exception
+   */
   public void createNamespace(String name, Map<String, String> labels) throws ApiException {
     var namespace = new V1Namespace();
     namespace.metadata(new V1ObjectMeta().name(name).labels(labels));

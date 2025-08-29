@@ -69,7 +69,13 @@ public class DeploymentService {
             deployment.setReplicas(d.getSpec().getReplicas());
           }
 
-          var containerList = d.getSpec().getTemplate().getSpec().getContainers();
+          List<V1Container> containerList = null;
+
+          if (d.getSpec() != null) {
+            if (d.getSpec().getTemplate().getSpec() != null) {
+              containerList = d.getSpec().getTemplate().getSpec().getContainers();
+            }
+          }
 
           List<Container> containers = containerList.stream().map(c -> {
             Container cont = new Container();
@@ -122,7 +128,10 @@ public class DeploymentService {
           deployment.setVolumes(deploymentVolumes);
           deployment.setContainers(containers);
           deployment.setSelectors(d.getSpec().getSelector().getMatchLabels());
-          deployment.setLabels(d.getMetadata().getLabels());
+
+          if (d.getMetadata() != null) {
+            deployment.setLabels(d.getMetadata().getLabels());
+          }
 
           return deployment;
         }).collect(toList());

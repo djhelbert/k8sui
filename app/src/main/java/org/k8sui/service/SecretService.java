@@ -20,6 +20,7 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.Secret;
@@ -33,6 +34,12 @@ public class SecretService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
+  /**
+   * List Secret Names by Name Space
+   *
+   * @param namespace Name Space
+   * @return String List
+   */
   public List<String> secretListNames(String namespace) {
     V1SecretList list = null;
 
@@ -59,9 +66,12 @@ public class SecretService {
 
       var map = s.getData();
 
-      List<SecretData> secretDataList = map.keySet().stream()
-          .map(key -> new SecretData(key, map.get(key)))
-          .collect(toList());
+      List<SecretData> secretDataList = null;
+      if (map != null) {
+        secretDataList = map.keySet().stream()
+            .map(key -> new SecretData(key, map.get(key)))
+            .collect(Collectors.toList());
+      }
 
       secret.setData(secretDataList);
 
@@ -94,13 +104,15 @@ public class SecretService {
     var list = coreV1Api.listNamespacedSecret(nameSpace).execute();
 
     var option = list.getItems().stream()
-        .filter(vs -> name.equalsIgnoreCase(vs.getMetadata().getName()))
+        .filter(vs -> vs.getMetadata() != null && name.equalsIgnoreCase(vs.getMetadata().getName()))
         .findFirst();
 
     if (option.isPresent()) {
       var v1Secret = option.get();
 
-      v1Secret.getData().put(key, value);
+      if (v1Secret.getData() != null) {
+        v1Secret.getData().put(key, value);
+      }
 
       coreV1Api.replaceNamespacedSecret(name, nameSpace, v1Secret).execute();
     }
@@ -108,7 +120,8 @@ public class SecretService {
 
   /**
    * Delete Secret
-   * @param name Secret Name
+   *
+   * @param name      Secret Name
    * @param nameSpace Name Space
    * @throws ApiException API Exception
    */

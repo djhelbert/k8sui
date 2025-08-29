@@ -25,32 +25,57 @@ import java.util.Map;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.PersistentVolume;
 
+/**
+ * Persistent Volume Service
+ */
 public class PersistentVolumeService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
+  /**
+   * List PV
+   *
+   * @return PV List
+   * @throws ApiException API Exception
+   */
   public List<PersistentVolume> listPersistentVolumes() throws ApiException {
     var list = coreV1Api.listPersistentVolume().execute();
 
     return list.getItems().stream().map(pv -> {
       var persistentVolume = new PersistentVolume();
-      persistentVolume.setUid(pv.getMetadata().getUid());
-      persistentVolume.setName(pv.getMetadata().getName());
-      persistentVolume.setStorageClassName(pv.getSpec().getStorageClassName());
-      persistentVolume.setPersistentVolumeReclaimPolicy(
-          pv.getSpec().getPersistentVolumeReclaimPolicy());
-      persistentVolume.setLabels(pv.getMetadata().getLabels());
-      persistentVolume.setAnnotations(pv.getMetadata().getAnnotations());
+      if (pv.getMetadata() != null) {
+        persistentVolume.setUid(pv.getMetadata().getUid());
+        persistentVolume.setName(pv.getMetadata().getName());
+      }
+
+      if (pv.getSpec() != null) {
+        persistentVolume.setStorageClassName(pv.getSpec().getStorageClassName());
+        persistentVolume.setPersistentVolumeReclaimPolicy(
+            pv.getSpec().getPersistentVolumeReclaimPolicy());
+      }
+
+      if (pv.getMetadata() != null) {
+        persistentVolume.setLabels(pv.getMetadata().getLabels());
+        persistentVolume.setAnnotations(pv.getMetadata().getAnnotations());
+      }
 
       final Map<String, String> capacities = new HashMap<>();
-      final Map<String, Quantity> capacityMap = pv.getSpec().getCapacity();
+      Map<String, Quantity> capacityMap = new HashMap<>();
 
-      for (String key : capacityMap.keySet()) {
-        capacities.put(key, capacityMap.get(key).toSuffixedString());
+      if (pv.getSpec() != null) {
+        capacityMap = pv.getSpec().getCapacity();
+
+        if (capacityMap != null) {
+          for (String key : capacityMap.keySet()) {
+            capacities.put(key, capacityMap.get(key).toSuffixedString());
+          }
+        }
       }
 
       persistentVolume.setCapacities(capacities);
-      persistentVolume.setStatus(pv.getStatus().getPhase());
+      if (pv.getStatus() != null) {
+        persistentVolume.setStatus(pv.getStatus().getPhase());
+      }
 
       List<String> accessModes = pv.getSpec().getAccessModes();
       persistentVolume.setAccessModes(accessModes);
@@ -63,6 +88,12 @@ public class PersistentVolumeService {
     }).collect(toList());
   }
 
+  /**
+   * Create PV
+   *
+   * @param volume Volume
+   * @throws ApiException API Exception
+   */
   public void createPersistentVolume(PersistentVolume volume) throws ApiException {
     var meta = new V1ObjectMeta();
     meta.setName(volume.getName());
@@ -94,6 +125,12 @@ public class PersistentVolumeService {
     coreV1Api.createPersistentVolume(v1pv).execute();
   }
 
+  /**
+   * Delete PV
+   *
+   * @param name Name
+   * @throws ApiException API Exception
+   */
   public void deletePersistentVolume(String name) throws ApiException {
     coreV1Api.deletePersistentVolume(name).execute();
   }

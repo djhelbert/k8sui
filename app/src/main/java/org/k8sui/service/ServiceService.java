@@ -44,7 +44,8 @@ public class ServiceService {
 
     return serviceList.getItems().stream()
         .map(s -> {
-              Service service = new Service(s.getMetadata().getUid(), s.getMetadata().getName(),
+              Service service = new Service(s.getMetadata() == null ? "" : s.getMetadata().getUid(),
+                  s.getMetadata().getName(),
                   s.getMetadata().getNamespace());
 
               if (s.getSpec() != null) {
@@ -56,7 +57,10 @@ public class ServiceService {
 
               service.setLabels(s.getMetadata().getLabels());
 
-              List<V1ServicePort> v1ServicePorts = s.getSpec().getPorts();
+              List<V1ServicePort> v1ServicePorts = null;
+              if (s.getSpec() != null) {
+                v1ServicePorts = s.getSpec().getPorts();
+              }
 
               if (v1ServicePorts != null) {
                 List<ServicePort> servicePortList = v1ServicePorts.stream().map(p -> {
@@ -111,7 +115,9 @@ public class ServiceService {
     }
 
     if ("NodePort".equalsIgnoreCase(svc.getType())) {
-      v1ServicePort.setNodePort(svc.getServicePorts().getFirst().getNodePort());
+      if (svc.getServicePorts() != null) {
+        v1ServicePort.setNodePort(svc.getServicePorts().getFirst().getNodePort());
+      }
     }
 
     v1ServiceSpec.setPorts(Collections.singletonList(v1ServicePort));

@@ -17,6 +17,7 @@ import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ConfigMapList;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +31,26 @@ public class ConfigMapService {
 
   private final CoreV1Api coreV1Api = CoreApiSupplier.api();
 
+  /**
+   * Get ConfigMap Names by Name Space
+   * @param namespace Name Space
+   * @return String List
+   */
   public List<String> configMapListNames(String namespace) {
     V1ConfigMapList list = null;
+
     try {
       list = coreV1Api.listNamespacedConfigMap(namespace).execute();
     } catch (ApiException e) {
       log.error("ConfigMapService", e);
     }
-    return list.getItems().stream().map(cm -> cm.getMetadata().getName()).toList();
+
+    if (list != null) {
+      return list.getItems().stream().map(cm -> cm.getMetadata() != null ? cm.getMetadata()
+          .getName() : null).toList();
+    } else {
+      return new ArrayList<>();
+    }
   }
 
   public List<ConfigMap> configMapList(String namespace) throws ApiException {
@@ -45,16 +58,19 @@ public class ConfigMapService {
 
     return list.getItems().stream().map(cm -> {
       var configMap = new ConfigMap();
-      configMap.setUid(cm.getMetadata().getUid());
+      configMap.setUid(cm.getMetadata() != null ? cm.getMetadata().getUid() : "");
       configMap.setNameSpace(cm.getMetadata().getNamespace());
       configMap.setName(cm.getMetadata() == null ? null : cm.getMetadata().getName());
       configMap.setCreationDate(cm.getMetadata().getCreationTimestamp());
 
       var map = cm.getData();
 
-      List<ConfigMapData> configMapDataList = map.keySet().stream()
-          .map(k -> new ConfigMapData(k, map.get(k)))
-          .collect(toList());
+      List<ConfigMapData> configMapDataList = null;
+      if (map != null) {
+        configMapDataList = map.keySet().stream()
+            .map(k -> new ConfigMapData(k, map.get(k)))
+            .collect(toList());
+      }
 
       configMap.setData(configMapDataList);
 
@@ -83,13 +99,20 @@ public class ConfigMapService {
 
   public void addData(String name, String nameSpace, String key, String value) throws ApiException {
     var list = coreV1Api.listNamespacedConfigMap(nameSpace).execute();
+
     var option = list.getItems().stream()
-        .filter(i -> name.equalsIgnoreCase(i.getMetadata().getName())).findFirst();
-    var v1ConfigMap = option.get();
+        .filter(i -> name.equalsIgnoreCase(
+            i.getMetadata() != null ? i.getMetadata().getName() : null)).findFirst();
 
-    v1ConfigMap.getData().put(key, value);
+    if(option.isPresent()) {
+      var v1ConfigMap = option.get();
 
-    coreV1Api.replaceNamespacedConfigMap(name, nameSpace, v1ConfigMap).execute();
+      if (v1ConfigMap.getData() != null) {
+        v1ConfigMap.getData().put(key, value);
+      }
+
+      coreV1Api.replaceNamespacedConfigMap(name, nameSpace, v1ConfigMap).execute();
+    }
   }
 
   /**

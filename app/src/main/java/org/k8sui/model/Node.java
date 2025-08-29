@@ -11,10 +11,12 @@ package org.k8sui.model;
 
 import java.util.Map;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 @Data
+@NoArgsConstructor
 @ToString
 public class Node implements Comparable<Node> {
 
