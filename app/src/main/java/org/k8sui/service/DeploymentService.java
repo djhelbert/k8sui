@@ -31,6 +31,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.Container;
 import org.k8sui.model.ContainerPort;
@@ -77,41 +78,50 @@ public class DeploymentService {
             }
           }
 
-          List<Container> containers = containerList.stream().map(c -> {
-            Container cont = new Container();
-            cont.setName(c.getName());
-            cont.setImage(c.getImage());
-            cont.setImagePullPolicy(c.getImagePullPolicy());
+          List<Container> containers = null;
+          if (containerList != null) {
+            containers = containerList.stream().map(c -> {
+              Container cont = new Container();
+              cont.setName(c.getName());
+              cont.setImage(c.getImage());
+              cont.setImagePullPolicy(c.getImagePullPolicy());
 
-            List<VolumeMount> volumeMounts = new ArrayList<>();
+              List<VolumeMount> volumeMounts = new ArrayList<>();
 
-            if(c.getVolumeMounts() != null) {
-              for(V1VolumeMount vm : c.getVolumeMounts()) {
-                volumeMounts.add(new VolumeMount(vm.getName(), vm.getMountPath()));
+              if(c.getVolumeMounts() != null) {
+                for(V1VolumeMount vm : c.getVolumeMounts()) {
+                  volumeMounts.add(new VolumeMount(vm.getName(), vm.getMountPath()));
+                }
               }
-            }
 
-            cont.setVolumeMounts(volumeMounts);
+              cont.setVolumeMounts(volumeMounts);
 
-            if (c.getPorts() != null) {
-              cont.setPorts(
-                  c.getPorts().stream().map(p -> new ContainerPort(p.getContainerPort())).toList());
-            }
+              if (c.getPorts() != null) {
+                cont.setPorts(
+                    c.getPorts().stream().map(p -> new ContainerPort(p.getContainerPort())).toList());
+              }
 
-            if (c.getEnvFrom() != null) {
-              Optional<V1EnvFromSource> configMapSrc = c.getEnvFrom().stream()
-                  .filter(from -> from.getConfigMapRef() != null).findFirst();
-              Optional<V1EnvFromSource> secretSrc = c.getEnvFrom().stream()
-                  .filter(from -> from.getSecretRef() != null).findFirst();
+              if (c.getEnvFrom() != null) {
+                Optional<V1EnvFromSource> configMapSrc = c.getEnvFrom().stream()
+                    .filter(from -> from.getConfigMapRef() != null).findFirst();
+                Optional<V1EnvFromSource> secretSrc = c.getEnvFrom().stream()
+                    .filter(from -> from.getSecretRef() != null).findFirst();
 
-              configMapSrc.ifPresent(v1EnvFromSource -> cont.setConfigMapRef(
-                  v1EnvFromSource.getConfigMapRef().getName()));
-              secretSrc.ifPresent(v1EnvFromSource -> cont.setSecretRef(
-                  v1EnvFromSource.getSecretRef().getName()));
-            }
+                configMapSrc.ifPresent(v1EnvFromSource -> {
+                  if (v1EnvFromSource.getConfigMapRef() != null) {
+                    cont.setConfigMapRef(v1EnvFromSource.getConfigMapRef().getName());
+                  }
+                });
+                secretSrc.ifPresent(v1EnvFromSource -> {
+                  if (v1EnvFromSource.getSecretRef() != null) {
+                    cont.setSecretRef(v1EnvFromSource.getSecretRef().getName());
+                  }
+                });
+              }
 
-            return cont;
-          }).collect(toList());
+              return cont;
+            }).collect(Collectors.toList());
+          }
 
           List<DeploymentVolume> deploymentVolumes = new ArrayList<>();
 
