@@ -30,7 +30,6 @@ import io.kubernetes.client.openapi.models.V1VolumeMount;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.k8sui.CoreApiSupplier;
 import org.k8sui.model.Container;
@@ -47,16 +46,29 @@ public class DeploymentService {
 
   private final AppsV1Api appsV1Api = CoreApiSupplier.app();
 
+  /**
+   * List Deployments
+   *
+   * @param namespace Name Space
+   * @return Deployment List
+   * @throws ApiException API Exception
+   */
   public List<Deployment> listDeployments(String namespace) throws ApiException {
     var deploymentList = appsV1Api.listNamespacedDeployment(namespace).execute();
 
     return deploymentList.getItems().stream()
         .map(d -> {
-          Deployment deployment = new Deployment();
+          var deployment = new Deployment();
 
           if (d.getMetadata() != null) {
             deployment = new Deployment(d.getMetadata().getUid(), d.getMetadata().getName(),
                 d.getMetadata().getNamespace());
+          }
+
+          if (d.getSpec() != null) {
+            if (d.getSpec().getStrategy() != null) {
+              deployment.setStrategy(d.getSpec().getStrategy().getType());
+            }
           }
 
           var status = d.getStatus();
@@ -121,21 +133,18 @@ public class DeploymentService {
               }
 
               if (c.getEnvFrom() != null) {
-                Optional<V1EnvFromSource> configMapSrc = c.getEnvFrom().stream()
-                    .filter(from -> from.getConfigMapRef() != null).findFirst();
-                Optional<V1EnvFromSource> secretSrc = c.getEnvFrom().stream()
-                    .filter(from -> from.getSecretRef() != null).findFirst();
+                List<String> configMapRefs = new ArrayList<>();
+                List<String> secretRefs = new ArrayList<>();
 
-                configMapSrc.ifPresent(v1EnvFromSource -> {
-                  if (v1EnvFromSource.getConfigMapRef() != null) {
-                    cont.setConfigMapRef(v1EnvFromSource.getConfigMapRef().getName());
-                  }
-                });
-                secretSrc.ifPresent(v1EnvFromSource -> {
-                  if (v1EnvFromSource.getSecretRef() != null) {
-                    cont.setSecretRef(v1EnvFromSource.getSecretRef().getName());
-                  }
-                });
+                configMapRefs = c.getEnvFrom().stream()
+                    .filter(from -> from.getConfigMapRef() != null)
+                    .map(from -> from.getConfigMapRef().getName()).toList();
+                cont.setConfigMapRefs(configMapRefs);
+
+                secretRefs = c.getEnvFrom().stream()
+                    .filter(from -> from.getSecretRef() != null)
+                    .map(from -> from.getSecretRef().getName()).toList();
+                cont.setSecretRefs(secretRefs);
               }
 
               return cont;
@@ -166,6 +175,12 @@ public class DeploymentService {
         }).collect(toList());
   }
 
+  /**
+   * Add Deployment
+   *
+   * @param deployment Deployment
+   * @throws ApiException API Exception
+   */
   public void addDeployment(Deployment deployment) throws ApiException {
     // Create a deployment
     V1Deployment v1Deployment = new V1Deployment();
@@ -197,15 +212,15 @@ public class DeploymentService {
 
       final List<V1EnvFromSource> envFromSources = new ArrayList<>();
 
-      if (c.getConfigMapRef() != null && !c.getConfigMapRef().isEmpty()) {
+      for (String ref : c.getConfigMapRefs()) {
         var envFromSource = new V1EnvFromSource();
-        envFromSource.setConfigMapRef(new V1ConfigMapEnvSource().name(c.getConfigMapRef()));
+        envFromSource.setConfigMapRef(new V1ConfigMapEnvSource().name(ref));
         envFromSources.add(envFromSource);
       }
 
-      if (c.getSecretRef() != null && !c.getSecretRef().isEmpty()) {
+      for (String ref : c.getSecretRefs()) {
         var envFromSource = new V1EnvFromSource();
-        envFromSource.setSecretRef(new V1SecretEnvSource().name(c.getSecretRef()));
+        envFromSource.setSecretRef(new V1SecretEnvSource().name(ref));
         envFromSources.add(envFromSource);
       }
 

@@ -20,7 +20,7 @@ import org.k8sui.ui.BaseTableModel;
 public class ContainerModel extends BaseTableModel {
 
   private static final String[] headers = {"Name", "Image", "Image Pull Policy", "ConfigMapRef",
-      "SecretRef", "Volumes", "Ports"};
+      "SecretRef", "Env", "Volumes", "Ports"};
   private List<Container> containers;
 
   /**
@@ -52,21 +52,23 @@ public class ContainerModel extends BaseTableModel {
     } else if (col == 2) {
       return containers.get(row).getImagePullPolicy();
     } else if (col == 3) {
-      return containers.get(row).getConfigMapRef();
+      return containers.get(row).getConfigMapRefs().toString();
     } else if (col == 4) {
-      return containers.get(row).getSecretRef();
+      return containers.get(row).getSecretRefs().toString();
     } else if (col == 5) {
+      return containers.get(row).getVariables().toString();
+    } else if (col == 6) {
       if (containers.get(row).getVolumeMounts() == null) {
         return "";
       } else {
         return containers.get(row).getVolumeMounts().toString();
       }
-    }
-
-    if (containers.get(row).getPorts() != null) {
-      return containers.get(row).getPorts().toString();
     } else {
-      return "";
+      if (containers.get(row).getPorts() != null) {
+        return containers.get(row).getPorts().toString();
+      } else {
+        return "";
+      }
     }
   }
 }

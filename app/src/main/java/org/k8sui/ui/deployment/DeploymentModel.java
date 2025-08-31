@@ -19,11 +19,13 @@ import org.k8sui.ui.BaseTableModel;
  */
 public class DeploymentModel extends BaseTableModel {
 
-  private static final String[] headers = {"UID", "Name", "Namespace", "Replicas", "Volumes", "Selector"};
+  private static final String[] headers = {"UID", "Name", "Namespace", "Strategy", "Replicas",
+      "Volumes", "Selector"};
   private List<Deployment> deployments;
 
   /**
    * Constructor
+   *
    * @param deploymentList Deployment List
    */
   public DeploymentModel(List<Deployment> deploymentList) {
@@ -54,9 +56,11 @@ public class DeploymentModel extends BaseTableModel {
     } else if (col == 2) {
       return deployments.get(row).getNamespace();
     } else if (col == 3) {
+      return deployments.get(row).getStrategy();
+    } else if (col == 4) {
       var replicaStatus = deployments.get(row).getReadyReplicas().toString();
       return replicaStatus + "/" + deployments.get(row).getReplicas();
-    } else if (col == 4) {
+    } else if (col == 5) {
       return deployments.get(row).getVolumes().toString();
     } else {
       return deployments.get(row).getSelectors() == null ? ""

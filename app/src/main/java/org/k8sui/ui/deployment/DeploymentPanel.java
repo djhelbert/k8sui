@@ -96,12 +96,24 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
     // Table setup
     table = new JTable(model);
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    table.getColumnModel().getColumn(3).setMaxWidth(80);
-    table.getColumnModel().getColumn(3).setPreferredWidth(80);
+    table.getColumnModel().getColumn(1).setMaxWidth(110);
+    table.getColumnModel().getColumn(1).setPreferredWidth(110);
+    table.getColumnModel().getColumn(2).setMaxWidth(110);
+    table.getColumnModel().getColumn(2).setPreferredWidth(110);
+    table.getColumnModel().getColumn(3).setMaxWidth(90);
+    table.getColumnModel().getColumn(3).setPreferredWidth(90);
+    table.getColumnModel().getColumn(4).setMaxWidth(80);
+    table.getColumnModel().getColumn(4).setPreferredWidth(80);
     table.getSelectionModel().addListSelectionListener(this);
 
     var containerTable = new JTable(containerModel);
     containerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    containerTable.getColumnModel().getColumn(0).setMaxWidth(110);
+    containerTable.getColumnModel().getColumn(0).setPreferredWidth(110);
+    containerTable.getColumnModel().getColumn(2).setMaxWidth(110);
+    containerTable.getColumnModel().getColumn(2).setPreferredWidth(110);
+    containerTable.getColumnModel().getColumn(7).setMaxWidth(100);
+    containerTable.getColumnModel().getColumn(7).setPreferredWidth(100);
     var scrollPane = new JScrollPane(containerTable);
     scrollPane.setBorder(
         BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Containers"));
@@ -193,8 +205,13 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
       gridPanel.add(pvcList);
 
       var mountPathField = new JTextField("/data");
+      mountPathField.setEnabled(false);
       gridPanel.add(new JLabel("Mount Path:"));
       gridPanel.add(mountPathField);
+
+      pvcRadio.addChangeListener((evt) -> {
+        mountPathField.setEnabled(pvcRadio.isSelected());
+      });
 
       dialog.add(gridPanel, BorderLayout.CENTER);
 
@@ -231,10 +248,10 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
           newDeployment.setContainers(List.of(container));
 
           if(secretRadio.isSelected() && secretList.getSelectedItem() != null) {
-            container.setSecretRef(secretList.getSelectedItem().toString());
+            container.setSecretRefs(List.of(secretList.getSelectedItem().toString()));
           }
           if(configMapRadio.isSelected() && configMapList.getSelectedItem() != null) {
-            container.setConfigMapRef(configMapList.getSelectedItem().toString());
+            container.setConfigMapRefs(List.of(configMapList.getSelectedItem().toString()));
           }
           if(pvcRadio.isSelected() && pvcList.getSelectedItem() != null) {
             container.setVolumeMounts(List.of(new VolumeMount("volume", mountPathField.getText())));
