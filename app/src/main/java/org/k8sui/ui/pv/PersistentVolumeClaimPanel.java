@@ -90,8 +90,11 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
     // Table setup
     pvcTable = new JTable(pvcModel);
     pvcTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    Util.tableColumnSize(pvcTable, 1, 110);
+    Util.tableColumnSize(pvcTable, 2, 110);
     Util.tableColumnSize(pvcTable, 3, 100);
-    Util.tableColumnSize(pvcTable, 5, 90);
+    Util.tableColumnSize(pvcTable, 4, 160);
+    Util.tableColumnSize(pvcTable, 5, 80);
     pvcTable.getSelectionModel().addListSelectionListener(this);
     pvcTable.setDefaultRenderer(String.class, new BoundTableCellRenderer());
 

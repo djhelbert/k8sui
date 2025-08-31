@@ -104,9 +104,9 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
 
     var containerTable = new JTable(containerModel);
     containerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    Util.tableColumnSize(containerTable, 0, 110);
-    Util.tableColumnSize(containerTable, 2, 110);
-    Util.tableColumnSize(containerTable, 7, 100);
+    Util.tableColumnSize(containerTable, 2, 120);
+    Util.tableColumnSize(containerTable, 3, 100);
+    Util.tableColumnSize(containerTable, 4, 100);
     var scrollPane = new JScrollPane(containerTable);
     scrollPane.setBorder(
         BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Containers"));

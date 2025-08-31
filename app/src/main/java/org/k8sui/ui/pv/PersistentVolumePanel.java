@@ -84,6 +84,7 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
     // Table setup
     pvTable = new JTable(pvModel);
     pvTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    Util.tableColumnSize(pvTable, 2, 110);
     Util.tableColumnSize(pvTable, 3, 100);
     Util.tableColumnSize(pvTable, 5, 120);
     Util.tableColumnSize(pvTable, 6, 90);
