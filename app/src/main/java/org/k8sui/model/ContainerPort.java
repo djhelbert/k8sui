@@ -21,7 +21,6 @@ public class ContainerPort implements Comparable<ContainerPort> {
 
   private Integer containerPort;
 
-
   @Override
   public String toString() {
     return containerPort.toString();

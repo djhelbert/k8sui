@@ -37,6 +37,7 @@ import org.k8sui.model.Container;
 import org.k8sui.model.ContainerPort;
 import org.k8sui.model.Deployment;
 import org.k8sui.model.DeploymentVolume;
+import org.k8sui.model.EnvVar;
 import org.k8sui.model.VolumeMount;
 
 /**
@@ -88,8 +89,8 @@ public class DeploymentService {
 
               List<VolumeMount> volumeMounts = new ArrayList<>();
 
-              if(c.getVolumeMounts() != null) {
-                for(V1VolumeMount vm : c.getVolumeMounts()) {
+              if (c.getVolumeMounts() != null) {
+                for (V1VolumeMount vm : c.getVolumeMounts()) {
                   volumeMounts.add(new VolumeMount(vm.getName(), vm.getMountPath()));
                 }
               }
@@ -98,7 +99,25 @@ public class DeploymentService {
 
               if (c.getPorts() != null) {
                 cont.setPorts(
-                    c.getPorts().stream().map(p -> new ContainerPort(p.getContainerPort())).toList());
+                    c.getPorts().stream().map(p -> new ContainerPort(p.getContainerPort()))
+                        .toList());
+              }
+
+              if (c.getEnv() != null) {
+                var envList = c.getEnv().stream().map(e -> {
+                  String from = null;
+
+                  if (e.getValueFrom() != null) {
+                    if (e.getValueFrom().getConfigMapKeyRef() != null) {
+                      from = e.getValueFrom().getConfigMapKeyRef().getName();
+                    } else if (e.getValueFrom().getSecretKeyRef() != null) {
+                      from = e.getValueFrom().getSecretKeyRef().getName();
+                    }
+                  }
+
+                  return new EnvVar(from, e.getName(), e.getValue());
+                }).toList();
+                cont.setVariables(envList);
               }
 
               if (c.getEnvFrom() != null) {

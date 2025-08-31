@@ -15,6 +15,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Service Port
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

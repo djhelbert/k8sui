@@ -15,6 +15,9 @@ import lombok.Data;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Deployment
+ */
 @Data
 @ToString
 public class Deployment implements Comparable<Deployment> {

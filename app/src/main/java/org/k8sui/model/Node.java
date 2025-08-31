@@ -15,6 +15,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Node
+ */
 @Data
 @NoArgsConstructor
 @ToString

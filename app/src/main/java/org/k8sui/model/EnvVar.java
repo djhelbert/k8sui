@@ -5,17 +5,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Volume Mount
+ * Environment Variable
  */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class VolumeMount {
+@NoArgsConstructor
+public class EnvVar {
+  private String from;
   private String name;
-  private String mountPath;
+  private String value;
 
   @Override
   public String toString() {
-    return name + ":" + mountPath;
+    return (from == null ? "" : from + ":") + name + (value == null ? "" : ":" + value);
   }
 }

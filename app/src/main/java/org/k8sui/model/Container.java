@@ -27,6 +27,7 @@ public class Container implements Comparable<Container> {
   private String secretRef;
   private List<VolumeMount> volumeMounts;
   private List<ContainerPort> ports;
+  private List<EnvVar> variables;
 
   @Override
   public int compareTo(@NotNull Container container) {

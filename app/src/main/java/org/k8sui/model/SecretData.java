@@ -14,6 +14,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Secret Kay Value Pair
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -18,6 +18,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Persistent Volume Claim
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

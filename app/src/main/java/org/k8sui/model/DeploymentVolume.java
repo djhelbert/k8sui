@@ -13,6 +13,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Deployment Volume Claim
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

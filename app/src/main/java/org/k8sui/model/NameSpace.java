@@ -15,6 +15,9 @@ import lombok.Data;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Name Space
+ */
 @Data
 @ToString
 public class NameSpace implements Comparable<NameSpace> {
@@ -26,6 +29,13 @@ public class NameSpace implements Comparable<NameSpace> {
   private Map<String, String> labels;
   private Map<String, String> annotations;
 
+  /**
+   * Constructor
+   * @param uid UID
+   * @param namespace Name Space
+   * @param creation Creation Date
+   * @param status Status
+   */
   public NameSpace(String uid, String namespace, OffsetDateTime creation, String status) {
     this.uid = uid;
     this.namespace = namespace;
