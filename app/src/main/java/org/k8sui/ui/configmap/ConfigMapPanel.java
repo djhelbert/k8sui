@@ -48,8 +48,8 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
   private final JButton refreshButton = new JButton("Refresh");
   private final JButton addButton = new JButton("Add");
   private final JButton addDataButton = new JButton("Add Data");
-  private JTable table;
-  private ConfigMapModel model;
+  private JTable configMapTable;
+  private ConfigMapModel configMapModel;
   private final ConfigMapService service = new ConfigMapService();
   private final ConfigMapDataModel dataModel = new ConfigMapDataModel(new ArrayList<>());
   private final JButton deleteButton = new JButton("Delete");
@@ -63,10 +63,10 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
 
   private void init() {
     try {
-      model = new ConfigMapModel(service.configMapList(nameSpaceListPanel.getNamespace()));
+      configMapModel = new ConfigMapModel(service.configMapList(nameSpaceListPanel.getNamespace()));
     } catch (ApiException ex) {
       log.error("ConfigMap Panel", ex);
-      model = new ConfigMapModel(new ArrayList<>());
+      configMapModel = new ConfigMapModel(new ArrayList<>());
     }
 
     // Setup add button
@@ -89,52 +89,51 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
     buttonPanel.add(deleteButton);
     buttonPanel.add(addDataButton);
     // Table setup
-    table = new JTable(model);
-    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    table.getSelectionModel().addListSelectionListener(this);
+    configMapTable = new JTable(configMapModel);
+    configMapTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    configMapTable.getSelectionModel().addListSelectionListener(this);
 
     final JTable dataTable = new JTable(dataModel);
     dataTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    dataTable.getColumnModel().getColumn(0).setMaxWidth(250);
-    dataTable.getColumnModel().getColumn(0).setPreferredWidth(250);
+    Util.tableColumnSize(dataTable, 0, 250);
     var scrollPane = new JScrollPane(dataTable);
     scrollPane.setBorder(
         BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Data"));
 
     setLayout(new BorderLayout());
     add(buttonPanel, BorderLayout.NORTH);
-    add(new JScrollPane(table), BorderLayout.CENTER);
+    add(new JScrollPane(configMapTable), BorderLayout.CENTER);
     add(scrollPane, BorderLayout.SOUTH);
   }
 
   @Override
   public void update() {
-    table.clearSelection();
+    configMapTable.clearSelection();
 
     try {
-      model.setMaps(service.configMapList(nameSpaceListPanel.getNamespace()));
+      configMapModel.setMaps(service.configMapList(nameSpaceListPanel.getNamespace()));
     } catch (ApiException ex) {
       Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
     }
 
-    model.fireTableDataChanged();
+    configMapModel.fireTableDataChanged();
   }
 
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource().equals(refreshButton)) {
       try {
-        model.setMaps(service.configMapList(nameSpaceListPanel.getNamespace()));
-        model.fireTableDataChanged();
+        configMapModel.setMaps(service.configMapList(nameSpaceListPanel.getNamespace()));
+        configMapModel.fireTableDataChanged();
       } catch (ApiException ex) {
         Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
       }
     } else if (e.getSource().equals(deleteButton)) {
-      int row = table.getSelectedRow();
+      int row = configMapTable.getSelectedRow();
 
       if (row != -1) {
         try {
-          service.deleteConfigMap(model.getConfigMap(row).getName(),
+          service.deleteConfigMap(configMapModel.getConfigMap(row).getName(),
               nameSpaceListPanel.getNamespace());
         } catch (ApiException ex) {
           log.error("ConfigMap Panel", ex);
@@ -167,8 +166,8 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
         }
 
         try {
-          int row = table.getSelectedRow();
-          service.addData(model.getConfigMap(row).getName(), nameSpaceListPanel.getNamespace(),
+          int row = configMapTable.getSelectedRow();
+          service.addData(configMapModel.getConfigMap(row).getName(), nameSpaceListPanel.getNamespace(),
               keyField.getText(), valueField.getText());
           dataModel.addData(new ConfigMapData(keyField.getText(), valueField.getText()));
           dataModel.fireTableDataChanged();
@@ -257,10 +256,10 @@ public class ConfigMapPanel extends JPanel implements ActionListener, ListSelect
 
   @Override
   public void valueChanged(ListSelectionEvent e) {
-    int row = table.getSelectedRow();
+    int row = configMapTable.getSelectedRow();
 
     if (row != -1) {
-      dataModel.setData(model.getConfigMap(row).getData());
+      dataModel.setData(configMapModel.getConfigMap(row).getData());
       dataModel.fireTableDataChanged();
       deleteButton.setEnabled(true);
       addDataButton.setEnabled(true);

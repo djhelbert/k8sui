@@ -48,8 +48,8 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
   private final JButton refreshButton = new JButton("Refresh");
   private final JButton addButton = new JButton("Add");
   private final JButton addDataButton = new JButton("Add Data");
-  private JTable table;
-  private SecretModel model;
+  private JTable secretTable;
+  private SecretModel secretModel;
   private final SecretService service = new SecretService();
   private final SecretDataModel dataModel = new SecretDataModel(new ArrayList<>());
   private final JButton deleteButton = new JButton("Delete");
@@ -63,10 +63,10 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
 
   private void init() {
     try {
-      model = new SecretModel(service.secretList(nameSpaceListPanel.getNamespace()));
+      secretModel = new SecretModel(service.secretList(nameSpaceListPanel.getNamespace()));
     } catch (ApiException err) {
       log.error("Secret Panel", err);
-      model = new SecretModel(new ArrayList<>());
+      secretModel = new SecretModel(new ArrayList<>());
     }
 
     // Setup add button
@@ -89,54 +89,55 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
     buttonPanel.add(deleteButton);
     buttonPanel.add(addDataButton);
     // Table setup
-    table = new JTable(model);
-    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    table.getSelectionModel().addListSelectionListener(this);
+    secretTable = new JTable(secretModel);
+    secretTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    secretTable.getSelectionModel().addListSelectionListener(this);
 
-    final JTable dataTable = new JTable(dataModel);
+    var dataTable = new JTable(dataModel);
     dataTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    dataTable.getColumnModel().getColumn(0).setMaxWidth(250);
-    dataTable.getColumnModel().getColumn(0).setPreferredWidth(250);
+    Util.tableColumnSize(dataTable, 0, 250);
+
     var scrollPane = new JScrollPane(dataTable);
     scrollPane.setBorder(
         BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Data"));
 
     setLayout(new BorderLayout());
     add(buttonPanel, BorderLayout.NORTH);
-    add(new JScrollPane(table), BorderLayout.CENTER);
+    add(new JScrollPane(secretTable), BorderLayout.CENTER);
     add(scrollPane, BorderLayout.SOUTH);
   }
 
   @Override
   public void update() {
-    table.clearSelection();
+    secretTable.clearSelection();
 
     try {
-      model.setSecrets(service.secretList(nameSpaceListPanel.getNamespace()));
+      secretModel.setSecrets(service.secretList(nameSpaceListPanel.getNamespace()));
     } catch (ApiException ex) {
       log.error("Secret Panel", ex);
       Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
     }
 
-    model.fireTableDataChanged();
+    secretModel.fireTableDataChanged();
   }
 
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource().equals(refreshButton)) {
       try {
-        model.setSecrets(service.secretList(nameSpaceListPanel.getNamespace()));
-        model.fireTableDataChanged();
+        secretModel.setSecrets(service.secretList(nameSpaceListPanel.getNamespace()));
+        secretModel.fireTableDataChanged();
       } catch (ApiException ex) {
         log.error("Secret Panel", ex);
         Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
       }
     } else if (e.getSource().equals(deleteButton)) {
-      int row = table.getSelectedRow();
+      int row = secretTable.getSelectedRow();
 
       if (row != -1) {
         try {
-          service.deleteSecret(model.getSecret(row).getName(), nameSpaceListPanel.getNamespace());
+          service.deleteSecret(secretModel.getSecret(row).getName(),
+              nameSpaceListPanel.getNamespace());
         } catch (ApiException ex) {
           log.error("Secret Panel", ex);
           Util.showError(this, Util.getValue(ex.getResponseBody(), "reason"), "Error");
@@ -168,8 +169,8 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
         }
 
         try {
-          int row = table.getSelectedRow();
-          service.addSecret(model.getSecret(row).getName(), nameSpaceListPanel.getNamespace(),
+          int row = secretTable.getSelectedRow();
+          service.addSecret(secretModel.getSecret(row).getName(), nameSpaceListPanel.getNamespace(),
               keyField.getText(), base64Encode(valueField.getText()));
           dataModel.addData(new SecretData(keyField.getText(), base64Encode(valueField.getText())));
           dataModel.fireTableDataChanged();
@@ -259,10 +260,10 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
 
   @Override
   public void valueChanged(ListSelectionEvent e) {
-    int row = table.getSelectedRow();
+    int row = secretTable.getSelectedRow();
 
     if (row != -1) {
-      dataModel.setData(model.getSecret(row).getData());
+      dataModel.setData(secretModel.getSecret(row).getData());
       dataModel.fireTableDataChanged();
       deleteButton.setEnabled(true);
       addDataButton.setEnabled(true);
@@ -276,6 +277,7 @@ public class SecretPanel extends JPanel implements ActionListener, ListSelection
 
   /**
    * Base64 Encoder
+   *
    * @param text String
    * @return Byte Array
    */

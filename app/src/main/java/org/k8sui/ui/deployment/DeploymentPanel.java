@@ -57,8 +57,8 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
   private final JButton refreshButton = new JButton("Refresh");
   private final JButton addButton = new JButton("Add");
   private final JButton deleteButton = new JButton("Delete");
-  private JTable table;
-  private DeploymentModel model;
+  private JTable deploymentTable;
+  private DeploymentModel deploymentModel;
   private final ContainerModel containerModel = new ContainerModel(new ArrayList<>());
   private final DeploymentService service = new DeploymentService();
   private final ConfigMapService configMapService = new ConfigMapService();
@@ -74,7 +74,7 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
 
   private void init() {
     try {
-      model = new DeploymentModel(service.listDeployments(nameSpaceListPanel.getNamespace()));
+      deploymentModel = new DeploymentModel(service.listDeployments(nameSpaceListPanel.getNamespace()));
     } catch (ApiException err) {
       log.error("Node Panel", err);
     }
@@ -94,47 +94,40 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
     buttonPanel.add(addButton);
     buttonPanel.add(deleteButton);
     // Table setup
-    table = new JTable(model);
-    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    table.getColumnModel().getColumn(1).setMaxWidth(110);
-    table.getColumnModel().getColumn(1).setPreferredWidth(110);
-    table.getColumnModel().getColumn(2).setMaxWidth(110);
-    table.getColumnModel().getColumn(2).setPreferredWidth(110);
-    table.getColumnModel().getColumn(3).setMaxWidth(90);
-    table.getColumnModel().getColumn(3).setPreferredWidth(90);
-    table.getColumnModel().getColumn(4).setMaxWidth(80);
-    table.getColumnModel().getColumn(4).setPreferredWidth(80);
-    table.getSelectionModel().addListSelectionListener(this);
+    deploymentTable = new JTable(deploymentModel);
+    deploymentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    Util.tableColumnSize(deploymentTable, 1, 110);
+    Util.tableColumnSize(deploymentTable, 2, 110);
+    Util.tableColumnSize(deploymentTable, 3, 90);
+    Util.tableColumnSize(deploymentTable, 4, 80);
+    deploymentTable.getSelectionModel().addListSelectionListener(this);
 
     var containerTable = new JTable(containerModel);
     containerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    containerTable.getColumnModel().getColumn(0).setMaxWidth(110);
-    containerTable.getColumnModel().getColumn(0).setPreferredWidth(110);
-    containerTable.getColumnModel().getColumn(2).setMaxWidth(110);
-    containerTable.getColumnModel().getColumn(2).setPreferredWidth(110);
-    containerTable.getColumnModel().getColumn(7).setMaxWidth(100);
-    containerTable.getColumnModel().getColumn(7).setPreferredWidth(100);
+    Util.tableColumnSize(containerTable, 0, 110);
+    Util.tableColumnSize(containerTable, 2, 110);
+    Util.tableColumnSize(containerTable, 7, 100);
     var scrollPane = new JScrollPane(containerTable);
     scrollPane.setBorder(
         BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Containers"));
 
     setLayout(new BorderLayout());
     add(buttonPanel, BorderLayout.NORTH);
-    add(new JScrollPane(table), BorderLayout.CENTER);
+    add(new JScrollPane(deploymentTable), BorderLayout.CENTER);
     add(scrollPane, BorderLayout.SOUTH);
   }
 
   @Override
   public void update() {
-    table.clearSelection();
+    deploymentTable.clearSelection();
 
     try {
-      model.setDeployments(service.listDeployments(nameSpaceListPanel.getNamespace()));
+      deploymentModel.setDeployments(service.listDeployments(nameSpaceListPanel.getNamespace()));
     } catch (ApiException err) {
       log.error("Deployment Panel", err);
     }
 
-    model.fireTableDataChanged();
+    deploymentModel.fireTableDataChanged();
   }
 
   @Override
@@ -143,9 +136,11 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
       update();
     }
     if (e.getSource().equals(deleteButton)) {
-      int row = table.getSelectedRow();
+      int row = deploymentTable.getSelectedRow();
+
       if (row != -1) {
-        Deployment dp = model.getDeployment(row);
+        Deployment dp = deploymentModel.getDeployment(row);
+
         try {
           service.deleteDeployment(dp.getNamespace(), dp.getName());
         } catch (ApiException ex) {
@@ -216,9 +211,9 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
       dialog.add(gridPanel, BorderLayout.CENTER);
 
       // Create OK and Cancel buttons
-      JPanel buttonPanel = new JPanel(new FlowLayout());
-      JButton okButton = new JButton("OK");
-      JButton cancelButton = new JButton("Cancel");
+      var buttonPanel = new JPanel(new FlowLayout());
+      var okButton = new JButton("OK");
+      var cancelButton = new JButton("Cancel");
       buttonPanel.add(okButton);
       buttonPanel.add(cancelButton);
       dialog.add(buttonPanel, BorderLayout.SOUTH);
@@ -280,10 +275,10 @@ public class DeploymentPanel extends JPanel implements ActionListener, ListSelec
 
   @Override
   public void valueChanged(ListSelectionEvent e) {
-    int row = table.getSelectedRow();
+    int row = deploymentTable.getSelectedRow();
 
     if (row != -1) {
-      containerModel.setContainers(model.getDeployment(row).getContainers());
+      containerModel.setContainers(deploymentModel.getDeployment(row).getContainers());
       containerModel.fireTableDataChanged();
     } else {
       containerModel.setContainers(new ArrayList<>());

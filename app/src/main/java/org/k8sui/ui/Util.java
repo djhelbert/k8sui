@@ -22,6 +22,7 @@ import java.util.Objects;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import org.json.JSONObject;
 
 /**
@@ -57,9 +58,9 @@ public class Util {
   /**
    * Show Error Dialog
    *
-   * @param c Component
+   * @param c       Component
    * @param message Error Message String
-   * @param title Dialog Title
+   * @param title   Dialog Title
    */
   public static void showError(Component c, String message, String title) {
     final JLabel label = new JLabel(message);
@@ -69,9 +70,9 @@ public class Util {
   /**
    * Show Info Dialog
    *
-   * @param c Component
+   * @param c       Component
    * @param message Message String
-   * @param title Dialog Title
+   * @param title   Dialog Title
    */
   public static void showInfo(Component c, String message, String title) {
     final JLabel label = new JLabel(message);
@@ -81,8 +82,8 @@ public class Util {
   /**
    * Show Plain Dialog
    *
-   * @param c Component
-   * @param m Component
+   * @param c     Component
+   * @param m     Component
    * @param title Dialog Title
    */
   public static void showInfo(Component c, Component m, String title) {
@@ -162,6 +163,24 @@ public class Util {
     return true;
   }
 
+  /**
+   * Table Column Size
+   *
+   * @param table       Table
+   * @param columnIndex Column Index
+   * @param maxWidth    Maximum Width
+   */
+  public static void tableColumnSize(JTable table, int columnIndex, int maxWidth) {
+    table.getColumnModel().getColumn(columnIndex).setMaxWidth(maxWidth);
+    table.getColumnModel().getColumn(columnIndex).setPreferredWidth(maxWidth);
+  }
+
+  /**
+   * Is Valid Quantity
+   *
+   * @param qty Quantity String eg. 1Gi
+   * @return boolean
+   */
   public static boolean isQuantity(String qty) {
     try {
       var q = new Quantity(qty);

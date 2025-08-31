@@ -81,13 +81,11 @@ public class NameSpacePanel extends JPanel implements ActionListener, ListSelect
     // Table setup
     namespaceTable = new JTable(nameSpaceModel);
     namespaceTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    namespaceTable.getColumnModel().getColumn(3).setMaxWidth(80);
-    namespaceTable.getColumnModel().getColumn(3).setPreferredWidth(80);
+    Util.tableColumnSize(namespaceTable, 3, 80);
     namespaceTable.setDefaultRenderer(String.class, new StatusTableCellRenderer());
     namespaceTable.getSelectionModel().addListSelectionListener(this);
 
     var southPanel = new JPanel(new GridLayout(1, 2));
-
     var labelTable = new JTable(labelTableModel);
     labelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     var labelScrollPane = new JScrollPane(labelTable);

@@ -95,20 +95,16 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
     // Table setup
     serviceTable = new JTable(serviceModel);
     serviceTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    serviceTable.getColumnModel().getColumn(1).setMaxWidth(120);
-    serviceTable.getColumnModel().getColumn(1).setPreferredWidth(120);
-    serviceTable.getColumnModel().getColumn(2).setMaxWidth(110);
-    serviceTable.getColumnModel().getColumn(2).setPreferredWidth(110);
-    serviceTable.getColumnModel().getColumn(3).setMaxWidth(90);
-    serviceTable.getColumnModel().getColumn(3).setPreferredWidth(90);
-    serviceTable.getColumnModel().getColumn(4).setMaxWidth(110);
-    serviceTable.getColumnModel().getColumn(4).setPreferredWidth(110);
+    Util.tableColumnSize(serviceTable, 1, 120);
+    Util.tableColumnSize(serviceTable, 2, 110);
+    Util.tableColumnSize(serviceTable, 3, 90);
+    Util.tableColumnSize(serviceTable, 4, 110);
     serviceTable.getSelectionModel().addListSelectionListener(this);
 
     var southPanel = new JPanel(new GridLayout(1, 2));
 
     // Setup service port table
-    JTable servicePortTable = new JTable(servicePortModel);
+    var servicePortTable = new JTable(servicePortModel);
     servicePortTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     var servicePortScrollPane = new JScrollPane(servicePortTable);
     servicePortScrollPane.setBorder(
@@ -201,11 +197,11 @@ public class ServicePanel extends JPanel implements ActionListener, ListSelectio
       gridPanel.add(new JLabel("Node Port:"));
       gridPanel.add(nodePortField);
 
-      JTextField labelKeyField = new JTextField(20);
+      var labelKeyField = new JTextField(20);
       gridPanel.add(new JLabel("Label Key:"));
       gridPanel.add(labelKeyField);
 
-      JTextField labelValueField = new JTextField(20);
+      var labelValueField = new JTextField(20);
       gridPanel.add(new JLabel("Label Value:"));
       gridPanel.add(labelValueField);
 

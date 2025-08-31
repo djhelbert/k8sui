@@ -34,7 +34,7 @@ public class NodePanel extends JPanel implements ActionListener, ListSelectionLi
 
   private final JPanel buttonPanel = new JPanel();
   private final JButton refreshButton = new JButton("Refresh");
-  private JTable table;
+  private JTable nodeTable;
   private NodeModel nodeModel;
   private final NodeService service = new NodeService();
   private final MapTableModel mapTableModel = new MapTableModel();
@@ -59,17 +59,14 @@ public class NodePanel extends JPanel implements ActionListener, ListSelectionLi
     buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
     buttonPanel.add(refreshButton);
     //  Setup tables
-    table = new JTable(nodeModel);
-    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    table.getColumnModel().getColumn(3).setMaxWidth(50);
-    table.getColumnModel().getColumn(4).setMaxWidth(110);
-    table.getColumnModel().getColumn(5).setMaxWidth(110);
-    table.getColumnModel().getColumn(3).setPreferredWidth(50);
-    table.getColumnModel().getColumn(4).setPreferredWidth(110);
-    table.getColumnModel().getColumn(5).setPreferredWidth(110);
-    table.getSelectionModel().addListSelectionListener(this);
+    nodeTable = new JTable(nodeModel);
+    nodeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    Util.tableColumnSize(nodeTable, 3, 50);
+    Util.tableColumnSize(nodeTable, 4, 110);
+    Util.tableColumnSize(nodeTable, 5, 110);
+    nodeTable.getSelectionModel().addListSelectionListener(this);
 
-    JTable labelTable = new JTable(mapTableModel);
+    var labelTable = new JTable(mapTableModel);
     labelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     var scrollPane = new JScrollPane(labelTable);
     scrollPane.setBorder(
@@ -77,7 +74,7 @@ public class NodePanel extends JPanel implements ActionListener, ListSelectionLi
 
     setLayout(new BorderLayout());
     add(buttonPanel, BorderLayout.NORTH);
-    add(new JScrollPane(table), BorderLayout.CENTER);
+    add(new JScrollPane(nodeTable), BorderLayout.CENTER);
     add(scrollPane, BorderLayout.SOUTH);
   }
 
@@ -95,7 +92,7 @@ public class NodePanel extends JPanel implements ActionListener, ListSelectionLi
 
   @Override
   public void valueChanged(ListSelectionEvent e) {
-    int row = table.getSelectedRow();
+    int row = nodeTable.getSelectedRow();
 
     if (row != -1) {
       mapTableModel.setList(nodeModel.getNode(row).getLabels());

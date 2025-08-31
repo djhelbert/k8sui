@@ -90,15 +90,12 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
     // Table setup
     pvcTable = new JTable(pvcModel);
     pvcTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    pvcTable.getColumnModel().getColumn(3).setMaxWidth(110);
-    pvcTable.getColumnModel().getColumn(3).setPreferredWidth(110);
-    pvcTable.getColumnModel().getColumn(5).setMaxWidth(90);
-    pvcTable.getColumnModel().getColumn(5).setPreferredWidth(90);
+    Util.tableColumnSize(pvcTable, 3, 100);
+    Util.tableColumnSize(pvcTable, 5, 90);
     pvcTable.getSelectionModel().addListSelectionListener(this);
     pvcTable.setDefaultRenderer(String.class, new BoundTableCellRenderer());
 
     var southPanel = new JPanel(new GridLayout(1, 2));
-
     var labelTable = new JTable(labelTableModel);
     labelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     var labelScrollPane = new JScrollPane(labelTable);
@@ -156,10 +153,10 @@ public class PersistentVolumeClaimPanel extends JPanel implements ActionListener
     }
     if (e.getSource().equals(addButton)) {
       // Create the dialog
-      JDialog dialog = new JDialog(App.frame(), "Add Persistent Volume Claim", true);
+      var dialog = new JDialog(App.frame(), "Add Persistent Volume Claim", true);
       dialog.setLayout(new BorderLayout(5, 5));
 
-      JPanel gridPanel = new JPanel(new GridLayout(7, 2, 5, 5));
+      var gridPanel = new JPanel(new GridLayout(7, 2, 5, 5));
 
       // Create text field
       JTextField nameField = new JTextField(10);

@@ -84,12 +84,9 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
     // Table setup
     pvTable = new JTable(pvModel);
     pvTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    pvTable.getColumnModel().getColumn(3).setMaxWidth(100);
-    pvTable.getColumnModel().getColumn(3).setPreferredWidth(1000);
-    pvTable.getColumnModel().getColumn(5).setMaxWidth(120);
-    pvTable.getColumnModel().getColumn(5).setPreferredWidth(120);
-    pvTable.getColumnModel().getColumn(6).setMaxWidth(90);
-    pvTable.getColumnModel().getColumn(6).setPreferredWidth(90);
+    Util.tableColumnSize(pvTable, 3, 100);
+    Util.tableColumnSize(pvTable, 5, 120);
+    Util.tableColumnSize(pvTable, 6, 90);
     pvTable.getSelectionModel().addListSelectionListener(this);
     pvTable.setDefaultRenderer(String.class, new BoundTableCellRenderer());
 
@@ -151,10 +148,10 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
     }
     if (e.getSource().equals(addButton)) {
       // Create the dialog
-      JDialog dialog = new JDialog(App.frame(), "Add Persistent Volume", true);
+      var dialog = new JDialog(App.frame(), "Add Persistent Volume", true);
       dialog.setLayout(new BorderLayout(5, 5));
 
-      JPanel gridPanel = new JPanel(new GridLayout(8, 2, 5, 5));
+      var gridPanel = new JPanel(new GridLayout(8, 2, 5, 5));
 
       // Create text field
       JTextField nameField = new JTextField(10);
@@ -196,9 +193,9 @@ public class PersistentVolumePanel extends JPanel implements ActionListener, Lis
       dialog.add(gridPanel, BorderLayout.CENTER);
 
       // Create OK and Cancel buttons
-      JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-      JButton okButton = new JButton("OK");
-      JButton cancelButton = new JButton("Cancel");
+      var buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+      var okButton = new JButton("OK");
+      var cancelButton = new JButton("Cancel");
       buttonPanel.add(okButton);
       buttonPanel.add(cancelButton);
       dialog.add(buttonPanel, BorderLayout.SOUTH);
