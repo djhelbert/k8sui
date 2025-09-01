@@ -1,5 +1,15 @@
 # k8sui
-Kubernetes UI
+Java Swing Kubernetes UI
+
+## Manage Kubernetes
+* Name Spaces
+* Persistent Volumes
+* Persistent Volume Claims
+* ConfigMaps
+* Secrets
+* Deployments
+* Services
+* Pods
 
 ## Requirements
 JDK 21
