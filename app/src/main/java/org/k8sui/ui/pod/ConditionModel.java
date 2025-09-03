@@ -51,10 +51,8 @@ public class ConditionModel extends BaseTableModel {
     } else if (col == 1) {
       return conditions.get(row).getStatus();
     } else if (col == 2) {
-      return conditions.get(row).getStatus();
-    } else if (col == 3) {
       return conditions.get(row).getUpdated().toString();
-    } else if (col == 4) {
+    } else if (col == 3) {
       return conditions.get(row).getReason();
     } else {
       return conditions.get(row).getMessage();

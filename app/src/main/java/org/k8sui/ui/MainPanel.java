@@ -18,6 +18,7 @@ import org.k8sui.ui.configmap.ConfigMapPanel;
 import org.k8sui.ui.deployment.DeploymentPanel;
 import org.k8sui.ui.namespace.NameSpacePanel;
 import org.k8sui.ui.node.NodePanel;
+import org.k8sui.ui.pod.PodPanel;
 import org.k8sui.ui.pv.PersistentVolumeClaimPanel;
 import org.k8sui.ui.pv.PersistentVolumePanel;
 import org.k8sui.ui.secret.SecretPanel;
@@ -46,12 +47,14 @@ public class MainPanel extends JPanel {
     var deploymentPanel = new DeploymentPanel();
     var persistentVolumePanel = new PersistentVolumePanel();
     var persistentVolumeClaimPanel = new PersistentVolumeClaimPanel();
+    var podPanel = new PodPanel();
 
     nameSpacePanel.addNameSpaceObserver(configMapPanel.getNameSpaceListPanel());
     nameSpacePanel.addNameSpaceObserver(secretsPanel.getNameSpaceListPanel());
     nameSpacePanel.addNameSpaceObserver(servicePanel.getNameSpaceListPanel());
     nameSpacePanel.addNameSpaceObserver(deploymentPanel.getNameSpaceListPanel());
     nameSpacePanel.addNameSpaceObserver(persistentVolumeClaimPanel.getNameSpaceListPanel());
+    nameSpacePanel.addNameSpaceObserver(podPanel.getNameSpaceListPanel());
 
     tabbedPane.addTab("Nodes", nodePanel);
     tabbedPane.addTab("Namespaces", nameSpacePanel);
@@ -61,6 +64,7 @@ public class MainPanel extends JPanel {
     tabbedPane.addTab("Secrets", secretsPanel);
     tabbedPane.addTab("Deployments", deploymentPanel);
     tabbedPane.addTab("Services", servicePanel);
+    tabbedPane.addTab("Pods", podPanel);
 
     add(tabbedPane, BorderLayout.CENTER);
   }

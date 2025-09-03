@@ -76,6 +76,7 @@ public class PodService {
               var pc = new PodContainer();
               pc.setImage(c.getImage());
               pc.setName(c.getName());
+              pc.setStatus("");
 
               if (c.getEnv() != null) {
                 List<EnvVar> vars = c.getEnv().stream()
