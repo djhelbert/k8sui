@@ -9,7 +9,6 @@
  */
 package org.k8sui.model;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,8 +28,8 @@ public class PodContainer implements Comparable<PodContainer> {
   private String name;
   private String image;
   private String status;
-  private List<EnvVar> variables;
   private List<String> mounts;
+  private List<EnvVar> variables;
 
   @Override
   public int compareTo(@NotNull PodContainer container) {
