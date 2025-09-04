@@ -19,7 +19,7 @@ import org.k8sui.ui.BaseTableModel;
  */
 public class PodModel extends BaseTableModel {
 
-  static final String[] headers = {"UID", "Name", "Namespace", "Status", "IP", "Creation"};
+  static final String[] headers = {"UID", "Name", "Namespace", "Status", "IP", "Node", "Creation"};
   private List<Pod> pods;
 
   /**
@@ -63,6 +63,8 @@ public class PodModel extends BaseTableModel {
       return pods.get(row).getStatus();
     } else if (col == 4) {
       return pods.get(row).getIp();
+    } else if (col == 5) {
+      return pods.get(row).getNode();
     } else {
       return pods.get(row).getCreation().toString();
     }

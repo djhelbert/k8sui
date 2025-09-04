@@ -32,6 +32,7 @@ public class Pod implements Comparable<Pod> {
   private OffsetDateTime creation;
   private String name;
   private String namespace;
+  private String node;
   private String status;
   private Integer restarts;
   private List<Condition> conditions;

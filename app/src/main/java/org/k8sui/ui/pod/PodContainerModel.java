@@ -19,7 +19,7 @@ import org.k8sui.ui.BaseTableModel;
  */
 public class PodContainerModel extends BaseTableModel {
 
-  private static final String[] headers = {"Name", "Image", "Status", "Mounts", "Variables"};
+  private static final String[] headers = {"Name", "Image", "Liveness", "Readiness", "Mounts", "Variables"};
   private List<PodContainer> containers;
 
   /**
@@ -54,8 +54,10 @@ public class PodContainerModel extends BaseTableModel {
     } else if (col == 1) {
       return containers.get(row).getImage();
     } else if (col == 2) {
-      return containers.get(row).getStatus();
+      return containers.get(row).getLiveness();
     } else if (col == 3) {
+      return containers.get(row).getReadiness();
+    } else if (col == 4) {
       if (containers.get(row).getMounts() == null) {
         return "";
       } else {

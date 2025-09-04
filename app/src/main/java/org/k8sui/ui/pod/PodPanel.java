@@ -75,9 +75,13 @@ public class PodPanel extends JPanel implements ActionListener, ListSelectionLis
     podTable.setDefaultRenderer(String.class, new RunningTableCellRenderer());
     Util.tableColumnSize(podTable, 3, 80);
     Util.tableColumnSize(podTable, 4, 100);
+    Util.tableColumnSize(podTable, 5, 110);
     podTable.getSelectionModel().addListSelectionListener(this);
 
-    var southPanel = new JPanel(new GridLayout(1, 2));
+    var centerPanel = new JPanel(new GridLayout(2, 1));
+    centerPanel.add(new JScrollPane(podTable));
+
+    var podPanel = new JPanel(new GridLayout(2, 1));
 
     // Setup pod containers table
     var podContainerTable = new JTable(podContainerModel);
@@ -88,18 +92,20 @@ public class PodPanel extends JPanel implements ActionListener, ListSelectionLis
 
     var conditionTable = new JTable(conditionModel);
     conditionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    Util.tableColumnSize(conditionTable, 1, 80);
+    Util.tableColumnSize(conditionTable, 0, 180);
+    Util.tableColumnSize(conditionTable, 1, 70);
+    Util.tableColumnSize(conditionTable, 2, 180);
     var conditionScrollPane = new JScrollPane(conditionTable);
     conditionScrollPane.setBorder(
         BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Conditions"));
 
-    southPanel.add(podContainerScrollPane);
-    southPanel.add(conditionScrollPane);
+    podPanel.add(podContainerScrollPane);
+    podPanel.add(conditionScrollPane);
+    centerPanel.add(podPanel);
 
     setLayout(new BorderLayout());
     add(buttonPanel, BorderLayout.NORTH);
-    add(new JScrollPane(podTable), BorderLayout.CENTER);
-    add(southPanel, BorderLayout.SOUTH);
+    add(centerPanel, BorderLayout.CENTER);
   }
 
   @Override

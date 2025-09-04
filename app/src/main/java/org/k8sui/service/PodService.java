@@ -72,11 +72,31 @@ public class PodService {
           }
 
           if (vp.getSpec() != null) {
+            pod.setNode(vp.getSpec().getNodeName());
+          }
+
+          if (vp.getSpec() != null) {
             List<PodContainer> containers = vp.getSpec().getContainers().stream().map(c -> {
               var pc = new PodContainer();
               pc.setImage(c.getImage());
               pc.setName(c.getName());
-              pc.setStatus("");
+
+              if (c.getLivenessProbe() != null) {
+                if(c.getLivenessProbe().getHttpGet() != null) {
+                  pc.setLiveness(c.getLivenessProbe().getHttpGet().getPath());
+                }
+                if(c.getLivenessProbe().getExec() != null) {
+                  pc.setLiveness(c.getLivenessProbe().getExec().getCommand().toString());
+                }
+              }
+              if (c.getReadinessProbe() != null) {
+                if(c.getReadinessProbe().getHttpGet() != null) {
+                  pc.setReadiness(c.getReadinessProbe().getHttpGet().getPath());
+                }
+                if(c.getReadinessProbe().getExec() != null) {
+                  pc.setReadiness(c.getReadinessProbe().getExec().getCommand().toString());
+                }
+              }
 
               if (c.getEnv() != null) {
                 List<EnvVar> vars = c.getEnv().stream()
